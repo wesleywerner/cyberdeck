@@ -1,0 +1,25 @@
+# hacking
+
+This guide to hacking on the code for this project will hopefully be helpful to contributors and myself.
+
+The first phase of this project is to re-implement the data structures and game logic, there will be no graphical parts to these, but there will be unit tests for checking data integrity and game logic.
+
+### software.lua, hardware.lua, chips.lua
+
+This handles the in-game software, hardware and chips you can plug/load into your deck. It also calculates the price for these items, and get their display text.
+
+  software = require("software")
+
+software.types lists all the types of software available, along with the complexity of each, and a list of predefined names.
+
+To create a new instance call `software("type", rating)`
+
+# Tests
+
+Unit tests are implemented with the included luaunit module. To run all tests:
+
+  lua test-all.lua -v
+
+To run your test file stand-alone:
+
+  lua yourTests.lua
