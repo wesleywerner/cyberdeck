@@ -14,7 +14,7 @@ software.types lists all the types of software available, along with the complex
 
 To create a new instance call `software("type", rating)`
 
-# Tests
+# tests
 
 Unit tests are implemented with the included luaunit module. To run all tests:
 
@@ -23,3 +23,12 @@ Unit tests are implemented with the included luaunit module. To run all tests:
 To run your test file stand-alone:
 
   lua yourTests.lua
+
+# port notes
+
+* The original game source can be found on [sourceforge](https://sourceforge.net/projects/decker/files/decker/Decker%201.12/). The `Help/Decker.rtf` file is particulary helpful.
+
+* These ICE abilities were not implemented:
+  * hardened, phasing
+  * trace and dump
+  * trace and fry
