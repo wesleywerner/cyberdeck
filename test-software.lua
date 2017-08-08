@@ -60,6 +60,13 @@ function TestSoftware:testLoadTimeWithHardware()
   luaunit.assertEquals( sw:getLoadTime(testNode, testHardware), 2.25)
 end
 
+function TestSoftware:testConstructorValidation()
+  local func = function()
+    software("Unreal Item", 1)
+  end
+  luaunit.assertError(func)
+end
+
 -- allow stand-alone test
 if not IS_TESTING_ALL then
   os.exit( luaunit.LuaUnit.run() )

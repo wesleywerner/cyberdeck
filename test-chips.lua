@@ -37,6 +37,13 @@ function TestChips:testText()
   luaunit.assertEquals(chip:getText(), "Coprocessor L3")
 end
 
+function TestChips:testConstructorValidation()
+  local func = function()
+    chips("Unreal item", 3)
+  end
+  luaunit.assertError(func)
+end
+
 -- allow stand-alone test
 if not IS_TESTING_ALL then
   os.exit( luaunit.LuaUnit.run() )

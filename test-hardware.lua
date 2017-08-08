@@ -57,6 +57,13 @@ function TestHardware:testPriceBioMonitorL4()
   luaunit.assertEquals(hw:getPrice(), 4000)
 end
 
+function TestHardware:testConstructorValidation()
+  local func = function()
+    hardware("Unreal item", 1)
+  end
+  luaunit.assertError(func)
+end
+
 -- allow stand-alone test
 if not IS_TESTING_ALL then
   os.exit( luaunit.LuaUnit.run() )
