@@ -15,6 +15,41 @@
 
 Hardware = {}
 
+--[[ Constructor
+  the __call metamethod allows us to call the table like a function,
+  this becomes a constructor for creating new instances.
+  ]]
+setmetatable( Hardware, {
+  __call = function( cls, typeName, rating)
+
+    -- new instance
+    local instance = {}
+    
+    --[[
+      the __index metatable redirects function-calls on any instances to
+      this base table (ie inheritance), and
+      "cls" refers to the current table
+      ]]
+    setmetatable( instance, { __index=cls } )
+    
+    -- validate the given values
+    if not cls.types[typeName] then
+      error (string.format("%q is not a valid hardware type.", typeName))
+    end
+    
+    if not rating or rating < 1 then
+      error (string.format("%q is not a valid rating for hardware.", rating or "nil" ))
+    end
+    
+    -- assign the given values
+    instance.typeName = typeName
+    instance.rating = rating
+    
+    return instance
+  
+  end
+})
+
 -- TODO possibly move to global.lua
 Hardware.categories = {
   "software",
@@ -71,41 +106,6 @@ Hardware.types = {
     baseCost = 1500,
   },
 }
-
---[[ Constructor
-  the __call metamethod allows us to call the table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
-setmetatable( Hardware, {
-  __call = function( cls, typeName, rating)
-
-    -- new instance
-    local instance = {}
-    
-    --[[
-      the __index metatable redirects function-calls on any instances to
-      this base table (ie inheritance), and
-      "cls" refers to the current table
-      ]]
-    setmetatable( instance, { __index=cls } )
-    
-    -- validate the given values
-    if not cls.types[typeName] then
-      error (string.format("%q is not a valid hardware type.", typeName))
-    end
-    
-    if not rating or rating < 1 then
-      error (string.format("%q is not a valid rating for hardware.", rating or "nil" ))
-    end
-    
-    -- assign the given values
-    instance.typeName = typeName
-    instance.rating = rating
-    
-    return instance
-  
-  end
-})
 
 function Hardware:getType()
   local def = self.types[self.typeName]

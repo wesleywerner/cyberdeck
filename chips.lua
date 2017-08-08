@@ -16,27 +16,6 @@
 
 Chips = {}
 
-Chips.types = {
-  ["CPU"] = {
-    baseCost = 150,
-  },
-  ["Attack Firmware"] = {
-    baseCost = 100,
-  },
-  ["Defense Firmware"] = {
-    baseCost = 100,
-  },
-  ["Stealth Firmware"] = {
-    baseCost = 100,
-  },
-  ["Analysis Firmware"] = {
-    baseCost = 100,
-  },
-  ["Coprocessor"] = {
-    baseCost = 125,
-  },
-}
-
 --[[ Constructor
   the __call metamethod allows us to call the table like a function,
   this becomes a constructor for creating new instances.
@@ -71,6 +50,27 @@ setmetatable( Chips, {
   
   end
 })
+
+Chips.types = {
+  ["CPU"] = {
+    baseCost = 150,
+  },
+  ["Attack Firmware"] = {
+    baseCost = 100,
+  },
+  ["Defense Firmware"] = {
+    baseCost = 100,
+  },
+  ["Stealth Firmware"] = {
+    baseCost = 100,
+  },
+  ["Analysis Firmware"] = {
+    baseCost = 100,
+  },
+  ["Coprocessor"] = {
+    baseCost = 125,
+  },
+}
 
 function Chips:getType()
   local def = self.types[self.typeName]

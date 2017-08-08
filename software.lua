@@ -28,6 +28,41 @@
 
 Software = {}
 
+--[[ Constructor
+  the __call metamethod allows us to call the Software table like a function,
+  this becomes a constructor for creating new instances.
+  ]]
+setmetatable( Software, {
+  __call = function( cls, typeName, rating, autoLoad)
+
+    -- new instance
+    local instance = {}
+    
+    --[[
+      the __index metatable redirects function-calls on any instances to
+      this base table (ie inheritance), and
+      "cls" refers to the current table
+      ]]
+    setmetatable( instance, { __index=cls } )
+    
+    -- validate the given values
+    if not cls.types[typeName] then
+      error (string.format("%q is not a valid software class.", typeName))
+    end
+    
+    if not rating or rating < 1 then
+      error (string.format("%q is not a valid rating for software.", rating or "nil" ))
+    end
+    
+    -- assign the given values
+    instance.class = typeName
+    instance.rating = math.floor(rating)
+    
+    return instance
+  
+  end
+} )
+
 --[[ Definitions for the different software types.
   complexity: affects the software price and memory usage (among other things).
   names: list of predefined software names, indexed to correlate to the software rating.
@@ -678,41 +713,6 @@ Software.types = {
   },
 
 }
-
---[[ Constructor
-  the __call metamethod allows us to call the Software table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
-setmetatable( Software, {
-  __call = function( cls, typeName, rating, autoLoad)
-
-    -- new instance
-    local instance = {}
-    
-    --[[
-      the __index metatable redirects function-calls on any instances to
-      this base table (ie inheritance), and
-      "cls" refers to the current table
-      ]]
-    setmetatable( instance, { __index=cls } )
-    
-    -- validate the given values
-    if not cls.types[typeName] then
-      error (string.format("%q is not a valid software class.", typeName))
-    end
-    
-    if not rating or rating < 1 then
-      error (string.format("%q is not a valid rating for software.", rating or "nil" ))
-    end
-    
-    -- assign the given values
-    instance.class = typeName
-    instance.rating = math.floor(rating)
-    
-    return instance
-  
-  end
-} )
 
 --[[ Gets the definition for the class underlying this software ]]
 function Software:getType()
