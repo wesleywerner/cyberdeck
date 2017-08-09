@@ -14,8 +14,9 @@
 ]]--
 
 IS_TESTING_ALL = true
-luaunit = require('luaunit')
-require('test-software')
-require('test-hardware')
-require('test-chips')
+luaunit = require("luaunit")
+require("test-software")
+require("test-hardware")
+require("test-chips")
+require("test-ice")
 os.exit( luaunit.LuaUnit.run() )
