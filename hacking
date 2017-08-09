@@ -28,7 +28,18 @@ To run your test file stand-alone:
 
 * The original game source can be found on [sourceforge](https://sourceforge.net/projects/decker/files/decker/Decker%201.12/). The `Help/Decker.rtf` file is particulary helpful.
 
-* These ICE abilities were not implemented:
-  * hardened, phasing
+* These ICE types were never implemented:
+  * AST_CRASH
+
+* These ICE abilities were never implemented:
+  * hardened
+  * phasing
   * trace and dump
   * trace and fry
+  * killer
+  * trace dump
+  * trace burn
+
+# variations from the original
+
+* ICE names vary if they are of the hareded, phasing, crashing or lethal sub-types, these are implemented. The orignal game additionally had names lists for the combinations of lethal+hardened, lethal+phasing and lethal+crash sub-types. This is no longer the case. These combinations now simply use the one "lethal" list of names.
