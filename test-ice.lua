@@ -87,6 +87,14 @@ function TestICE:testText()
   luaunit.assertEquals(ice:getName(), "Sentry")
 end
 
+function TestICE:testNotes()
+  local ice = ICE("Attack", 2)
+  ice.analyzed = true
+  ice.dumper = true
+  ice.fryer = true
+  luaunit.assertEquals(ice:getNotes(), "Attacks intruders. Can dump your deck from the matrix. Can fry one of your hardware chips.")
+end
+
 -- allow stand-alone test
 if not IS_TESTING_ALL then
   os.exit( luaunit.LuaUnit.run() )

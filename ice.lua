@@ -466,8 +466,33 @@ function Ice:getPrice()
 end
 
 function Ice:getNotes()
-  -- for the notes see Ice.cpp CIce::GetNotes
-  -- notice how it only gives detailed notes after the Ice is analyzed
+  local def = self:getType()
+  if not self.analyzed then
+    -- give the ICE type note
+    return def.note
+  else
+    -- add extra notes for the behaviour flags
+    local extraNotes = {}
+    if self.hardened then
+      table.insert(extraNotes, "Resistant to non-piercing attacks.")
+    end
+    if self.phasing then
+      table.insert(extraNotes, "Resistant to non-area attacks.")
+    end
+    if self.crasher then
+      table.insert(extraNotes, "Attacks can crash your programs.")
+    end
+    if self.lethal then
+      table.insert(extraNotes, "Attacks can cause you mental damage.")
+    end
+    if self.dumper then
+      table.insert(extraNotes, "Can dump your deck from the matrix.")
+    end
+    if self.fryer then
+      table.insert(extraNotes, "Can fry one of your hardware chips.")
+    end
+    return def.note .. " " .. table.concat(extraNotes, " ")
+  end
 end
 
 function Ice:getText()
