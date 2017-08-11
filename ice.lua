@@ -15,8 +15,56 @@
 
 --[[ ICE
 
-    Intrusion Countermeasure Elements
-  ]]
+  Intrusion Countermeasure Elements
+
+  TODO 
+  ICE STATES - implemented from Ice.h
+  
+  inactive (STATE_INACTIVE)
+    Black ice which is not active
+  
+  guarding (STATE_GUARDING)
+    Attack and trace ICE that are *not* bypassed will query the player autonomously.
+    Other ICE only query if they are accessed.
+  
+  following (STATE_FOLLOWING)
+    Follows the player to adjacent nodes, unless the current node is smoked.
+    If in the same node as the player, it will query the player.
+    If the query was bypassed, it goes into a searching state and wanders.
+  
+  moving (STATE_MOVING)
+    Going to a target node. (Black only)
+  
+  searching (STATE_SEARCHING)
+    Searching for intruders (Black/Probe)
+  
+  destroying* (STATE_DESTROYING)
+    Destroying a datafile - tapeworm only
+  
+  queried 1, queried 2, queried 3 (STATE_QUERIED1/2/3)
+    Queried player, waiting for response
+  
+  attacking (STATE_ATTACKING)
+    Black ice attacking/chasing the player
+  
+  return home (STATE_MOVING_H)
+    White ice returning to home node
+       
+ * possibly no need for this as a state?  
+]]
+
+--[[ List of conditions when the player can be queried:
+     always assume the ICE and the player are in the same node
+     & indicates only if the ICE is not bypassed
+     ^ indicates only if the ICE noticed the player - tests the player hide program vs the ICE
+  
+    state is following
+    state is moving and ICE is attack, probe or trace &^
+    state is searching with notice &^
+    state is queried1/2/3 &
+    state is guarding and (ICE is attack or trace &^) or (ICE was accessed)
+]]
+
 
 Ice = {}
 
@@ -76,7 +124,12 @@ setmetatable( Ice, {
     instance.lastMoveDirection = nil
     -- track list of flags
     instance.flags = {}
-    
+    -- see the list of ICE state at the top of this file
+    instance.state = nil
+    --  try signal a red alert
+    instance.hostile = nil
+    -- actively wanders about searching for the player. also navigates to the player on alerts.
+    instance.response = nil
     
     return instance
   
@@ -232,6 +285,7 @@ Ice.types = {
       "phasing",    -- Resistant to non-area attacks
       "crash",      -- Can crash your programs on succesful hits
       "lethal",     -- sends power surges through your cyberdeck directly into your brain to cause mental damage
+      "response",   -- actively wanders about searching for the player. also navigates to the player on alerts.
     },
     flagNamesOverride = {
       ["hardened"] = {
@@ -326,6 +380,7 @@ Ice.types = {
     allowedFlags = {
       "dump",       -- dump the decker
       "fry",        -- attempt to fry a chip
+      "response",   -- actively wanders about searching for the player. also navigates to the player on alerts.
     },
     flagNamesOverride = {
       ["dump"] = {
