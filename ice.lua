@@ -111,7 +111,7 @@ setmetatable( Ice, {
     -- was this ICE bypassed by the player
     instance.bypassed = nil
     -- was this ICE accessed by the player
-    instance.acccessed = nil
+    instance.accessed = nil
     -- home node of this ICE
     instance.homeNode = nil
     -- current location
@@ -122,14 +122,29 @@ setmetatable( Ice, {
     instance.targetNode = nil
     -- last direction moved
     instance.lastMoveDirection = nil
-    -- track list of flags
-    instance.flags = {}
     -- see the list of ICE state at the top of this file
     instance.state = nil
     --  try signal a red alert
     instance.hostile = nil
     -- actively wanders about searching for the player. also navigates to the player on alerts.
     instance.response = nil
+
+    -- BEHAVIOUR FLAGS
+    -- Resistant to non-piercing attacks
+    instance.hardened = false
+    -- Resistant to non-area attacks
+    instance.phasing = false
+    -- Can crash your programs on succesful hits
+    instance.crasher = false
+    -- sends power surges through your cyberdeck directly into your brain to cause mental damage
+    instance.lethal = false
+    -- destroys a file when it dies
+    instance.dataBomb = false
+    -- dump the decker out of the matrix
+    instance.dumper = false
+    -- attempt to fry a random one of the player's chips on successful dump
+    instance.fryer = false
+    
     
     return instance
   
@@ -238,23 +253,6 @@ Ice.types = {
       "Tapeworm Mk5",
       "StrangleVine II",
     },
-    allowedFlags = {
-      "data bomb",  -- Will attack on self destruct
-    },
-    flagNamesOverride = {
-      ["data bomb"] = {
-        "Data Bomb",
-        "Dynamyte 1.0",
-        "Trap",
-        "Data Bomb Mk2",
-        "Dynamyte 2.0",
-        "Trap II",
-        "Dynamyte 2.1",
-        "Data Bomb Mk3",
-        "Trap III",
-        "Da Bomb",
-      },
-    }
   },
   ["Attack"] = {
     note = "Attacks intruders.",
@@ -280,78 +278,6 @@ Ice.types = {
       "Centurion IV",
       "Green Beret",
     },
-    allowedFlags = {
-      "hardened",   -- Resistant to non-piercing attacks
-      "phasing",    -- Resistant to non-area attacks
-      "crash",      -- Can crash your programs on succesful hits
-      "lethal",     -- sends power surges through your cyberdeck directly into your brain to cause mental damage
-      "response",   -- actively wanders about searching for the player. also navigates to the player on alerts.
-    },
-    flagNamesOverride = {
-      ["hardened"] = {
-        "Attack-H",
-        "Knight",
-        "Tank",
-        "Turtle",
-        "Attack-H Mk2",
-        "Knight II",
-        "Terrapin",
-        "Sherman",
-        "Attack-H Mk3",
-        "Knight III",
-        "Tortoise",
-        "Attack-H Mk4",
-        "Dragon Turtle",
-        "Knight IV",
-        "Bradley",
-      },
-      ["phasing"] = {
-        "Attack-P",
-        "Bugs",
-        "Spook",
-        "Neophyte",
-        "Attack-P Mk2",
-        "Bees",
-        "Ghost",
-        "Disciple",
-        "Shade",
-        "Wasps",
-        "Attack-P Mk3",
-        "Monk",
-        "Phantom",
-        "Hornets",
-        "Quai Chang Kain",
-      },
-      ["crash"] = {
-        "Attack-C",
-        "Spider",
-        "Scorpion",
-        "Rattler",
-        "Attack-C Mk2",
-        "Copperhead",
-        "Scorpion 2.0",
-        "Attack-C Mk3",
-        "Spider II",
-        "Scorpion 2.3",
-        "Cottonmouth",
-        "Spider III",
-        "Attack-C Mk4",
-        "Scorpion 3.0",
-        "Black Widow",
-      },
-      ["lethal"] = {
-        "Attack-L",
-        "Cowboy",
-        "Attack-L Mk2",
-        "Wrangler",
-        "Executioner",
-        "Sheriff",
-        "Attack-L Mk3",
-        "Executioner II",
-        "Marshal",
-        "Highlander",
-      },
-    }
   },
   ["Trace"] = {
     note = "Attempts to trace an intruder's signal in the system.",
@@ -377,45 +303,117 @@ Ice.types = {
       "Trace Mk5",
       "Hound of the Baskervilles",
     },
-    allowedFlags = {
-      "dump",       -- dump the decker
-      "fry",        -- attempt to fry a chip
-      "response",   -- actively wanders about searching for the player. also navigates to the player on alerts.
-    },
-    flagNamesOverride = {
-      ["dump"] = {
-        "Trace & Dump",
-        "Detective",
-        "Ranger",
-        "Investigator",
-        "Trace & Dump Mk2",
-        "Detective 2.2",
-        "Ranger II",
-        "Investigator",
-        "Trace & Dump Mk3",
-        "Detective 3.1",
-        "Ranger III",
-        "Investigator",
-        "Trace & Dump Mk4",
-        "Detective 4.0",
-        "Ranger IV",
-      },
-      ["fry"] = {
-        "Trace & Fry",
-        "Mindworm",
-        "Zapp",
-        "Trace & Fry Mk2",
-        "Mindworm 2.0",
-        "SuperZapp",
-        "Mindworm 3.1",
-        "Trace & Fry Mk3",
-        "Mindworm 4.0",
-        "MegaZapp",
-      },
-    },
   },
-
 }
+
+-- names applied for specific ICE flags
+Ice.alternateNames = {
+  ["hardened"] = {
+    "Attack-H",
+    "Knight",
+    "Tank",
+    "Turtle",
+    "Attack-H Mk2",
+    "Knight II",
+    "Terrapin",
+    "Sherman",
+    "Attack-H Mk3",
+    "Knight III",
+    "Tortoise",
+    "Attack-H Mk4",
+    "Dragon Turtle",
+    "Knight IV",
+    "Bradley",
+  },
+  ["phasing"] = {
+    "Attack-P",
+    "Bugs",
+    "Spook",
+    "Neophyte",
+    "Attack-P Mk2",
+    "Bees",
+    "Ghost",
+    "Disciple",
+    "Shade",
+    "Wasps",
+    "Attack-P Mk3",
+    "Monk",
+    "Phantom",
+    "Hornets",
+    "Quai Chang Kain",
+  },
+  ["crasher"] = {
+    "Attack-C",
+    "Spider",
+    "Scorpion",
+    "Rattler",
+    "Attack-C Mk2",
+    "Copperhead",
+    "Scorpion 2.0",
+    "Attack-C Mk3",
+    "Spider II",
+    "Scorpion 2.3",
+    "Cottonmouth",
+    "Spider III",
+    "Attack-C Mk4",
+    "Scorpion 3.0",
+    "Black Widow",
+  },
+  ["lethal"] = {
+    "Attack-L",
+    "Cowboy",
+    "Attack-L Mk2",
+    "Wrangler",
+    "Executioner",
+    "Sheriff",
+    "Attack-L Mk3",
+    "Executioner II",
+    "Marshal",
+    "Highlander",
+  },
+  ["data bomb"] = {
+    "Data Bomb",
+    "Dynamyte 1.0",
+    "Trap",
+    "Data Bomb Mk2",
+    "Dynamyte 2.0",
+    "Trap II",
+    "Dynamyte 2.1",
+    "Data Bomb Mk3",
+    "Trap III",
+    "Da Bomb",
+  },
+  ["dump"] = {
+    "Trace & Dump",
+    "Detective",
+    "Ranger",
+    "Investigator",
+    "Trace & Dump Mk2",
+    "Detective 2.2",
+    "Ranger II",
+    "Investigator",
+    "Trace & Dump Mk3",
+    "Detective 3.1",
+    "Ranger III",
+    "Investigator",
+    "Trace & Dump Mk4",
+    "Detective 4.0",
+    "Ranger IV",
+  },
+  ["fry"] = {
+    "Trace & Fry",
+    "Mindworm",
+    "Zapp",
+    "Trace & Fry Mk2",
+    "Mindworm 2.0",
+    "SuperZapp",
+    "Mindworm 3.1",
+    "Trace & Fry Mk3",
+    "Mindworm 4.0",
+    "MegaZapp",
+  },
+}
+
 
 function Ice:getType()
   local def = self.types[self.typeName]
@@ -426,27 +424,35 @@ function Ice:getType()
 end
 
 function Ice:getName()
-  local def = self:getType()
-  
-  -- if the ICE flags have name overrides
-  if def.allowedFlags then
-    for flagIdx,flagKey in ipairs(self.flags) do
-      local flagNameList = def.flagNamesOverride[flagKey]
-      if flagNameList then
-        if self.rating < #flagNameList then
-          return flagNameList[self.rating]
-        else
-          return flagNameList[#flagNameList]
-        end
-      end
-    end
+  local nameList = nil
+  if self.hardened then
+    nameList = self.alternateNames["hardened"]
+  elseif self.phasing then
+    nameList = self.alternateNames["phasing"]
+  elseif self.crasher then
+    nameList = self.alternateNames["crasher"]
+  elseif self.lethal then
+    nameList = self.alternateNames["lethal"]
+  elseif self.dataBomb then
+    nameList = self.alternateNames["data bomb"]
+  elseif self.dumper then
+    nameList = self.alternateNames["dumper"]
+  elseif self.fryer then
+    nameList = self.alternateNames["fryer"]
+  else
+    local def = self:getType()
+    nameList = def.names
   end
   
-  -- get the name related to rating, limited to names list size
-  if self.rating < #def.names then
-    return def.names[self.rating]
+  if not nameList then
+    error(string.format("%q has no namelist", self.typeName))
+  end
+  
+  -- get the name related to rating, clamped to list size
+  if self.rating < #nameList then
+    return nameList[self.rating]
   else
-    return def.names[#def.names]
+    return nameList[#nameList]
   end
 end
 
@@ -466,23 +472,6 @@ end
 
 function Ice:getText()
   return string.format("%s (%s %d)", self:getName(), self.typeName, self.rating)
-end
-
-function Ice:hasFlag(flagName)
-  local def = self:getType()
-  for k,v in pairs(def.allowedFlags) do
-    if v==flagName then return true end
-  end
-  return false
-end
-
-function Ice:setFlag(flagName)
-  if not self:hasFlag(flagName) then
-    error(string.format("%q is not a valid flag for %q", flagName, self.typeName))
-  end
-  if not self.flags[flagName] then
-    table.insert(self.flags, flagName)
-  end
 end
 
 return Ice

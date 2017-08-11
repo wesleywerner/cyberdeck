@@ -43,3 +43,5 @@ To run your test file stand-alone:
 # variations from the original
 
 * ICE names vary if they are of the hareded, phasing, crashing or lethal sub-types, these are implemented. The orignal game additionally had names lists for the combinations of lethal+hardened, lethal+phasing and lethal+crash sub-types. This is no longer the case. These combinations now simply use the one "lethal" list of names.
+
+* ICE behaviour flags "crash", "dump" and "fry" have changed to "crasher", "dumper" and "fryer".
