@@ -48,32 +48,27 @@ function TestICE:testNameAttack()
 end
 
 function TestICE:testNameForDataBomb()
-  local ice = ICE("Tapeworm", 100)  -- a ridiculous rating
-  ice.dataBomb = true
+  local ice = ICE("Tapeworm", 100, {"databomb"} )  -- a ridiculous rating
   luaunit.assertEquals(ice:getName(), "Da Bomb")
 end
 
 function TestICE:testNameForHardened()
-  local ice = ICE("Attack", 2)
-  ice.hardened = true
+  local ice = ICE("Attack", 2, {"hardened"} )
   luaunit.assertEquals(ice:getName(), "Knight")
 end
 
 function TestICE:testNameForPhasing()
-  local ice = ICE("Attack", 2)
-  ice.phasing = true
+  local ice = ICE("Attack", 2, {"phasing"} )
   luaunit.assertEquals(ice:getName(), "Bugs")
 end
 
 function TestICE:testNameForCrasher()
-  local ice = ICE("Attack", 2)
-  ice.crasher = true
+  local ice = ICE("Attack", 2, {"crasher"} )
   luaunit.assertEquals(ice:getName(), "Spider")
 end
 
 function TestICE:testNameForLethal()
-  local ice = ICE("Attack", 2)
-  ice.lethal = true
+  local ice = ICE("Attack", 2, {"lethal"} )
   luaunit.assertEquals(ice:getName(), "Cowboy")
 end
 

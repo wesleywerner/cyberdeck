@@ -73,7 +73,7 @@ Ice = {}
   this becomes a constructor for creating new instances.
   ]]
 setmetatable( Ice, {
-  __call = function( cls, typeName, rating)
+  __call = function( cls, typeName, rating, flags)
 
     -- new instance
     local instance = {}
@@ -95,6 +95,7 @@ setmetatable( Ice, {
     end
     
     -- assign the given values
+    instance.name = nil
     instance.typeName = typeName
     instance.rating = rating
     instance.health = nil
@@ -139,13 +140,15 @@ setmetatable( Ice, {
     -- sends power surges through your cyberdeck directly into your brain to cause mental damage
     instance.lethal = false
     -- destroys a file when it dies
-    instance.dataBomb = false
+    instance.databomb = false
     -- dump the decker out of the matrix
     instance.dumper = false
     -- attempt to fry a random one of the player's chips on successful dump
     instance.fryer = false
+    -- apply any given flags
+    instance:applyFlags(flags)
     
-    
+    instance.name = instance:getDefaultName()
     return instance
   
   end
@@ -414,16 +417,40 @@ Ice.alternateNames = {
   },
 }
 
+function Ice:applyFlags(flags)
+  local allowedFlags = {
+    ["hardened"] = true,
+    ["phasing"] = true,
+    ["crasher"] = true, 
+    ["lethal"] = true,
+    ["databomb"] = true,
+    ["dumper"] = true,
+    ["fryer"] = true,
+  }
+  if flags then
+    for k,v in pairs(flags) do
+      if not allowedFlags[v] then
+        error(string.format("%q is not a valid ICE flag", v))
+      else
+        self[v] = true
+      end
+    end
+  end
+end
 
 function Ice:getType()
   local def = self.types[self.typeName]
   if not def then
-    error( "No type definition found for %q", self.typeName)
+    error("No type definition found for %q", self.typeName)
   end
   return def
 end
 
 function Ice:getName()
+  return self.name
+end
+
+function Ice:getDefaultName()
   local nameList = nil
   if self.hardened then
     nameList = self.alternateNames["hardened"]
@@ -433,7 +460,7 @@ function Ice:getName()
     nameList = self.alternateNames["crasher"]
   elseif self.lethal then
     nameList = self.alternateNames["lethal"]
-  elseif self.dataBomb then
+  elseif self.databomb then
     nameList = self.alternateNames["data bomb"]
   elseif self.dumper then
     nameList = self.alternateNames["dumper"]
