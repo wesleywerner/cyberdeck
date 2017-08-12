@@ -67,11 +67,11 @@
 
 
 Ice = {}
+Ice.MAX_HEALTH = 20
 
---[[ Constructor
-  the __call metamethod allows us to call the table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
+-- Constructor
+-- the __call metamethod allows us to call the table like a function,
+-- this becomes a constructor for creating new instances.
 setmetatable( Ice, {
   __call = function( cls, typeName, rating, flags)
 
@@ -98,7 +98,7 @@ setmetatable( Ice, {
     instance.name = nil
     instance.typeName = typeName
     instance.rating = rating
-    instance.health = nil
+    instance.health = Ice.MAX_HEALTH
     -- number of turns to slow the ICE - skips every other turn - Affected by slow program
     instance.slowLevel = nil
     -- is confused for this many turns - Affected by confusion program
@@ -107,8 +107,8 @@ setmetatable( Ice, {
     instance.weakenLevel = nil
     -- take damage this many turns - Affected by virus program
     instance.virusLevel = nil
-    -- if this ICE has been analyzed
-    instance.analyzed = nil
+    -- the analyzed level this ICE was subjected against
+    instance.analyzedLevel = 0
     -- was this ICE bypassed by the player
     instance.bypassed = nil
     -- was this ICE accessed by the player
@@ -154,8 +154,8 @@ setmetatable( Ice, {
   end
 })
 
---[[ There are a couple types of ICE, some of them have optional flags
-    to change their behaviour. Some of these flags changes the ICE's name. ]]  
+-- There are a couple types of ICE, some of them have optional flags
+-- to change their behaviour. Some of these flags changes the ICE's name.
 Ice.types = {
   ["Gateway"] = {
     note = "Bars passageway to another node.",
@@ -386,7 +386,7 @@ Ice.alternateNames = {
     "Trap III",
     "Da Bomb",
   },
-  ["dump"] = {
+  ["dumper"] = {
     "Trace & Dump",
     "Detective",
     "Ranger",
@@ -403,7 +403,7 @@ Ice.alternateNames = {
     "Detective 4.0",
     "Ranger IV",
   },
-  ["fry"] = {
+  ["fryer"] = {
     "Trace & Fry",
     "Mindworm",
     "Zapp",
@@ -417,6 +417,7 @@ Ice.alternateNames = {
   },
 }
 
+-- apply the given flags, a table of string values, to the ICE
 function Ice:applyFlags(flags)
   local allowedFlags = {
     ["hardened"] = true,
@@ -462,10 +463,10 @@ function Ice:getDefaultName()
     nameList = self.alternateNames["lethal"]
   elseif self.databomb then
     nameList = self.alternateNames["data bomb"]
-  elseif self.dumper then
-    nameList = self.alternateNames["dumper"]
   elseif self.fryer then
     nameList = self.alternateNames["fryer"]
+  elseif self.dumper then
+    nameList = self.alternateNames["dumper"]
   else
     local def = self:getType()
     nameList = def.names
@@ -483,10 +484,6 @@ function Ice:getDefaultName()
   end
 end
 
-function Ice:getRating()
-  return self.rating
-end
-
 function Ice:getPrice()
   local def = self:getType()
   return 42;
@@ -494,7 +491,7 @@ end
 
 function Ice:getNotes()
   local def = self:getType()
-  if not self.analyzed then
+  if self.analyzedLevel == 0 then
     -- give the ICE type note
     return def.note
   else
@@ -524,6 +521,56 @@ end
 
 function Ice:getText()
   return string.format("%s (%s %d)", self:getName(), self.typeName, self.rating)
+end
+
+-- get the ICE rating, adjusted by factors like health, 
+-- if the ICE was analyzed and any weakened effects.
+-- larger results indicate a favorable outcome for the ICE.
+function Ice:getRating(includeAnalyzedState)
+
+  -- include the analyzed state by default
+  includeAnalyzedState = includeAnalyzedState or true
+  
+  -- use the base rating
+	local nRating = self.rating
+
+	-- adjust for health
+  -- this was called GetConditionModifier() in original source
+	nRating = nRating - ((Ice.MAX_HEALTH - self.health)/4)
+
+	-- adjust for weakened effects
+	if self.weakened then
+    nRating = nRating - 4
+  end
+
+	-- reduce if ICE was analyzed
+	if addAnalyzedLevel then
+    nRating = nRating - self.analyzedLevel
+  end
+
+	--// Modify according to rating type
+	--if (nType == RATING_COMBAT)
+	--{
+		--// White ice has a penalty to combat
+		--if (m_nType <= MAX_WHITE)
+		--{
+			--nRating -= 2;
+		--}
+	--}
+	--else if (nType == RATING_SENSORS)
+	--{
+		--// White ice gets bonus to sensors if alarm set
+		--if (m_nType <= MAX_WHITE)
+		--{
+			--if (g_pChar->m_pSystem->m_nAlert != ALERT_GREEN)
+			--{
+				--nRating += 2;
+			--}
+		--}
+	--}
+
+	return nRating
+
 end
 
 return Ice

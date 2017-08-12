@@ -82,11 +82,15 @@ function TestICE:testText()
   luaunit.assertEquals(ice:getName(), "Sentry")
 end
 
-function TestICE:testNotes()
-  local ice = ICE("Attack", 2)
-  ice.analyzed = true
-  ice.dumper = true
-  ice.fryer = true
+function TestICE:testNotesNotAnalyzed()
+  local ice = ICE("Attack", 2, {"dumper", "fryer"} )
+  ice.analyzed = 2
+  luaunit.assertEquals(ice:getNotes(), "Attacks intruders.")
+end
+
+function TestICE:testNotesAnalyzed()
+  local ice = ICE("Attack", 2, {"dumper", "fryer"} )
+  ice.analyzedLevel = 2
   luaunit.assertEquals(ice:getNotes(), "Attacks intruders. Can dump your deck from the matrix. Can fry one of your hardware chips.")
 end
 
