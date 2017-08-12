@@ -24,6 +24,19 @@ To run your test file stand-alone:
 
   lua yourTests.lua
 
+# questions new players might ask
+
+* a warning should be shown if the player starts a new chip project, and they don't own a chip burner.
+* what is lifestyle and reputation, and how do they affect my game?
+* why do I have so many types of chips (co processor, attack, defense...) in my decker? 
+* when and how is my attack/defend rating modified?
+* how do I heal?
+* how do I turn off a red alert?
+* do ICE come back after I crashed them?
+* will I ever get reported to the police?
+* how do I prevent the sysadmin from shutting down the system in a red alert?
+* what happens if I get traced and how can I stop it?
+
 # port notes
 
 * The original game source can be found on [sourceforge](https://sourceforge.net/projects/decker/files/decker/Decker%201.12/). The `Help/Decker.rtf` file is particulary helpful.
