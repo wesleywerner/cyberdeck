@@ -17,6 +17,34 @@ function TestICE:testRating()
   luaunit.assertEquals(ice:getRating(), 3)
 end
 
+function TestICE:testRatingVersusHardware()
+  local ice = ICE("Trace", 3)
+  ice.analyzedLevel = 2
+  luaunit.assertEquals(ice:getRating(true), 3)
+end
+
+function TestICE:testRatingAnalyzed()
+  local ice = ICE("Probe", 3)
+  ice.analyzedLevel = 2
+  luaunit.assertEquals(ice:getRating(), 1)
+end
+
+function TestICE:testRatingWeakend()
+  local ice = ICE("Probe", 3)
+  ice.weakened = true
+  luaunit.assertEquals(ice:getRating(), -1)
+end
+
+function TestICE:testRatingAttack()
+  local ice = ICE("Attack", 2)
+  luaunit.assertEquals(ice:getAttackRating(), 2)
+end
+
+function TestICE:testRatingSensor()
+  local ice = ICE("Probe", 2)
+  luaunit.assertEquals(ice:getSensorRating(), 4)
+end
+
 function TestICE:testNameMax()
   local ice = ICE("Gateway", 100) -- a ridiculous rating
   luaunit.assertEquals(ice:getName(), "Big Bouncer")

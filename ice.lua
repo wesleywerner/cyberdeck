@@ -159,6 +159,7 @@ setmetatable( Ice, {
 Ice.types = {
   ["Gateway"] = {
     note = "Bars passageway to another node.",
+    isCombat = false,
     names = {
       "Gateway",
       "Fence",
@@ -184,6 +185,7 @@ Ice.types = {
   },
   ["Probe"] = {
     note = "Searches for intruders in the system.",
+    isCombat = false,
     names = {
       "Probe",
       "Gazer",
@@ -209,6 +211,7 @@ Ice.types = {
   },
   ["Guardian"] = {
     note = "Guards access to the node.",
+    isCombat = false,
     names = {
       "Guardian",
       "Protector",
@@ -234,6 +237,7 @@ Ice.types = {
   },
   ["Tapeworm"] = {
     note = "Guards a file. Will self-destruct on illegal access, taking the file with it.",
+    isCombat = false,
     names = {
       "Tapeworm",
       "Boa",
@@ -259,6 +263,7 @@ Ice.types = {
   },
   ["Attack"] = {
     note = "Attacks intruders.",
+    isCombat = true,
     names = {
       "Attack",
       "Brute",
@@ -284,6 +289,7 @@ Ice.types = {
   },
   ["Trace"] = {
     note = "Attempts to trace an intruder's signal in the system.",
+    isCombat = true,
     names = {
       "Trace",
       "Hound",
@@ -526,51 +532,56 @@ end
 -- get the ICE rating, adjusted by factors like health, 
 -- if the ICE was analyzed and any weakened effects.
 -- larger results indicate a favorable outcome for the ICE.
-function Ice:getRating(includeAnalyzedState)
+-- give optional parameter "versusHardwareOrOtherICE" as true to ignore player analysis effects.
+function Ice:getRating(versusHardwareOrOtherICE)
 
-  -- include the analyzed state by default
-  includeAnalyzedState = includeAnalyzedState or true
-  
   -- use the base rating
 	local nRating = self.rating
 
-	-- adjust for health
-  -- this was called GetConditionModifier() in original source
+	-- adjust according to ICE health. The curve of this can be seen with
+  -- this code:
+  --  for n=20,1,-1 do
+  --    print(string.format("%d%% ICE health reduces rating by -%.2f",n/20*100,(20-n)/4))
+  --  end
+  -- this was called GetConditionModifier() in the original source.
 	nRating = nRating - ((Ice.MAX_HEALTH - self.health)/4)
 
-	-- adjust for weakened effects
+	-- reduce if the ICE is weakened
 	if self.weakened then
     nRating = nRating - 4
   end
 
-	-- reduce if ICE was analyzed
-	if addAnalyzedLevel then
+	-- reduce if the ICE was analyzed
+	if not versusHardwareOrOtherICE then
     nRating = nRating - self.analyzedLevel
   end
 
-	--// Modify according to rating type
-	--if (nType == RATING_COMBAT)
-	--{
-		--// White ice has a penalty to combat
-		--if (m_nType <= MAX_WHITE)
-		--{
-			--nRating -= 2;
-		--}
-	--}
-	--else if (nType == RATING_SENSORS)
-	--{
-		--// White ice gets bonus to sensors if alarm set
-		--if (m_nType <= MAX_WHITE)
-		--{
-			--if (g_pChar->m_pSystem->m_nAlert != ALERT_GREEN)
-			--{
-				--nRating += 2;
-			--}
-		--}
-	--}
-
 	return nRating
+end
 
+-- get the ICE rating adjusted for combat.
+-- non-combat ICE take a penalty.
+function Ice:getAttackRating(versusHardwareOrOtherICE)
+  local nRating = self:getRating(versusHardwareOrOtherICE)
+  local def = self:getType()
+  if not def.isCombat then
+    return nRating - 2
+  else
+    return nRating
+  end
+end
+
+-- get the ICE rating adjusted for sensors.
+-- used when calculating odds of hide and deceive programs against ICE.
+-- non-combat ICE get a bonus.
+function Ice:getSensorRating(versusHardwareOrOtherICE)
+  local nRating = self:getRating(versusHardwareOrOtherICE)
+  local def = self:getType()
+  if not def.isCombat then
+    return nRating + 2
+  else
+    return nRating
+  end
 end
 
 return Ice
