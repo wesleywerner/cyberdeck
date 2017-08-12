@@ -47,7 +47,7 @@
   attacking (STATE_ATTACKING)
     Black ice attacking/chasing the player
   
-  return home (STATE_MOVING_H)
+  homeward (STATE_MOVING_H)
     White ice returning to home node
        
  * possibly no need for this as a state?  
@@ -582,6 +582,26 @@ function Ice:getSensorRating(versusHardwareOrOtherICE)
   else
     return nRating
   end
+end
+
+function Ice:setState(newstate)
+  local allowedStates = {
+    ["inactive"] = true,
+    ["guarding"] = true,
+    ["following"] = true,
+    ["moving"] = true,
+    ["searching"] = true,
+    ["destroying"] = true,
+    ["queried 1"] = true,
+    ["queried 2"] = true,
+    ["queried 3"] = true,
+    ["attacking"] = true,
+    ["homeward"] = true,
+  }
+  if not allowedStates[newstate] then
+    error(string.format("%q is not a valid ICE state"))
+  end
+  self.state = newstate
 end
 
 return Ice

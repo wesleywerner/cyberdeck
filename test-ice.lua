@@ -122,6 +122,19 @@ function TestICE:testNotesAnalyzed()
   luaunit.assertEquals(ice:getNotes(), "Attacks intruders. Can dump your deck from the matrix. Can fry one of your hardware chips.")
 end
 
+function TestICE:testStateValid()
+  local ice = ICE("Gateway", 1)
+  ice:setState("guarding")
+end
+
+function TestICE:testStateInValid()
+  local func = function()
+    local ice = ICE("Gateway", 1)
+    ice:setState("invalid selection")
+  end
+  luaunit.assertError(func)
+end
+
 -- allow stand-alone test
 if not IS_TESTING_ALL then
   os.exit( luaunit.LuaUnit.run() )
