@@ -573,10 +573,11 @@ end
 
 -- get the ICE rating adjusted for sensors.
 -- used when calculating odds of hide and deceive programs against ICE.
--- non-combat ICE get a bonus.
+-- non-combat ICE get a bonus if alarm set.
 function Ice:getSensorRating(versusHardwareOrOtherICE)
   local nRating = self:getRating(versusHardwareOrOtherICE)
   local def = self:getType()
+  -- TODO check if current system alert is not green
   if not def.isCombat then
     return nRating + 2
   else
