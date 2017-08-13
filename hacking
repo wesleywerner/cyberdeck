@@ -24,7 +24,7 @@ To run your test file stand-alone:
 
   lua yourTests.lua
 
-# questions new players might ask
+# questions new players might ask - or tips to become a better hacker
 
 * a warning should be shown if the player starts a new chip project, and they don't own a chip burner.
 * what is lifestyle and reputation, and how do they affect my game?
@@ -36,6 +36,7 @@ To run your test file stand-alone:
 * will I ever get reported to the police?
 * how do I prevent the sysadmin from shutting down the system in a red alert?
 * what happens if I get traced and how can I stop it?
+* analyze a gateway or tapeworm before deceiving/decrypting. It reduces the ICE rating, increasing your chances.
 
 # port notes
 
