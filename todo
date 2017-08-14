@@ -37,24 +37,28 @@ Decker.h
 Decker.cpp
 
 ## wip
+Character.cpp
+Character.h
 Ice.cpp
 Ice.h
+
+## todo
+Area.cpp  -- system>areas>nodes (only larger systems has multiple areas)
+Area.h
+Node.cpp
+Node.h
+System.cpp
+System.h
 IceDataDlg.cpp
 IceDataDlg.h
 ShopItem.cpp
 ShopItem.h
-
-## todo
 ActiveBar.cpp
 ActiveBar.h
 AlarmBar.cpp
 AlarmBar.h
-Area.cpp
-Area.h
 BuildDialog.cpp
 BuildDialog.h
-Character.cpp
-Character.h
 CharDataDialog.cpp
 CharDataDialog.h
 ClockView.cpp
@@ -108,8 +112,6 @@ NewCharDlg.h
 NewInfo.h
 NewProjectDlg.cpp
 NewProjectDlg.h
-Node.cpp
-Node.h
 NodeView.cpp
 NodeView.h
 OptionsDlg.cpp
@@ -129,7 +131,5 @@ Source.cpp
 Source.h
 StdAfx.cpp
 StdAfx.h
-System.cpp
-System.h
 TransferDlg.cpp
 TransferDlg.h
