@@ -28,46 +28,32 @@
 
 Software = {}
 
---[[ Constructor
-  the __call metamethod allows us to call the Software table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
-setmetatable( Software, {
-  __call = function( cls, typeName, rating, autoLoad)
+function Software:create(class, rating, name)
 
-    -- new instance
-    local instance = {}
-    
-    --[[
-      the __index metatable redirects function-calls on any instances to
-      this base table (ie inheritance), and
-      "cls" refers to the current table
-      ]]
-    setmetatable( instance, { __index=cls } )
-    
-    -- validate the given values
-    if not cls.types[typeName] then
-      error (string.format("%q is not a valid software class.", typeName))
-    end
-    
-    if not rating or rating < 1 then
-      error (string.format("%q is not a valid rating for software.", rating or "nil" ))
-    end
-    
-    -- assign the given values
-    instance.class = typeName
-    instance.rating = math.floor(rating)
-    
-    return instance
+  local instance = {}
   
+  -- validate the given values
+  if not self.types[class] then
+    error (string.format("%q is not a valid software class.", class))
   end
-} )
+  
+  if not rating or rating < 1 then
+    error (string.format("%q is not a valid rating for software.", rating or "nil" ))
+  end
+  
+  -- assign the given values
+  instance.class = class
+  instance.rating = math.floor(rating)
+  instance.name = name or self:getDefaultName(instance)
+  
+  return instance
 
---[[ Definitions for the different software types.
-  complexity: affects the software price and memory usage (among other things).
-  names: list of predefined software names, indexed to correlate to the software rating.
-  includeOnNewGame: the player starts with this software.
-  ]]
+end
+
+-- Definitions for the different software types.
+-- complexity: affects the software price and memory usage (among other things).
+-- names: list of predefined software names, indexed to correlate to the software rating.
+-- includeOnNewGame: the player starts with this software.
 Software.types = {
 	["Attack"] = {
     includeOnNewGame = true,
@@ -715,19 +701,19 @@ Software.types = {
 }
 
 --[[ Gets the definition for the class underlying this software ]]
-function Software:getType()
-  local def = self.types[self.class]
+function Software:getType(sw)
+  local def = self.types[sw.class]
   if not def then
-    error( "No software class definition found for %q", self.class)
+    error( "No software class definition found for %q", sw.class)
   end
   return def
 end
 
-function Software:getRating()
-  return self.rating
+function Software:getRating(sw)
+  return sw.rating
 end
 
-function Software:getLoadTime(node, hardware)
+function Software:getLoadTime(sw, node, hardware)
   -- load time is dependent on your hardware bus and current node speed.
   
   -- TODO If have a high-speed connection, time is 1 turn.
@@ -739,7 +725,7 @@ function Software:getLoadTime(node, hardware)
   -- Time is size / (2^(bus size))
   -- TODO implement player hardware
   if hardware then
-    local mp = self:getMemoryUsage()
+    local mp = self:getMemoryUsage(sw)
     local speed = 2^hardware:getBandwidthRate()
     --print("memory usage: " .. mp)
     --print("bus speed: " .. speed)
@@ -749,24 +735,23 @@ function Software:getLoadTime(node, hardware)
   
 end
 
-function Software:getMemoryUsage()
-  local def = self:getType()
-  return def.complexity * self.rating
+function Software:getMemoryUsage(sw)
+  local def = self:getType(sw)
+  return def.complexity * sw.rating
 end
 
-function Software:getName()
-  local def = self:getType()
-  return def.names[self.rating]
+function Software:getDefaultName(sw)
+  local def = self:getType(sw)
+  return def.names[sw.rating]
 end
 
-function Software:getPrice()
-  local def = self:getType()
-  return def.complexity * self.rating^2 * 25;
+function Software:getPrice(sw)
+  local def = self:getType(sw)
+  return def.complexity * sw.rating^2 * 25;
 end
 
-
-function Software:getText()
-  return string.format("%s (%s %d)", self:getName(), self.class, self.rating)
+function Software:getText(sw)
+  return string.format("%s (%s %d)", sw.name, sw.class, sw.rating)
 end
 
 return Software

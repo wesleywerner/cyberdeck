@@ -4,52 +4,57 @@ software = require('software')
 TestSoftware = {}
 
 function TestSoftware:testType()
-  local sw = software("Attack", 1)
-  luaunit.assertEquals(sw:getType(), software.types['Attack'])
+  local sw = software:create("Attack", 1)
+  luaunit.assertEquals(software:getType(sw), software.types['Attack'])
 end
 
 function TestSoftware:testRating()
-  local sw = software("Attack", 1)
-  luaunit.assertEquals(sw:getRating(), 1)
+  local sw = software:create("Attack", 1)
+  luaunit.assertEquals(software:getRating(sw), 1)
 end
 
-function TestSoftware:testName()
-  local sw = software("Attack", 3)
-  luaunit.assertEquals(sw:getName(), software.types["Attack"].names[3])
+function TestSoftware:testDefaultName()
+  local sw = software:create("Attack", 3)
+  luaunit.assertEquals(software:getDefaultName(sw), software.types["Attack"].names[3])
+end
+
+function TestSoftware:testCustomName()
+  local sw = software:create("Attack", 3, "Fritz 42")
+  luaunit.assertEquals(sw.name, "Fritz 42")
 end
 
 function TestSoftware:testText()
-  local sw = software("Virus", 4)
-  luaunit.assertEquals(sw:getText(), "Arsenic (Virus 4)")
+  local sw = software:create("Virus", 4)
+  luaunit.assertEquals(software:getText(sw), "Arsenic (Virus 4)")
 end
 
 function TestSoftware:testPrice()
-  local sw1 = software("Attack", 1)
-  luaunit.assertEquals(sw1:getPrice(), 50)  -- 2 * 1^2 * 25
-  local sw2 = software("Attack", 3)
-  luaunit.assertEquals(sw2:getPrice(), 450) -- 2 * 3^2 * 25
-  local sw3 = software("Virus", 3)
-  luaunit.assertEquals(sw3:getPrice(), 675) -- 3 * 3^2 * 25
+  local sw1 = software:create("Attack", 1)
+  luaunit.assertEquals(software:getPrice(sw1), 50)  -- 2 * 1^2 * 25
+  local sw2 = software:create("Attack", 3)
+  luaunit.assertEquals(software:getPrice(sw2), 450) -- 2 * 3^2 * 25
+  local sw3 = software:create("Virus", 3)
+  luaunit.assertEquals(software:getPrice(sw3), 675) -- 3 * 3^2 * 25
 end
 
 function TestSoftware:testMemoryUsage()
-  local attackSoftware = software("Attack", 1)
-  luaunit.assertEquals(attackSoftware:getMemoryUsage(), 2)
-  local sw = software("Virus", 2)
-  luaunit.assertEquals(sw:getMemoryUsage(), 6)
+  local attackSoftware = software:create("Attack", 1)
+  luaunit.assertEquals(software:getMemoryUsage(attackSoftware), 2)
+  local virusSoftware = software:create("Virus", 2)
+  luaunit.assertEquals(software:getMemoryUsage(virusSoftware), 6)
 end
 
 function TestSoftware:testLoadTimeInHighSpeedNode()
-  local sw = software("Attack", 1)
+  local sw = software:create("Attack", 1)
   local testNode = {
     isActivated = function() return true end,
     isHighSpeed = function() return true end
     }
-  luaunit.assertEquals( sw:getLoadTime(testNode, nil), 1)
+  luaunit.assertEquals(software:getLoadTime(sw, testNode, nil), 1)
 end
 
 function TestSoftware:testLoadTimeWithHardware()
-  local sw = software("Virus", 2)  -- gives 6 memory points
+  local sw = software:create("Virus", 2)  -- gives 6 memory points
   local testNode = {
     isActivated = function() return false end,
     isHighSpeed = function() return false end
@@ -57,12 +62,12 @@ function TestSoftware:testLoadTimeWithHardware()
   local testHardware = {
     getBandwidthRate = function() return 2 end
   }
-  luaunit.assertEquals( sw:getLoadTime(testNode, testHardware), 2.25)
+  luaunit.assertEquals(software:getLoadTime(sw, testNode, testHardware), 2.25)
 end
 
 function TestSoftware:testConstructorValidation()
   local func = function()
-    software("Unreal Item", 1)
+    software:create("Unreal Item", 1)
   end
   luaunit.assertError(func)
 end
