@@ -16,40 +16,27 @@
 
 Chips = {}
 
---[[ Constructor
-  the __call metamethod allows us to call the table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
-setmetatable( Chips, {
-  __call = function( cls, typeName, rating)
+function Chips:create(class, rating)
 
-    -- new instance
-    local instance = {}
-    
-    --[[
-      the __index metatable redirects function-calls on any instances to
-      this base table (ie inheritance), and
-      "cls" refers to the current table
-      ]]
-    setmetatable( instance, { __index=cls } )
-    
-    -- validate the given values
-    if not cls.types[typeName] then
-      error (string.format("%q is not a valid chip type.", typeName))
-    end
-    
-    if not rating or rating < 1 then
-      error (string.format("%q is not a valid rating for chips.", rating or "nil" ))
-    end
-    
-    -- assign the given values
-    instance.typeName = typeName
-    instance.rating = rating
-    
-    return instance
+  -- new instance
+  local instance = {}
   
+  -- validate the given values
+  if not self.types[class] then
+    error (string.format("%q is not a valid chip class.", class))
   end
-})
+  
+  if not rating or rating < 1 then
+    error (string.format("%q is not a valid rating for chips.", rating or "nil" ))
+  end
+  
+  -- assign the given values
+  instance.class = class
+  instance.rating = rating
+  
+  return instance
+
+end
 
 Chips.types = {
   ["CPU"] = {
@@ -72,29 +59,29 @@ Chips.types = {
   },
 }
 
-function Chips:getType()
-  local def = self.types[self.typeName]
+function Chips:getType(ch)
+  local def = self.types[ch.class]
   if not def then
-    error( "No type definition found for %q", self.typeName)
+    error( "No type definition found for %q", ch.class)
   end
   return def
 end
 
-function Chips:getName()
-  return self.typeName
+function Chips:getName(ch)
+  return ch.class
 end
 
-function Chips:getRating()
-  return self.rating
+function Chips:getRating(ch)
+  return ch.rating
 end
 
-function Chips:getPrice()
-  local def = self:getType()
-  return math.pow(self.rating, 2) * def.baseCost
+function Chips:getPrice(ch)
+  local def = self:getType(ch)
+  return math.pow(ch.rating, 2) * def.baseCost
 end
 
-function Chips:getText()
-  return string.format("%s L%d", self:getName(), self.rating)
+function Chips:getText(ch)
+  return string.format("%s L%d", self:getName(ch), ch.rating)
 end
 
 return Chips
