@@ -8,58 +8,58 @@ hardware = require('hardware')
 TestHardware = {}
 
 function TestHardware:testType()
-  local hw = hardware("Chip Burner", 1)
-  luaunit.assertEquals(hw:getType(), hardware.types["Chip Burner"])
+  local hw = hardware:create("Chip Burner", 1)
+  luaunit.assertEquals(hardware:getType(hw), hardware.types["Chip Burner"])
 end
 
 function TestHardware:testRating()
-  local hw = hardware("Chip Burner", 2)
-  luaunit.assertEquals(hw:getRating(), 2)
+  local hw = hardware:create("Chip Burner", 2)
+  luaunit.assertEquals(hardware:getRating(hw), 2)
 end
 
 function TestHardware:testMaxRating()
-  local hw = hardware("Chip Burner", 1)
-  luaunit.assertEquals(hw:getMaxRating(), 4)
+  local hw = hardware:create("Chip Burner", 1)
+  luaunit.assertEquals(hardware:getMaxRating(hw), 4)
 end
 
 function TestHardware:testName()
-  local hw = hardware("Chip Burner", 1)
-  luaunit.assertEquals(hw:getName(), "Chip Burner")
+  local hw = hardware:create("Chip Burner", 1)
+  luaunit.assertEquals(hardware:getName(hw), "Chip Burner")
 end
 
 function TestHardware:testTextChipBurnerL3()
-  local hw = hardware("Chip Burner", 3)
-  luaunit.assertEquals(hw:getText(), "Chip Burner (Triple Speed)")
+  local hw = hardware:create("Chip Burner", 3)
+  luaunit.assertEquals(hardware:getText(hw), "Chip Burner (Triple Speed)")
 end
 
 function TestHardware:testTextBioMonitorL2()
-  local hw = hardware("Bio Monitor", 2)
-  luaunit.assertEquals(hw:getText(), "Bio Monitor (Auto Dump)")
+  local hw = hardware:create("Bio Monitor", 2)
+  luaunit.assertEquals(hardware:getText(hw), "Bio Monitor (Auto Dump)")
 end
 
 function TestHardware:testTextProximityMapper()
-  local hw = hardware("Proximity Mapper", 1)
-  luaunit.assertEquals(hw:getText(), "Proximity Mapper")
+  local hw = hardware:create("Proximity Mapper", 1)
+  luaunit.assertEquals(hardware:getText(hw), "Proximity Mapper")
 end
 
 function TestHardware:testPriceChipBurnerL1()
-  local hw = hardware("Chip Burner", 1)
-  luaunit.assertEquals(hw:getPrice(), 1000)
+  local hw = hardware:create("Chip Burner", 1)
+  luaunit.assertEquals(hardware:getPrice(hw), 1000)
 end
 
 function TestHardware:testPriceChipBurnerL3()
-  local hw = hardware("Chip Burner", 3)
-  luaunit.assertEquals(hw:getPrice(), 4000)
+  local hw = hardware:create("Chip Burner", 3)
+  luaunit.assertEquals(hardware:getPrice(hw), 4000)
 end
 
 function TestHardware:testPriceBioMonitorL4()
-  local hw = hardware("Bio Monitor", 4)
-  luaunit.assertEquals(hw:getPrice(), 4000)
+  local hw = hardware:create("Bio Monitor", 4)
+  luaunit.assertEquals(hardware:getPrice(hw), 4000)
 end
 
 function TestHardware:testConstructorValidation()
   local func = function()
-    hardware("Unreal item", 1)
+    hardware:create("Unreal item", 1)
   end
   luaunit.assertError(func)
 end

@@ -15,47 +15,27 @@
 
 Hardware = {}
 
---[[ Constructor
-  the __call metamethod allows us to call the table like a function,
-  this becomes a constructor for creating new instances.
-  ]]
-setmetatable( Hardware, {
-  __call = function( cls, typeName, rating)
+function Hardware:create(class, rating)
 
-    -- new instance
-    local instance = {}
-    
-    --[[
-      the __index metatable redirects function-calls on any instances to
-      this base table (ie inheritance), and
-      "cls" refers to the current table
-      ]]
-    setmetatable( instance, { __index=cls } )
-    
-    -- validate the given values
-    if not cls.types[typeName] then
-      error (string.format("%q is not a valid hardware type.", typeName))
-    end
-    
-    if not rating or rating < 1 then
-      error (string.format("%q is not a valid rating for hardware.", rating or "nil" ))
-    end
-    
-    -- assign the given values
-    instance.typeName = typeName
-    instance.rating = rating
-    
-    return instance
+  -- new instance
+  local instance = {}
   
+  -- validate the given values
+  if not self.types[class] then
+    error (string.format("%q is not a valid hardware class.", class))
   end
-})
-
--- TODO possibly move to global.lua
-Hardware.categories = {
-  "software",
-  "chip",
-  "hardware"
-}
+  
+  if not rating or rating < 1 then
+    error (string.format("%q is not a valid rating for hardware.", rating or "nil" ))
+  end
+  
+  -- assign the given values
+  instance.class = class
+  instance.rating = rating
+  
+  return instance
+  
+end
 
 Hardware.types = {
 	["Chip Burner"] = {
@@ -107,48 +87,48 @@ Hardware.types = {
   },
 }
 
-function Hardware:getType()
-  local def = self.types[self.typeName]
+function Hardware:getType(hw)
+  local def = self.types[hw.class]
   if not def then
-    error( "No type definition found for %q", self.typeName)
+    error( "No type definition found for %q", self.class)
   end
   return def
 end
 
-function Hardware:getName()
-  return self.typeName
+function Hardware:getName(hw)
+  return hw.class
 end
 
-function Hardware:getRating()
-  return self.rating
+function Hardware:getRating(hw)
+  return hw.rating
 end
 
-function Hardware:getMaxRating()
-  local def = self:getType()
+function Hardware:getMaxRating(hw)
+  local def = self:getType(hw)
   return def.maxRating
 end
 
-function Hardware:getPrice()
+function Hardware:getPrice(hw)
   -- the original calculation uses bitwise left shift on the rating.
   -- since only lua 5.3+ has native bitwise operator support we use a
   -- lookup here to keep compatiblity with older luas.
   local lookup = {1,2,4,8,16}
-  local def = self:getType()
-  return def.baseCost * lookup[self.rating]
+  local def = self:getType(hw)
+  return def.baseCost * lookup[hw.rating]
 end
 
-function Hardware:getText()
-  local def = self:getType()
+function Hardware:getText(hw)
+  local def = self:getType(hw)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
-    return self:getName()
+    return self:getName(hw)
   else
     -- append a suffix instead of the current rating (if available)
-    local suffix = def.levelSuffixes and def.levelSuffixes[self.rating]
+    local suffix = def.levelSuffixes and def.levelSuffixes[hw.rating]
     if suffix then
-      return string.format("%s %s", self:getName(), suffix )
+      return string.format("%s %s", self:getName(hw), suffix )
     else
-      return string.format("%s L%d", self:getName(), self.rating )
+      return string.format("%s L%d", self:getName(hw), hw.rating )
     end
   end
 end
