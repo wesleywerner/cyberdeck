@@ -2,33 +2,6 @@
 
 * generating all ICE in the matrix should append codes to the ICE names - string.format("%x%d",10,9)
 
-# replayability
-
-The game is can become repetitive, to address replayability:
-
-* bring in new software as the game progresses. currently all software is available from the start.
-* change contract descriptions as the game progresses.
-* add new contract goals.
-* add new node types with new matrix actions.
-* add campaigns that follow a plot via multiple missions. these can have longer due dates: expose a political watershed before the election, or stop a mega corp from rolling out their new OS that will undermine society.
-* redirect ICE to the wrong node (false alarm)
-* consider: side/mini games as actions for new node types
-* study at an online college to pass time, with a chance of revealing a new skill.
-* choose a hacker class (warrior/stealth/white hat/black hat). each class has one ability that the others don't have.
-* give XP for crashing ICE when the ICE entry node is deactivated (encourages combat)
-* give XP for completing a mission without attacking or setting off any alert - cancelling an alert does not count (encourages stealth)
-* stun attacks (for combat variety)
-* the reflect software may be overpowered. limit it to a reasonable range.
-* gateways that are locked, requiring a red, green or blue key to open.
-* allow asynchronous program loading in the matrix with memory upgrades.
-
-# new missions
-
-* Kill a target ICE
-* kill all ICE in system
-* Deactivate the I/O node that spawns ICE
-* download all files in a data node or system
-
 # list of original source files
 
 ## done
