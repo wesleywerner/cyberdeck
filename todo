@@ -20,6 +20,7 @@ The game is can become repetitive, to address replayability:
 * stun attacks (for combat variety)
 * the reflect software may be overpowered. limit it to a reasonable range.
 * gateways that are locked, requiring a red, green or blue key to open.
+* allow asynchronous program loading in the matrix with memory upgrades.
 
 # new missions
 

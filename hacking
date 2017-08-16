@@ -59,3 +59,5 @@ To run your test file stand-alone:
 * ICE names vary if they are of the hareded, phasing, crashing or lethal sub-types, these are implemented. The orignal game additionally had names lists for the combinations of lethal+hardened, lethal+phasing and lethal+crash sub-types. This is no longer the case. These combinations now simply use the one "lethal" list of names.
 
 * ICE behaviour flags "crash", "dump" and "fry" have changed to "crasher", "dumper" and "fryer".
+
+* Originally you could not load two programs into your deck at the same time, or if you have a file transfer active, when in the matrix. This technical limitation has been removed, however you may still be limited in this fashion at a lower skill level, until you have the appropriate upgrades to allow asynchronous program loads.
