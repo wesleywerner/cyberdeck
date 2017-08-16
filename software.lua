@@ -46,6 +46,25 @@ function Software:create(class, rating, name)
   instance.rating = math.floor(rating)
   instance.name = name or self:getDefaultName(instance)
   
+  -- The effective rating while in the matrix.
+  -- It will equal the rating value when entering the matrix
+  -- and the software is set to auto load.
+  -- It can also be lowered while in the matrix - medic for example
+  -- decreases on each use, until it hits zero and crashes.
+  instance.loadedRating = 0
+  
+  -- Number of turns that remain for the software to be fully loaded.
+  -- It won't be usable until this value reaches zero.
+  instance.loadingTurns = 0
+  
+  -- The program is ready for use.
+  instance.loaded = false
+  
+  -- The program does not require execution by the player, it runs
+  -- in the background and is used automatically in certain events.
+  -- The shield and hide programs for example.
+  instance.background = false
+  
   return instance
 
 end
@@ -752,6 +771,13 @@ end
 
 function Software:getText(sw)
   return string.format("%s (%s %d)", sw.name, sw.class, sw.rating)
+end
+
+
+-- get the highest rated active software
+function Software:highestRatedActive(db)
+  -- TODO
+  -- where loadedRating>0 and loadingTurns==0
 end
 
 return Software
