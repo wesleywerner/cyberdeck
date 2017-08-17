@@ -1,1 +1,7 @@
+# symlink to original source
 decker-source
+
+# code coverage reports
+luacov.stats.out
+luacov.report.out
+

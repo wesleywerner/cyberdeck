@@ -534,7 +534,7 @@ function Ice:getRating(ice, versusHardwareOrOtherICE)
     nRating = nRating - 4
   end
 
-	-- reduce if the ICE was analyzed
+	-- reduce if the ICE was analyzed, except when rated against other ICE or player hardware.
 	if not versusHardwareOrOtherICE then
     nRating = nRating - ice.analyzedLevel
   end
