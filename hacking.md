@@ -65,6 +65,20 @@ sudo luarocks install luacheck && \
 sudo luarocks install busted
 ```
 
+# linting
+
+Check the code syntax:
+
+```
+luacheck --no-unused-args src/*.lua
+```
+
+Check the syntax of the tests by ignoring the busted global:
+
+```
+luacheck --no-unused-args --std max+busted tests/*.lua
+```
+
 # testing
 
 ```
@@ -84,12 +98,6 @@ For convenience this comes to the rescue:
 
 ```
 alias bustit='busted tests/*.lua'
-```
-
-To run linting on your tests themselves, define the testing framework globals so they are ignored:
-
-```
-luacheck --no-unused-args --std max+busted tests/*.lua
 ```
 
 # notes
