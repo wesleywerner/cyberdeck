@@ -9,8 +9,29 @@ function TestSoftware:testType()
 end
 
 function TestSoftware:testRating()
-  local sw = software:create("Attack", 1)
-  luaunit.assertEquals(software:getRating(sw), 1)
+  -- to test the rating, which is actually the "active rating" we must
+  -- load the software first
+  local sw = software:create("Attack", 2)
+  -- ensure the software can be loaded
+  local canwe = software:canLoad(sw)
+  luaunit.assertTrue(canwe)
+  -- assume a high-speed node, which has a load time of 1
+  local db = {
+    player = {
+      node = {
+        isActivated = function() return true end,
+        isHighSpeed = function() return true end
+      }
+    }
+  }
+  -- load it and call update to forward the loading process
+  software:beginLoad(db, sw)
+  -- check it is in a loading state
+  local isloading = software:isLoading(sw)
+  luaunit.assertTrue(isloading)
+  software:update(sw)
+  -- get the active rating
+  luaunit.assertEquals(software:getRating(sw), 2)
 end
 
 function TestSoftware:testDefaultName()
@@ -46,23 +67,27 @@ end
 
 function TestSoftware:testLoadTimeInHighSpeedNode()
   local sw = software:create("Attack", 1)
-  local testNode = {
-    isActivated = function() return true end,
-    isHighSpeed = function() return true end
+  local db = {
+    player = {
+      node = {
+        isActivated = function() return true end,
+        isHighSpeed = function() return true end
+      }
     }
-  luaunit.assertEquals(software:getLoadTime(sw, testNode, nil), 1)
+  }
+  luaunit.assertEquals(software:getLoadTime(db, sw), 1)
 end
 
 function TestSoftware:testLoadTimeWithHardware()
   local sw = software:create("Virus", 2)  -- gives 6 memory points
-  local testNode = {
-    isActivated = function() return false end,
-    isHighSpeed = function() return false end
+  local db = {
+    player = {
+      hardware = {
+        getBandwidthRate = function() return 2 end
+      }
     }
-  local testHardware = {
-    getBandwidthRate = function() return 2 end
   }
-  luaunit.assertEquals(software:getLoadTime(sw, testNode, testHardware), 2.25)
+  luaunit.assertEquals(software:getLoadTime(db, sw), 2.25)
 end
 
 function TestSoftware:testConstructorValidation()

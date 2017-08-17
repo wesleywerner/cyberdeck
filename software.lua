@@ -47,15 +47,14 @@ function Software:create(class, rating, name)
   instance.name = name or self:getDefaultName(instance)
   
   -- The effective rating while in the matrix.
-  -- It will equal the rating value when entering the matrix
-  -- and the software is set to auto load.
+  -- It will equal "rating" when loaded into your deck.
   -- It can also be lowered while in the matrix - medic for example
   -- decreases on each use, until it hits zero and crashes.
-  instance.loadedRating = 0
+  instance.activeRating = 0
   
   -- Number of turns that remain for the software to be fully loaded.
   -- It won't be usable until this value reaches zero.
-  instance.loadingTurns = 0
+  instance.loadTurns = 0
   
   -- The program is ready for use.
   instance.loaded = false
@@ -729,22 +728,24 @@ function Software:getType(sw)
 end
 
 function Software:getRating(sw)
-  return sw.rating
+  return sw.activeRating
 end
 
-function Software:getLoadTime(sw, node, hardware)
+function Software:getLoadTime(db, entity)
   -- load time is dependent on your hardware bus and current node speed.
   
   -- TODO If have a high-speed connection, time is 1 turn.
   --      node would be the current node the player is in.
+  local node = db.player.node
   if node and node:isHighSpeed() and node:isActivated() then
     return 1
   end
   
   -- Time is size / (2^(bus size))
   -- TODO implement player hardware
+  local hardware = db.player.hardware
   if hardware then
-    local mp = self:getMemoryUsage(sw)
+    local mp = self:getMemoryUsage(entity)
     local speed = 2^hardware:getBandwidthRate()
     --print("memory usage: " .. mp)
     --print("bus speed: " .. speed)
@@ -775,9 +776,65 @@ end
 
 
 -- get the highest rated active software
-function Software:highestRatedActive(db)
+function Software:findHighestActive(db)
   -- TODO
   -- where loadedRating>0 and loadingTurns==0
+end
+
+-- Can load if not loaded already and no load turns are set.
+function Software:canLoad(entity)
+  return not entity.loaded and entity.loadTurns == 0
+end
+
+-- Is loaded and ready for use
+function Software:isLoaded(entity)
+  return entity.loaded
+end
+
+-- Is loading when there are load turns left
+function Software:isLoading(entity)
+  return entity.loadTurns > 0
+end
+
+-- Crashes when loaded and the active rating drops to zero or below
+function Software:hasCrashed(entity)
+  return entity.loaded and entity.activeRating < 1
+end
+
+function Software:beginLoad(db, entity)
+  -- TODO check if the deck won't overload
+  -- TODO check how many other programs are loading, and if we have
+  --      the memory to load this one asynchronously
+  if self:canLoad(entity) then
+    entity.loadTurns = self:getLoadTime(db, entity)
+  end
+end
+
+-- Update the entity state at the end of the player's turn.
+function Software:update(entity)
+  if self:isLoading(entity) then
+    entity.loadTurns = entity.loadTurns - 1
+    if entity.loadTurns == 0 then
+      entity.loaded = true
+      entity.activeRating = entity.rating
+      -- TODO send message for program loaded
+    end
+  else
+    -- test if the program has crashed
+    if self:hasCrashed(entity) then
+      entity.loaded = false
+      entity.activeRating = 0
+      -- TODO send message for program crashed
+    end
+  end
+end
+
+function Software:updateAll(db)
+  -- TODO loop through all software and update
+  --- pseudocode:
+  for k,v in db.player.software do
+    self:update(v)
+  end
 end
 
 return Software
