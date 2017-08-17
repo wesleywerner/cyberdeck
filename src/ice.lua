@@ -3,12 +3,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Ice Foundation, either version 3 of the License, or
    any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
@@ -17,47 +17,47 @@
 
   Intrusion Countermeasure Elements
 
-  TODO 
+  TODO
   ICE STATES - implemented from Ice.h
-  
+
   inactive (STATE_INACTIVE)
     Black ice which is not active
-  
+
   guarding (STATE_GUARDING)
     Attack and trace ICE that are *not* bypassed will query the player autonomously.
     Other ICE only query if they are accessed.
-  
+
   following (STATE_FOLLOWING)
     Follows the player to adjacent nodes, unless the current node is smoked.
     If in the same node as the player, it will query the player.
     If the query was bypassed, it goes into a searching state and wanders.
-  
+
   moving (STATE_MOVING)
     Going to a target node. (Black only)
-  
+
   searching (STATE_SEARCHING)
     Searching for intruders (Black/Probe)
-  
+
   destroying* (STATE_DESTROYING)
     Destroying a datafile - tapeworm only
-  
+
   queried 1, queried 2, queried 3 (STATE_QUERIED1/2/3)
     Queried player, waiting for response
-  
+
   attacking (STATE_ATTACKING)
     Black ice attacking/chasing the player
-  
+
   homeward (STATE_MOVING_H)
     White ice returning to home node
-       
- * possibly no need for this as a state?  
+
+ * possibly no need for this as a state?
 ]]
 
 --[[ List of conditions when the player can be queried:
      always assume the ICE and the player are in the same node
      & indicates only if the ICE is not bypassed
      ^ indicates only if the ICE noticed the player - tests the player hide program vs the ICE
-  
+
     state is following
     state is moving and ICE is attack, probe or trace &^
     state is searching with notice &^
@@ -66,23 +66,23 @@
 ]]
 
 
-Ice = {}
+local Ice = {}
 Ice.MAX_HEALTH = 20
 
 function Ice:create(class, rating, flags)
 
   -- new instance
   local instance = {}
-  
+
   -- validate the given values
   if not self.types[class] then
     error (string.format("%q is not a valid ICE class.", class))
   end
-  
+
   if not rating or rating < 1 then
     error (string.format("%q is not a valid rating for ICE.", rating or "nil" ))
   end
-  
+
   -- assign the given values
   instance.name = nil
   instance.class = class
@@ -136,7 +136,7 @@ function Ice:create(class, rating, flags)
   instance.fryer = false
   -- apply any given flags
   self:applyFlags(instance, flags)
-  
+
   instance.name = self:getDefaultName(instance)
   return instance
 
@@ -416,7 +416,7 @@ function Ice:applyFlags(ice, flags)
   local allowedFlags = {
     ["hardened"] = true,
     ["phasing"] = true,
-    ["crasher"] = true, 
+    ["crasher"] = true,
     ["lethal"] = true,
     ["databomb"] = true,
     ["dumper"] = true,
@@ -465,11 +465,11 @@ function Ice:getDefaultName(ice)
     local def = self:getType(ice)
     nameList = def.names
   end
-  
+
   if not nameList then
     error(string.format("%q has no namelist", ice.class))
   end
-  
+
   -- get the name related to rating, clamped to list size
   if ice.rating < #nameList then
     return nameList[ice.rating]
@@ -512,7 +512,7 @@ function Ice:getText(ice)
   return string.format("%s (%s %d)", self:getName(ice), ice.class, ice.rating)
 end
 
--- get the ICE rating, adjusted by factors like health, 
+-- get the ICE rating, adjusted by factors like health,
 -- if the ICE was analyzed and any weakened effects.
 -- larger results indicate a favorable outcome for the ICE.
 -- give optional parameter "versusHardwareOrOtherICE" as true to ignore player analysis effects.

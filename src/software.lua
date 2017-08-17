@@ -3,12 +3,12 @@
    it under the terms of the GNU General Public License as published by
    the Free Software Foundation, either version 3 of the License, or
    any later version.
-   
+
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-   
+
    You should have received a copy of the GNU General Public License
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
@@ -17,53 +17,53 @@
 
     The most prominent properties are:
     * a class ("Attack", "Shield", "Slow", ...) that determines behaviour
-    * a rating (1..n) that determines how effective it works, 
+    * a rating (1..n) that determines how effective it works,
       the market price, and memory required to run in your deck.
     * a complexity, a value used internally to calculate those above.
-    
+
     The types table lists all the classes and predefined
     names for each class.
 ]]
 
 
-Software = {}
+local Software = {}
 
 function Software:create(class, rating, name)
 
   local instance = {}
-  
+
   -- validate the given values
   if not self.types[class] then
     error (string.format("%q is not a valid software class.", class))
   end
-  
+
   if not rating or rating < 1 then
     error (string.format("%q is not a valid rating for software.", rating or "nil" ))
   end
-  
+
   -- assign the given values
   instance.class = class
   instance.rating = math.floor(rating)
   instance.name = name or self:getDefaultName(instance)
-  
+
   -- The effective rating while in the matrix.
   -- It will equal "rating" when loaded into your deck.
   -- It can also be lowered while in the matrix - medic for example
   -- decreases on each use, until it hits zero and crashes.
   instance.activeRating = 0
-  
+
   -- Number of turns that remain for the software to be fully loaded.
   -- It won't be usable until this value reaches zero.
   instance.loadTurns = 0
-  
+
   -- The program is ready for use.
   instance.loaded = false
-  
+
   -- The program does not require execution by the player, it runs
   -- in the background and is used automatically in certain events.
   -- The shield and hide programs for example.
   instance.background = false
-  
+
   return instance
 
 end
@@ -733,14 +733,14 @@ end
 
 function Software:getLoadTime(db, entity)
   -- load time is dependent on your hardware bus and current node speed.
-  
+
   -- TODO If have a high-speed connection, time is 1 turn.
   --      node would be the current node the player is in.
   local node = db.player.node
   if node and node:isHighSpeed() and node:isActivated() then
     return 1
   end
-  
+
   -- Time is size / (2^(bus size))
   -- TODO implement player hardware
   local hardware = db.player.hardware
@@ -752,7 +752,7 @@ function Software:getLoadTime(db, entity)
     -- clamp to 1 for lowest value
     return math.max(1, ((mp + speed - 1) / speed))
   end
-  
+
 end
 
 function Software:getMemoryUsage(sw)
