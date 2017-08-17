@@ -26,12 +26,14 @@ I chose a model-view-controller pattern for seperating the game data from the lo
 
 You can consider all source files as logic, and these modules do not reference any global data object. Instead, most modules provide a `create()` method to return a data entity. Other methods in the modules take these entities as parameters and perform their logic on them. For example, the `hardware.lua` module:
 
-  -- create a new chip burner, stored in local "hw"
-  hardware = require('hardware')
-  local hw = hardware:create("Chip Burner", 1)
-  
-  -- later, we get the purchase price
-  local howmuch = hardware:getPrice(hw)
+```
+-- create a new chip burner, stored in local "hw"
+hardware = require('hardware')
+local hw = hardware:create("Chip Burner", 1)
+
+-- later, we get the purchase price
+local howmuch = hardware:getPrice(hw)
+```
 
 The entities we create will live in one table, affectionately thought of as the "db", which should live inside a single module only.
 
@@ -39,19 +41,58 @@ Worst case of hard-coding is limited to modules storing lookup lists to ensure d
 
 These logic modules are not factories, it is a horrible name and it won't be mentioned again.
 
-# tests
+# development environment
 
-Unit tests are implemented with the included luaunit module. For convenience you can copy `template.lua` and `test-template.lua` for new modules and tests respectively.
+You will need:
 
-To run all tests:
+* [LÖVE game framework](http://love2d.org/)
+* [Lua 5.x](http://www.lua.org/)
+* [Lua Rocks](https://luarocks.org/)
 
-  lua test-all.lua -v
+Just be sure your package manager has love >= 0.10.2, if not you will have to build it from source.
 
-To run your test file stand-alone:
+These commands are for apt-based systems, please adapt to them as needed.
 
-  lua yourTests.lua
+```
+# this should pull Lua5.1 in as a dependency
+sudo apt-get install love luarocks
+```
 
-# port notes
+Install code linting and unit testing rocks:
+
+```
+sudo luarocks install luacheck && \
+sudo luarocks install busted
+```
+
+# testing
+
+```
+busted tests/*.lua
+```
+
+Check code coverage:
+
+```
+busted --coverage tests/*.lua
+luacov
+# check the tail for the summary
+less luacov.report.out
+```
+
+For convenience this comes to the rescue:
+
+```
+alias bustit='busted tests/*.lua'
+```
+
+To run linting on your tests themselves, define the testing framework globals so they are ignored:
+
+```
+luacheck --no-unused-args --std max+busted tests/*.lua
+```
+
+# notes
 
 * The original game source can be found on [sourceforge](https://sourceforge.net/projects/decker/files/decker/Decker%201.12/). The `Help/Decker.rtf` file is particulary helpful.
 
@@ -106,7 +147,7 @@ The game can become a bit repetitive after a certain skill is reached. These ide
 * Deactivate the I/O node that spawns ICE
 * download all files in a data node or system
 
-## questions new players might ask - or tips to become a better hacker
+# questions new players might ask - or tips to become a better hacker
 
 * a warning should be shown if the player starts a new chip project, and they don't own a chip burner.
 * what is lifestyle and reputation, and how do they affect my game?
