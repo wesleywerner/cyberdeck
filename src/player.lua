@@ -17,11 +17,11 @@ local Player = {}
 
 Player.MAXHEALTH = 20
 
-function Player:create()
+function Player:create(db)
 
   local instance = {}
   instance.name = "Hacker X"
-  instance.credits = nil
+  instance.credits = 0
   instance.lifestyle = nil
 
   -- Mental and deck health reset when entering the matrix.
@@ -112,14 +112,34 @@ function Player:create()
 
 end
 
-function Player:getName(p)
-  return p.name
+function Player:getName(db)
+  return db.player.name
 end
 
--- Prepare the player for entering the matrix
-function Player:prepareForMatrix(p)
-  p.health.mental = self.MAXHEALTH
-  p.health.deck = self.MAXHEALTH
+-- Reset matrix-specific values.
+function Player:prepareForMatrix(db)
+  db.player.health.mental = self.MAXHEALTH
+  db.player.health.deck = self.MAXHEALTH
+end
+
+-- Get bank balance
+function Player:getCredits(db)
+  return db.player.credits
+end
+
+-- Increase credits
+function Player:addCredits(db, amount)
+  db.player.credits = db.player.credits + amount
+end
+
+-- If there are not enough credits to spend, return false.
+function Player:spendCredits(db, amount)
+  if db.player.credits < amount then
+    return false
+  else
+    db.player.credits = db.player.credits - amount
+    return true
+  end
 end
 
 return Player
