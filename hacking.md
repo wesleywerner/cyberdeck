@@ -81,23 +81,21 @@ luacheck --no-unused-args --std max+busted tests/*.lua
 
 # testing
 
+Unit testing is done with busted, the `.busted` config already defines everything, so simply run:
+
 ```
-busted tests/*.lua
+busted
 ```
 
 Check code coverage:
 
+Coverage is performed every time `busted` is run. Generate the report with `luacov`:
+
 ```
-busted --coverage tests/*.lua
-luacov
+busted && luacov
+
 # check the tail for the summary
 less luacov.report.out
-```
-
-For convenience this comes to the rescue:
-
-```
-alias bustit='busted tests/*.lua'
 ```
 
 # notes
