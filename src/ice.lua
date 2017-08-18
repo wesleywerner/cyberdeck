@@ -446,7 +446,7 @@ function Ice:getName(ice)
 end
 
 function Ice:getDefaultName(ice)
-  local nameList = nil
+  local nameList
   if ice.hardened then
     nameList = self.alternateNames["hardened"]
   elseif ice.phasing then
