@@ -28,7 +28,7 @@
 
 local Software = {}
 
-function Software:create(class, rating, name)
+function Software:create(db, class, rating, name)
 
   local instance = {}
 
@@ -44,7 +44,7 @@ function Software:create(class, rating, name)
   -- assign the given values
   instance.class = class
   instance.rating = math.floor(rating)
-  instance.name = name or self:getDefaultName(instance)
+  instance.name = name or self:getDefaultName(db, instance)
 
   -- The effective rating while in the matrix.
   -- It will equal "rating" when loaded into your deck.
@@ -719,7 +719,7 @@ Software.types = {
 }
 
 --[[ Gets the definition for the class underlying this software ]]
-function Software:getType(sw)
+function Software:getType(db, sw)
   local def = self.types[sw.class]
   if not def then
     error( "No software class definition found for %q", sw.class)
@@ -727,7 +727,7 @@ function Software:getType(sw)
   return def
 end
 
-function Software:getRating(sw)
+function Software:getRating(db, sw)
   return sw.activeRating
 end
 
@@ -745,7 +745,7 @@ function Software:getLoadTime(db, entity)
   -- TODO implement player hardware
   local hardware = db.player.hardware
   if hardware then
-    local mp = self:getMemoryUsage(entity)
+    local mp = self:getMemoryUsage(db, entity)
     local speed = 2^hardware:getBandwidthRate()
     --print("memory usage: " .. mp)
     --print("bus speed: " .. speed)
@@ -755,22 +755,22 @@ function Software:getLoadTime(db, entity)
 
 end
 
-function Software:getMemoryUsage(sw)
-  local def = self:getType(sw)
+function Software:getMemoryUsage(db, sw)
+  local def = self:getType(db, sw)
   return def.complexity * sw.rating
 end
 
-function Software:getDefaultName(sw)
-  local def = self:getType(sw)
+function Software:getDefaultName(db, sw)
+  local def = self:getType(db, sw)
   return def.names[sw.rating]
 end
 
-function Software:getPrice(sw)
-  local def = self:getType(sw)
+function Software:getPrice(db, sw)
+  local def = self:getType(db, sw)
   return def.complexity * sw.rating^2 * 25;
 end
 
-function Software:getText(sw)
+function Software:getText(db, sw)
   return string.format("%s (%s %d)", sw.name, sw.class, sw.rating)
 end
 
@@ -782,22 +782,22 @@ function Software:findHighestActive(db)
 end
 
 -- Can load if not loaded already and no load turns are set.
-function Software:canLoad(entity)
+function Software:canLoad(db, entity)
   return not entity.loaded and entity.loadTurns == 0
 end
 
 -- Is loaded and ready for use
-function Software:isLoaded(entity)
+function Software:isLoaded(db, entity)
   return entity.loaded
 end
 
 -- Is loading when there are load turns left
-function Software:isLoading(entity)
+function Software:isLoading(db, entity)
   return entity.loadTurns > 0
 end
 
 -- Crashes when loaded and the active rating drops to zero or below
-function Software:hasCrashed(entity)
+function Software:hasCrashed(db, entity)
   return entity.loaded and entity.activeRating < 1
 end
 
@@ -805,14 +805,14 @@ function Software:beginLoad(db, entity)
   -- TODO check if the deck won't overload
   -- TODO check how many other programs are loading, and if we have
   --      the memory to load this one asynchronously
-  if self:canLoad(entity) then
+  if self:canLoad(db, entity) then
     entity.loadTurns = self:getLoadTime(db, entity)
   end
 end
 
 -- Update the entity state at the end of the player's turn.
-function Software:update(entity)
-  if self:isLoading(entity) then
+function Software:update(db, entity)
+  if self:isLoading(db, entity) then
     entity.loadTurns = entity.loadTurns - 1
     if entity.loadTurns == 0 then
       entity.loaded = true
@@ -821,7 +821,7 @@ function Software:update(entity)
     end
   else
     -- test if the program has crashed
-    if self:hasCrashed(entity) then
+    if self:hasCrashed(db, entity) then
       entity.loaded = false
       entity.activeRating = 0
       -- TODO send message for program crashed
@@ -833,7 +833,7 @@ function Software:updateAll(db)
   -- TODO loop through all software and update
   --- pseudocode:
   for k,v in db.player.software do
-    self:update(v)
+    self:update(db, v)
   end
 end
 

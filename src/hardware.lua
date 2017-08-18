@@ -15,7 +15,7 @@
 
 local Hardware = {}
 
-function Hardware:create(class, rating)
+function Hardware:create(db, class, rating)
 
   -- new instance
   local instance = {}
@@ -87,7 +87,7 @@ Hardware.types = {
   },
 }
 
-function Hardware:getType(hw)
+function Hardware:getType(db, hw)
   local def = self.types[hw.class]
   if not def then
     error( "No type definition found for %q", self.class)
@@ -95,40 +95,40 @@ function Hardware:getType(hw)
   return def
 end
 
-function Hardware:getName(hw)
+function Hardware:getName(db, hw)
   return hw.class
 end
 
-function Hardware:getRating(hw)
+function Hardware:getRating(db, hw)
   return hw.rating
 end
 
-function Hardware:getMaxRating(hw)
-  local def = self:getType(hw)
+function Hardware:getMaxRating(db, hw)
+  local def = self:getType(db, hw)
   return def.maxRating
 end
 
-function Hardware:getPrice(hw)
+function Hardware:getPrice(db, hw)
   -- the original calculation uses bitwise left shift on the rating.
   -- since only lua 5.3+ has native bitwise operator support we use a
   -- lookup here to keep compatiblity with older luas.
   local lookup = {1,2,4,8,16}
-  local def = self:getType(hw)
+  local def = self:getType(db, hw)
   return def.baseCost * lookup[hw.rating]
 end
 
-function Hardware:getText(hw)
-  local def = self:getType(hw)
+function Hardware:getText(db, hw)
+  local def = self:getType(db, hw)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
-    return self:getName(hw)
+    return self:getName(db, hw)
   else
     -- append a suffix instead of the current rating (if available)
     local suffix = def.levelSuffixes and def.levelSuffixes[hw.rating]
     if suffix then
-      return string.format("%s %s", self:getName(hw), suffix )
+      return string.format("%s %s", self:getName(db, hw), suffix )
     else
-      return string.format("%s L%d", self:getName(hw), hw.rating )
+      return string.format("%s L%d", self:getName(db, hw), hw.rating )
     end
   end
 end

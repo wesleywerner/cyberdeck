@@ -1,7 +1,7 @@
 describe("Player", function()
 
   local player = require("player")
-  
+
   it("starts poor", function()
     local db = {}
     db.player = player:create(nil)
