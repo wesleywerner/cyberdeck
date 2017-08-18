@@ -24,20 +24,22 @@ The third phase introduces new features to the game. It could even start concurr
 
 I chose a model-view-controller pattern for seperating the game data from the logic, to fascilitate easier serialization for saving games, a functional design seemed to suit this well.
 
-You can consider all source files as logic, and these modules do not reference any global data object. Instead, most modules provide a `create()` method to return a data entity. Other methods in the modules take these entities as parameters and perform their logic on them. For example, the `hardware.lua` module:
+You can consider all non-view source files as logic, and these modules do not reference any global data object. Instead, most modules provide a `create()` method to return a data entity. Other methods in the modules take these entities as parameters and perform their logic on them. For example, the `hardware.lua` module:
 
 ```
 -- create a new chip burner, stored in local "hw"
 hardware = require('hardware')
-local hw = hardware:create("Chip Burner", 1)
+local someChip = hardware:create(db, "Chip Burner", 1)
 
 -- later, we get the purchase price
-local howmuch = hardware:getPrice(hw)
+local howmuch = hardware:getPrice(db, someChip)
 ```
 
 The entities we create will live in one table, affectionately thought of as the "db", which should live inside a single module only.
 
-Worst case of hard-coding is limited to modules storing lookup lists to ensure data integrity. `hardware.lua` has a list of possible hardware types to ensure that we create a "chip burner" and not a "pizza oven" by mistake.
+All the logic methods take our affectionately named `db` as a parameter. Not all of the methods will use it, but we give it anyway so things stay consistent.
+
+Worst case of hard-coding is limited to logic modules storing lookup lists to ensure data integrity. Our hardware module has a list of possible hardware types to ensure that we create a "chip burner" and not a "pizza oven" by mistake.
 
 These logic modules are not factories, it is a horrible name and it won't be mentioned again.
 
