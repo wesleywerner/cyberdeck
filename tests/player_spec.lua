@@ -105,6 +105,15 @@ describe("Player", function()
     end)
 
     it("fails upgrading to a lower rated", function()
+      local prog1 = software:create(db, "Attack", 1)
+      local prog2 = software:create(db, "Attack", 2)
+      local result2 = player:addSoftware(db, prog2)
+      local result1 = player:addSoftware(db, prog1)
+      assert.is_false(result1)
+      assert.is_true(result2)
+      -- verify
+      local verified = player:findSoftwareByClass(db, "Attack")
+      assert.are.equal(verified, prog2)
     end)
 
   end)
