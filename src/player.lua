@@ -55,6 +55,7 @@ function Player:create(db)
   -- list of hardware and software we own
   instance.hardware = {}
   instance.software = {}
+  instance.chips = {}
 
   instance.currentLoad = 0
   instance.loadStatus = 0
@@ -148,7 +149,7 @@ end
 -- this returns false.
 function Player:addHardware(db, entity)
   local hardware = require("hardware")
-  local existing = self:findHardwareByName(db, hardware:getName(db, entity))
+  local existing = self:findHardwareByClass(db, hardware:getName(db, entity))
   if existing and hardware:getRating(db, existing) >= hardware:getRating(db, entity) then
     -- TODO send message: You already own that hardware at the same or higher rating
     return false
@@ -176,12 +177,10 @@ function Player:removeHardware(db, entity)
   end
 end
 
--- TODO find by class instead
 -- Find a piece of hardware owned by the player
-function Player:findHardwareByName(db, name)
-  local hardware = require("hardware")
+function Player:findHardwareByClass(db, class)
   for i,v in ipairs(db.player.hardware) do
-    if hardware:getName(db, v) == name then
+    if v.class == class then
       return v
     end
   end

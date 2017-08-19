@@ -8,7 +8,7 @@ describe("Player", function()
     db = {}
     db.player = player:create(nil)
   end)
-  
+
   describe("Player credits", function()
 
     it("starts poor", function()
@@ -43,7 +43,7 @@ describe("Player", function()
     it("adds new to collection", function()
       local burner = hardware:create(db, "Chip Burner", 1)
       player:addHardware(db, burner)
-      local verified = player:findHardwareByName(db, "Chip Burner")
+      local verified = player:findHardwareByClass(db, "Chip Burner")
       assert.are.equal(burner, verified)
     end)
 
@@ -55,7 +55,7 @@ describe("Player", function()
       assert.is_true(lowerResult)
       assert.is_true(higherResult)
       -- verify the new hardware is owned by the player
-      local verified = player:findHardwareByName(db, "Chip Burner")
+      local verified = player:findHardwareByClass(db, "Chip Burner")
       assert.are.equal(burnerL2, verified)
       -- test the player received credits for selling the old hardware
       local resellValue = hardware:getResellPrice(db, burnerL1)
@@ -69,7 +69,7 @@ describe("Player", function()
       local lowerResult = player:addHardware(db, burnerL1)
       assert.is_true(higherResult)
       assert.is_false(lowerResult)
-      local verified = player:findHardwareByName(db, "Chip Burner")
+      local verified = player:findHardwareByClass(db, "Chip Burner")
       assert.are.equal(burnerL2, verified)
     end)
 
@@ -77,7 +77,7 @@ describe("Player", function()
       local monitor = hardware:create(db, "Bio Monitor", 2)
       player:addHardware(db, monitor)
       player:removeHardware(db, monitor)
-      local verified = player:findHardwareByName(db, "Bio Monitor")
+      local verified = player:findHardwareByClass(db, "Bio Monitor")
       assert.is_nil(verified)
     end)
 
