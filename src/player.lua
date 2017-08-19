@@ -168,6 +168,7 @@ end
 function Player:removeHardware(db, entity)
   local hardware = require("hardware")
   for i,v in ipairs(db.player.hardware) do
+    -- TODO if v == entity
     if hardware:getName(db, v) == hardware:getName(db, entity) then
       table.remove(db.player.hardware, i)
       return true
@@ -175,6 +176,7 @@ function Player:removeHardware(db, entity)
   end
 end
 
+-- TODO find by class instead
 -- Find a piece of hardware owned by the player
 function Player:findHardwareByName(db, name)
   local hardware = require("hardware")
@@ -184,5 +186,52 @@ function Player:findHardwareByName(db, name)
     end
   end
 end
+
+-- Adds the given software to the player.
+-- Returns true on success.
+-- Returns false if the player owns the same or higher rated version.
+function Player:addSoftware(db, entity)
+  local software = require("software")
+  
+  -- check for existing of the same class
+  local existing = self:findSoftwareByClass(db, entity.class)
+  if existing then
+    local existingRating = software:getRating(db, existing)
+    local entityRating = software:getRating(db, entity)
+    -- remove existing if lower rated
+    if existingRating < entityRating then
+      self:removeSoftware(db, existing)
+    else
+      print(existingRating, entityRating)
+      -- TODO send message: You already own that software at the same or higher rating
+      return false
+    end
+  end
+  
+  table.insert(db.player.software, entity)
+  return true
+end
+
+-- Removes software from the player
+function Player:removeSoftware(db, entity)
+  local software = require("software")
+  for i,v in ipairs(db.player.software) do
+    if v == entity then
+      table.remove(db.player.software, i)
+      return true
+    end
+  end
+end
+
+-- Find player owned software by name.
+function Player:findSoftwareByClass(db, class)
+  local software = require("software")
+  for i,v in ipairs(db.player.software) do
+    if v.class == class then
+      return v
+    end
+  end
+end
+
 
 return Player
