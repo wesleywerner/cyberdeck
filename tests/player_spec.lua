@@ -261,4 +261,54 @@ describe("Player", function()
 
   end)
 
+  describe("skills", function()
+
+    it("errors getting invalid skill level", function()
+      local func = function()
+        player:getSkillLevel(db, "invalid selection")
+      end
+      assert.has.errors(func, "\"invalid selection\" is not a valid skill class")
+    end)
+
+    it("starts unskilled", function()
+      assert.are.equal(1, player:getSkillLevel(db, "attack"))
+    end)
+
+    it("add points", function()
+
+      -- earn some points
+      player:addSkillPoints(db, 2)
+
+      -- verify
+      assert.are.equal(2, player:getSkillPoints(db))
+
+    end)
+
+    it("spend points", function()
+
+      -- earn some points
+      player:addSkillPoints(db, 2)
+
+      -- spend them
+      local didSpend = player:spendSkillPoints(db, "attack")
+
+      -- verify
+      assert.is_true(didSpend)
+      assert.are.equal(2, player:getSkillLevel(db, "attack"))
+
+    end)
+
+    it("cannot spend more points than cost", function()
+
+      -- spend them
+      local didSpend = player:spendSkillPoints(db, "attack")
+
+      -- verify the skill is still on level 1
+      assert.is_false(didSpend)
+      assert.are.equal(1, player:getSkillLevel(db, "attack"))
+
+    end)
+
+  end)
+
 end)

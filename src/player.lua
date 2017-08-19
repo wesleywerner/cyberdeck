@@ -38,12 +38,12 @@ function Player:create(db)
 
   instance.skills = {
     ["points"] = 0,
-    ["attack"] = 0,
-    ["defense"] = 0,
-    ["stealth"] = 0,
-    ["analysis"] = 0,
-    ["programming"] = 0,
-    ["chip design"] = 0,
+    ["attack"] = 1,
+    ["defense"] = 1,
+    ["stealth"] = 1,
+    ["analysis"] = 1,
+    ["programming"] = 1,
+    ["chip design"] = 1,
   }
 
   -- list of corporation names we visited, stores alert status and backdoors installed
@@ -276,6 +276,46 @@ function Player:findChipByClass(db, class)
     if v.class == class then
       return v
     end
+  end
+end
+
+-- Get the total skill points available for spending.
+function Player:getSkillPoints(db)
+  return db.player.skills["points"]
+end
+
+-- Add skill points to the player that they can spend.
+function Player:addSkillPoints(db, amount)
+  local skills = db.player.skills
+  skills["points"] = skills["points"] + amount
+end
+
+-- Increase one of the player skills.
+-- If not enough points are available, return false.
+-- The cost equals the current skill level.
+function Player:spendSkillPoints(db, class)
+  local skills = db.player.skills
+  if not skills[class] then
+    error(string.format("%q is not a valid skill class", class))
+  end
+  local points = skills["points"]
+  local cost = self:getSkillLevel(db, class)
+  if cost > points then
+    return false
+  else
+    skills["points"] = skills["points"] - cost
+    skills[class] = skills[class] + 1
+    return true
+  end
+end
+
+-- Get the skill level of the requested skill class.
+function Player:getSkillLevel(db, class)
+  local skills = db.player.skills
+  if not skills[class] then
+    error(string.format("%q is not a valid skill class", class))
+  else
+    return skills[class]
   end
 end
 
