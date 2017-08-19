@@ -32,7 +32,7 @@ describe("Software", function()
     -- call update to forward the loading process
     software:update(db2, sw)
     -- now we can get the rating
-    assert.are.equals(software:getRating(db2, sw), 2)
+    assert.are.equals(software:getActiveRating(db2, sw), 2)
   end)
 
   it("get the default name", function()

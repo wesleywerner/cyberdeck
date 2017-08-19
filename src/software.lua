@@ -727,8 +727,14 @@ function Software:getType(db, sw)
   return def
 end
 
-function Software:getRating(db, sw)
-  return sw.activeRating
+-- Get the potential rating.
+function Software:getRating(db, entity)
+  return entity.rating
+end
+
+-- Get the active (current) rating.
+function Software:getActiveRating(db, entity)
+  return entity.activeRating
 end
 
 function Software:getLoadTime(db, entity)
