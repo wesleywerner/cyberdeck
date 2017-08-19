@@ -192,7 +192,7 @@ end
 -- Returns false if the player owns the same or higher rated version.
 function Player:addSoftware(db, entity)
   local software = require("software")
-  
+
   -- check for existing of the same class
   local existing = self:findSoftwareByClass(db, entity.class)
   if existing then
@@ -207,14 +207,13 @@ function Player:addSoftware(db, entity)
       return false
     end
   end
-  
+
   table.insert(db.player.software, entity)
   return true
 end
 
 -- Removes software from the player
 function Player:removeSoftware(db, entity)
-  local software = require("software")
   for i,v in ipairs(db.player.software) do
     if v == entity then
       table.remove(db.player.software, i)
@@ -225,7 +224,6 @@ end
 
 -- Find player owned software by name.
 function Player:findSoftwareByClass(db, class)
-  local software = require("software")
   for i,v in ipairs(db.player.software) do
     if v.class == class then
       return v

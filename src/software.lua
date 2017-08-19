@@ -21,7 +21,7 @@
 --   This is known as the Potential Rating. It can fluctuate while in the
 --   matrix, and is then known as the Active Rating.
 -- * a complexity, a value used internally to calculate those above.
--- 
+--
 -- The types table lists all the classes and predefined
 -- names for each class.
 

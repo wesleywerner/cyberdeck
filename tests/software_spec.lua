@@ -7,7 +7,7 @@ describe("Software", function()
     local sw = software:create(db, "Attack", 1)
     assert.are.equals(software:getType(db, sw), software.types['Attack'])
   end)
-  
+
   it("get the potential rating", function()
     local sw = software:create(db, "Attack", 4)
     assert.are.equals(software:getPotentialRating(db, sw), 4)
