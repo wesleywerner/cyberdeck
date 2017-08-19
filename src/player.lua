@@ -142,4 +142,37 @@ function Player:spendCredits(db, amount)
   end
 end
 
+-- Adds the given hardware to the player
+function Player:addHardware(db, entity)
+  local hardware = require("hardware")
+  -- do not add existing
+  local existing = self:findHardwareByName(db, hardware:getName(db, entity))
+  if existing then
+    error("cannot add hardware the player already owns")
+  else
+    table.insert(db.player.hardware, entity)
+  end
+end
+
+-- Removes the given hardware from the player
+function Player:removeHardware(db, entity)
+  local hardware = require("hardware")
+  for i,v in ipairs(db.player.hardware) do
+    if hardware:getName(db, v) == hardware:getName(db, entity) then
+      table.remove(db.player.hardware, i)
+      return true
+    end
+  end
+end
+
+-- Find a piece of hardware owned by the player
+function Player:findHardwareByName(db, name)
+  local hardware = require("hardware")
+  for i,v in ipairs(db.player.hardware) do
+    if hardware:getName(db, v) == name then
+      return v
+    end
+  end
+end
+
 return Player
