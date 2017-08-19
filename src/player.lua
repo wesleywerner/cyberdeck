@@ -142,16 +142,26 @@ function Player:spendCredits(db, amount)
   end
 end
 
--- Adds the given hardware to the player
+-- Adds the given hardware to the player.
+-- If the player already own this hardware at a lower rating, it is
+-- sold for a second-hand price. If the player owns a higher rated one
+-- this returns false.
 function Player:addHardware(db, entity)
   local hardware = require("hardware")
-  -- do not add existing
   local existing = self:findHardwareByName(db, hardware:getName(db, entity))
-  if existing then
-    error("cannot add hardware the player already owns")
-  else
-    table.insert(db.player.hardware, entity)
+  if existing and hardware:getRating(db, existing) >= hardware:getRating(db, entity) then
+    -- TODO send message: You already own that hardware at the same or higher rating
+    return false
+  elseif existing then
+    -- resell old hardware
+    local value = hardware:getResellPrice(db, existing)
+    self:removeHardware(db, existing)
+    self:addCredits(db, value)
+    -- TODO send message: You sold your old hardware for %dcr
   end
+  -- add the new hardware
+  table.insert(db.player.hardware, entity)
+  return true
 end
 
 -- Removes the given hardware from the player

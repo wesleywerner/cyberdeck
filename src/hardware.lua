@@ -117,6 +117,10 @@ function Hardware:getPrice(db, hw)
   return def.baseCost * lookup[hw.rating]
 end
 
+function Hardware:getResellPrice(db, entity)
+  return self:getPrice(db, entity) / 2
+end
+
 function Hardware:getText(db, hw)
   local def = self:getType(db, hw)
   if def.maxRating == 1 then
