@@ -73,7 +73,7 @@ end
 -- names: list of predefined software names, indexed to correlate to the software rating.
 -- includeOnNewGame: the player starts with this software.
 Software.types = {
-	["Attack"] = {
+  ["Attack"] = {
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -99,7 +99,7 @@ Software.types = {
       "GigaBlaster",
     }
   },
-	["Area Attack"] = {
+  ["Area Attack"] = {
     complexity = 3,
     names = {
       "Grenade 1.0",
@@ -124,7 +124,7 @@ Software.types = {
       "Nuke",
     }
   },
-	["Piercing Attack"] = {
+  ["Piercing Attack"] = {
     complexity = 3,
     names = {
       "Spear 1.0a",
@@ -149,7 +149,7 @@ Software.types = {
       "Shredder",
     }
   },
-	["Slow"] = {
+  ["Slow"] = {
     complexity = 2,
     names = {
       "Slow",
@@ -174,7 +174,7 @@ Software.types = {
       "TimeStop",
     }
   },
-	["Virus"] = {
+  ["Virus"] = {
     complexity = 3,
     names = {
       "Flu 1.0",
@@ -199,7 +199,7 @@ Software.types = {
       "Ebola",
     }
   },
-	["Silence"] = {
+  ["Silence"] = {
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -225,7 +225,7 @@ Software.types = {
       "MegaMute",
     }
   },
-	["Confuse"] = {
+  ["Confuse"] = {
     complexity = 4,
     names = {
       "Confusion",
@@ -250,7 +250,7 @@ Software.types = {
       "DanQuayle",
     }
   },
-	["Weaken"] = {
+  ["Weaken"] = {
     complexity = 2,
     names = {
       "Weaken",
@@ -275,7 +275,7 @@ Software.types = {
       "Impotence",
     }
   },
-	["Shield"] = {
+  ["Shield"] = {
     complexity = 3,
     names = {
       "Shield",
@@ -300,7 +300,7 @@ Software.types = {
       "Aegis",
     }
   },
-	["Smoke"] = {
+  ["Smoke"] = {
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -326,7 +326,7 @@ Software.types = {
       "Houdini",
     }
   },
-	["Decoy"] = {
+  ["Decoy"] = {
     complexity = 4,
     names = {
       "Decoy",
@@ -351,7 +351,7 @@ Software.types = {
       "Simulacrum",
     }
   },
-	["Medic"] = {
+  ["Medic"] = {
     includeOnNewGame = true,
     complexity = 4,
     names = {
@@ -377,7 +377,7 @@ Software.types = {
       "M.A.S.H",
     }
   },
-	["Armor"] = {
+  ["Armor"] = {
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -403,7 +403,7 @@ Software.types = {
       "Adamantium",
     }
   },
-	["Hide"] = {
+  ["Hide"] = {
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -429,7 +429,7 @@ Software.types = {
       "HollowMan",
     }
   },
-	["Deceive"] = {
+  ["Deceive"] = {
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -455,7 +455,7 @@ Software.types = {
       "Politician",
     }
   },
-	["Relocate"] = {
+  ["Relocate"] = {
     complexity = 2,
     names = {
       "Relocate",
@@ -480,7 +480,7 @@ Software.types = {
       "Trail-B-Gone",
     }
   },
-	["Analyze"] = {
+  ["Analyze"] = {
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -506,7 +506,7 @@ Software.types = {
       "Forensics",
     }
   },
-	["Scan"] = {
+  ["Scan"] = {
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -532,7 +532,7 @@ Software.types = {
       "SuperScan",
     }
   },
-	["Evaluate"] = {
+  ["Evaluate"] = {
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -558,7 +558,7 @@ Software.types = {
       "ShowMeTheMoney",
     }
   },
-	["Decrypt"] = {
+  ["Decrypt"] = {
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -584,7 +584,7 @@ Software.types = {
       "SuperCracker",
     }
   },
-	["Reflect"] = {
+  ["Reflect"] = {
     complexity = 4,
     names = {
       "Reflect",
@@ -609,7 +609,7 @@ Software.types = {
       "Trampoline",
     }
   },
-	["Attack Boost"] = {
+  ["Attack Boost"] = {
     complexity = 3,
     names = {
       "Attack Boost 1.0",
@@ -634,7 +634,7 @@ Software.types = {
       "Attack Boost 6.0",
     }
   },
-	["Defense Boost"] = {
+  ["Defense Boost"] = {
     complexity = 3,
     names = {
       "Defense Boost 1.0",
@@ -659,7 +659,7 @@ Software.types = {
       "Defense Boost 6.0",
     }
   },
-	["Stealth Boost"] = {
+  ["Stealth Boost"] = {
     complexity = 3,
     names = {
       "Stealth Boost 1.0",
@@ -684,7 +684,7 @@ Software.types = {
       "Stealth Boost 6.0",
     }
   },
-	["Analysis Boost"] = {
+  ["Analysis Boost"] = {
     complexity = 3,
     names = {
       "Analysis Boost 1.0",
@@ -709,7 +709,7 @@ Software.types = {
       "Analysis Boost 6.0",
     }
   },
-	["Client Software"] = {
+  ["Client Software"] = {
     complexity = 4,
     names = {
       "Client Supplied Software"

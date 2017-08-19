@@ -519,27 +519,27 @@ end
 function Ice:getRating(db, ice, versusHardwareOrOtherICE)
 
   -- use the base rating
-	local nRating = ice.rating
+  local nRating = ice.rating
 
-	-- adjust according to ICE health. The curve of this can be seen with
+  -- adjust according to ICE health. The curve of this can be seen with
   -- this code:
   --  for n=20,1,-1 do
   --    print(string.format("%d%% ICE health reduces rating by -%.2f",n/20*100,(20-n)/4))
   --  end
   -- this was called GetConditionModifier() in the original source.
-	nRating = nRating - ((Ice.MAX_HEALTH - ice.health)/4)
+  nRating = nRating - ((Ice.MAX_HEALTH - ice.health)/4)
 
-	-- reduce if the ICE is weakened
-	if ice.weakened then
+  -- reduce if the ICE is weakened
+  if ice.weakened then
     nRating = nRating - 4
   end
 
-	-- reduce if the ICE was analyzed, except when rated against other ICE or player hardware.
-	if not versusHardwareOrOtherICE then
+  -- reduce if the ICE was analyzed, except when rated against other ICE or player hardware.
+  if not versusHardwareOrOtherICE then
     nRating = nRating - ice.analyzedLevel
   end
 
-	return nRating
+  return nRating
 end
 
 -- get the ICE rating adjusted for combat.
