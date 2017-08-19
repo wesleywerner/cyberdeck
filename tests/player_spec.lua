@@ -8,31 +8,35 @@ describe("Player", function()
     db = {}
     db.player = player:create(nil)
   end)
+  
+  describe("Player credits", function()
 
-  it("starts poor", function()
-    assert.are.equal(player:getCredits(db), 0)
+    it("starts poor", function()
+      assert.are.equal(player:getCredits(db), 0)
+    end)
+
+    it("gets paid", function()
+      player:addCredits(db, 42)
+      assert.are.equal(player:getCredits(db), 42)
+    end)
+
+    it("spends credits", function()
+      player:addCredits(db, 42)
+      local result = player:spendCredits(db, 22)
+      assert.is_true(result)
+      assert.are.equal(player:getCredits(db), 20)
+    end)
+
+    it("can't overspend credits", function()
+      player:addCredits(db, 42)
+      local result = player:spendCredits(db, 50)
+      assert.is_false(result)
+      assert.are.equal(player:getCredits(db), 42)
+    end)
+
   end)
 
-  it("gets paid", function()
-    player:addCredits(db, 42)
-    assert.are.equal(player:getCredits(db), 42)
-  end)
-
-  it("spends credits", function()
-    player:addCredits(db, 42)
-    local result = player:spendCredits(db, 22)
-    assert.is_true(result)
-    assert.are.equal(player:getCredits(db), 20)
-  end)
-
-  it("can't overspend credits", function()
-    player:addCredits(db, 42)
-    local result = player:spendCredits(db, 50)
-    assert.is_false(result)
-    assert.are.equal(player:getCredits(db), 42)
-  end)
-
-  describe("hardware", function()
+  describe("Player hardware", function()
 
     local hardware = require("hardware")
 
