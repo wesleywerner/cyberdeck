@@ -13,17 +13,17 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
---[["Software" is what you load into your deck when you enter the matrix.
-
-    The most prominent properties are:
-    * a class ("Attack", "Shield", "Slow", ...) that determines behaviour
-    * a rating (1..n) that determines how effective it works,
-      the market price, and memory required to run in your deck.
-    * a complexity, a value used internally to calculate those above.
-
-    The types table lists all the classes and predefined
-    names for each class.
-]]
+-- Software is what you load into your deck when you enter the matrix.
+-- The most prominent properties are:
+-- * a class ("Attack", "Shield", "Slow", ...) that determines behaviour
+-- * a rating (1..n) that determines how effective it works,
+--   the market price, and memory required to run in your deck.
+--   This is known as the Potential Rating. It can fluctuate while in the
+--   matrix, and is then known as the Active Rating.
+-- * a complexity, a value used internally to calculate those above.
+-- 
+-- The types table lists all the classes and predefined
+-- names for each class.
 
 
 local Software = {}
@@ -43,7 +43,7 @@ function Software:create(db, class, rating, name)
 
   -- assign the given values
   instance.class = class
-  instance.rating = math.floor(rating)
+  instance.potentialRating = math.floor(rating)
   instance.name = name or self:getDefaultName(db, instance)
 
   -- The effective rating while in the matrix.
@@ -728,8 +728,8 @@ function Software:getType(db, sw)
 end
 
 -- Get the potential rating.
-function Software:getRating(db, entity)
-  return entity.rating
+function Software:getPotentialRating(db, entity)
+  return entity.potentialRating
 end
 
 -- Get the active (current) rating.
@@ -763,28 +763,28 @@ end
 
 function Software:getMemoryUsage(db, sw)
   local def = self:getType(db, sw)
-  return def.complexity * sw.rating
+  return def.complexity * sw.potentialRating
 end
 
 function Software:getDefaultName(db, sw)
   local def = self:getType(db, sw)
-  return def.names[sw.rating]
+  return def.names[sw.potentialRating]
 end
 
 function Software:getPrice(db, sw)
   local def = self:getType(db, sw)
-  return def.complexity * sw.rating^2 * 25;
+  return def.complexity * sw.potentialRating^2 * 25;
 end
 
 function Software:getText(db, sw)
-  return string.format("%s (%s %d)", sw.name, sw.class, sw.rating)
+  return string.format("%s (%s %d)", sw.name, sw.class, sw.potentialRating)
 end
 
 
 -- get the highest rated active software
 function Software:findHighestActive(db)
   -- TODO
-  -- where loadedRating>0 and loadingTurns==0
+  -- where activeRating>0 and loadingTurns==0
 end
 
 -- Can load if not loaded already and no load turns are set.
@@ -822,7 +822,7 @@ function Software:update(db, entity)
     entity.loadTurns = entity.loadTurns - 1
     if entity.loadTurns == 0 then
       entity.loaded = true
-      entity.activeRating = entity.rating
+      entity.activeRating = entity.potentialRating
       -- TODO send message for program loaded
     end
   else

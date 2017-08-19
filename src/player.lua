@@ -196,8 +196,8 @@ function Player:addSoftware(db, entity)
   -- check for existing of the same class
   local existing = self:findSoftwareByClass(db, entity.class)
   if existing then
-    local existingRating = software:getRating(db, existing)
-    local entityRating = software:getRating(db, entity)
+    local existingRating = software:getPotentialRating(db, existing)
+    local entityRating = software:getPotentialRating(db, entity)
     -- remove existing if lower rated
     if existingRating < entityRating then
       self:removeSoftware(db, existing)
