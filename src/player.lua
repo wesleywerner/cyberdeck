@@ -149,17 +149,29 @@ end
 -- this returns false.
 function Player:addHardware(db, entity)
   local hardware = require("hardware")
-  local existing = self:findHardwareByClass(db, hardware:getName(db, entity))
-  if existing and hardware:getRating(db, existing) >= hardware:getRating(db, entity) then
-    -- TODO send message: You already own that hardware at the same or higher rating
-    return false
-  elseif existing then
-    -- resell old hardware
+
+  -- check for existing of the same class
+  local existing = self:findHardwareByClass(db, entity.class)
+  if existing then
+    local currentRating = hardware:getRating(db, existing)
+    local proposedRating = hardware:getRating(db, entity)
+    -- remove existing if lower rated
+    if currentRating < proposedRating then
+      self:removeHardware(db, existing)
+    else
+      -- TODO send message: You already own that hardware at the same or higher rating
+      return false
+    end
+  end
+
+  -- resell old hardware
+  if existing then
     local value = hardware:getResellPrice(db, existing)
     self:removeHardware(db, existing)
     self:addCredits(db, value)
     -- TODO send message: You sold your old hardware for %dcr
   end
+
   -- add the new hardware
   table.insert(db.player.hardware, entity)
   return true
@@ -195,13 +207,12 @@ function Player:addSoftware(db, entity)
   -- check for existing of the same class
   local existing = self:findSoftwareByClass(db, entity.class)
   if existing then
-    local existingRating = software:getPotentialRating(db, existing)
-    local entityRating = software:getPotentialRating(db, entity)
+    local currentRating = software:getPotentialRating(db, existing)
+    local proposedRating = software:getPotentialRating(db, entity)
     -- remove existing if lower rated
-    if existingRating < entityRating then
+    if currentRating < proposedRating then
       self:removeSoftware(db, existing)
     else
-      print(existingRating, entityRating)
       -- TODO send message: You already own that software at the same or higher rating
       return false
     end
