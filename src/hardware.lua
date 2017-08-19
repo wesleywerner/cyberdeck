@@ -38,30 +38,30 @@ function Hardware:create(db, class, rating)
 end
 
 Hardware.types = {
-	["Chip Burner"] = {
+  ["Chip Burner"] = {
     maxRating = 4,
     baseCost = 1000,
     levelSuffixes = {
       [1] = nil,
       [2] = "(Double Speed)",
-			[3] = "(Triple Speed)",
-			[4] = "(Quad Speed)"
+      [3] = "(Triple Speed)",
+      [4] = "(Quad Speed)"
 
     }
   },
-	["Surge Suppressor"] = {
+  ["Surge Suppressor"] = {
     maxRating = 5,
     baseCost = 500,
   },
-	["Neural Damper"] = {
+  ["Neural Damper"] = {
     maxRating = 5,
     baseCost = 1000,
   },
-	["Trace Monitor"] = {
+  ["Trace Monitor"] = {
     maxRating = 3,
     baseCost = 250,
   },
-	["Bio Monitor"] = {
+  ["Bio Monitor"] = {
     maxRating = 2,
     baseCost = 500,
     levelSuffixes = {
@@ -69,19 +69,19 @@ Hardware.types = {
       [2] = "(Auto Dump)"
     }
   },
-	["High Bandwidth Bus"] = {
+  ["High Bandwidth Bus"] = {
     maxRating = 5,
     baseCost = 500,
   },
-	["Proximity Mapper"] = {
+  ["Proximity Mapper"] = {
     maxRating = 1,
     baseCost = 2000,
   },
-	["Design Assistant"] = {
+  ["Design Assistant"] = {
     maxRating = 3,
     baseCost = 2000,
   },
-	["AntiTrace Proxy"] = {
+  ["AntiTrace Proxy"] = {
     maxRating = 1,
     baseCost = 1500,
   },
@@ -93,10 +93,6 @@ function Hardware:getType(db, hw)
     error( "No type definition found for %q", self.class)
   end
   return def
-end
-
-function Hardware:getName(db, hw)
-  return hw.class
 end
 
 function Hardware:getRating(db, hw)
@@ -121,18 +117,18 @@ function Hardware:getResellPrice(db, entity)
   return self:getPrice(db, entity) / 2
 end
 
-function Hardware:getText(db, hw)
-  local def = self:getType(db, hw)
+function Hardware:getText(db, entity)
+  local def = self:getType(db, entity)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
-    return self:getName(db, hw)
+    return entity.class
   else
     -- append a suffix instead of the current rating (if available)
-    local suffix = def.levelSuffixes and def.levelSuffixes[hw.rating]
+    local suffix = def.levelSuffixes and def.levelSuffixes[entity.rating]
     if suffix then
-      return string.format("%s %s", self:getName(db, hw), suffix )
+      return string.format("%s %s", entity.class, suffix )
     else
-      return string.format("%s L%d", self:getName(db, hw), hw.rating )
+      return string.format("%s L%d", entity.class, entity.rating )
     end
   end
 end

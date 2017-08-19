@@ -66,11 +66,11 @@ function Player:create(db)
   -- project we are working on
   instance.project = nil
   -- create project module?
-	--int m_nProjectType;
-	--int m_nProjectClass;
-	--int m_nProjectRating;
-	--int m_nProjectInitialTime;
-	--int m_nProjectTimeLeft;
+  --int m_nProjectType;
+  --int m_nProjectClass;
+  --int m_nProjectRating;
+  --int m_nProjectInitialTime;
+  --int m_nProjectTimeLeft;
 
   -- chip burning
   instance.chipBurner = nil
@@ -92,8 +92,8 @@ function Player:create(db)
 
   -- tracks damage done to the player during a turn in the matrix.
   -- I feel these will be better placed in the turn logic, if possible.
-	--int m_nDamageMental;
-	--int m_nDamageDeck;
+  --int m_nDamageMental;
+  --int m_nDamageDeck;
 
   -- system and node we are inside
   instance.system = nil
@@ -181,8 +181,7 @@ end
 function Player:removeHardware(db, entity)
   local hardware = require("hardware")
   for i,v in ipairs(db.player.hardware) do
-    -- TODO if v == entity
-    if hardware:getName(db, v) == hardware:getName(db, entity) then
+    if v == entity then
       table.remove(db.player.hardware, i)
       return true
     end

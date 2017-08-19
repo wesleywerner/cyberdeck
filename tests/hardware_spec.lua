@@ -18,9 +18,9 @@ describe("Hardware", function()
     assert.are.equals(hardware:getMaxRating(db, hw), 4)
   end)
 
-  it("get the hardware name", function()
+  it("get the hardware class", function()
     local hw = hardware:create(db, "Chip Burner", 1)
-    assert.are.equals(hardware:getName(db, hw), "Chip Burner")
+    assert.are.equals(hw.class, "Chip Burner")
   end)
 
   it("get the descriptive text", function()
