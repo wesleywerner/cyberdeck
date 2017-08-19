@@ -143,7 +143,7 @@ function Player:spendCredits(db, amount)
   end
 end
 
--- Adds the given hardware to the player.
+-- Add hardware to the player inventory.
 -- If the player already own this hardware at a lower rating, it is
 -- sold for a second-hand price. If the player owns a higher rated one
 -- this returns false.
@@ -177,7 +177,7 @@ function Player:addHardware(db, entity)
   return true
 end
 
--- Removes the given hardware from the player
+-- Remove hardware from the player inventory.
 function Player:removeHardware(db, entity)
   local hardware = require("hardware")
   for i,v in ipairs(db.player.hardware) do
@@ -188,7 +188,7 @@ function Player:removeHardware(db, entity)
   end
 end
 
--- Find a piece of hardware owned by the player
+-- Find player owned hardware by class name.
 function Player:findHardwareByClass(db, class)
   for i,v in ipairs(db.player.hardware) do
     if v.class == class then
@@ -197,7 +197,7 @@ function Player:findHardwareByClass(db, class)
   end
 end
 
--- Adds the given software to the player.
+-- Add software to the player inventory.
 -- Returns true on success.
 -- Returns false if the player owns the same or higher rated version.
 function Player:addSoftware(db, entity)
@@ -221,7 +221,7 @@ function Player:addSoftware(db, entity)
   return true
 end
 
--- Removes software from the player
+-- Remove software from the player inventory.
 function Player:removeSoftware(db, entity)
   for i,v in ipairs(db.player.software) do
     if v == entity then
@@ -231,7 +231,7 @@ function Player:removeSoftware(db, entity)
   end
 end
 
--- Find player owned software by name.
+-- Find player owned software by class name.
 function Player:findSoftwareByClass(db, class)
   for i,v in ipairs(db.player.software) do
     if v.class == class then
@@ -240,5 +240,43 @@ function Player:findSoftwareByClass(db, class)
   end
 end
 
+-- Add a chip to the player inventory.
+function Player:addChip(db, entity)
+  -- check for existing of the same class
+  local chips = require("chips")
+  local existing = self:findChipByClass(db, entity.class)
+  if existing then
+    local currentRating = chips:getRating(db, existing)
+    local proposedRating = chips:getRating(db, entity)
+    -- remove existing if lower rated
+    if currentRating < proposedRating then
+      self:removeChip(db, existing)
+    else
+      -- TODO send message: You already own that software at the same or higher rating
+      return false
+    end
+  end
+  table.insert(db.player.chips, entity)
+  return true
+end
+
+-- Remove a chip from the player inventory.
+function Player:removeChip(db, entity)
+  for i,v in ipairs(db.player.chips) do
+    if v == entity then
+      table.remove(db.player.chips, i)
+      return true
+    end
+  end
+end
+
+-- Find player owned chip by class name.
+function Player:findChipByClass(db, class)
+  for i,v in ipairs(db.player.chips) do
+    if v.class == class then
+      return v
+    end
+  end
+end
 
 return Player

@@ -6,10 +6,10 @@ describe("Player", function()
   -- create a new player for each test
   before_each(function()
     db = {}
-    db.player = player:create(nil)
+    db.player = player:create(db)
   end)
 
-  describe("Player credits", function()
+  describe("credits", function()
 
     it("starts poor", function()
 
@@ -59,7 +59,7 @@ describe("Player", function()
 
   end)
 
-  describe("Player hardware", function()
+  describe("hardware", function()
 
     local hardware = require("hardware")
 
@@ -132,7 +132,7 @@ describe("Player", function()
 
   end)
 
-  describe("Player software", function()
+  describe("software", function()
 
     local software = require("software")
 
@@ -182,6 +182,80 @@ describe("Player", function()
       assert.is_true(isProg2Added)
       local owned = player:findSoftwareByClass(db, "Attack")
       assert.are.equal(owned, prog2)
+
+    end)
+
+  end)
+
+  describe("chips", function()
+
+    local chips = require("chips")
+
+    it("add new", function()
+
+      -- add a cpu chip
+      local cpu = chips:create(db, "CPU", 1)
+      local isAdded = player:addChip(db, cpu)
+
+      -- verify
+      assert.is_true(isAdded)
+
+      local owned = player:findChipByClass(db, "CPU")
+      assert.are.equal(cpu, owned)
+
+    end)
+
+    it("upgrade existing", function()
+
+      -- add a lower chip
+      local cpu1 = chips:create(db, "CPU", 1)
+      local cpu1added = player:addChip(db, cpu1)
+
+      -- add a higher chip
+      local cpu2 = chips:create(db, "CPU", 2)
+      local cpu2added = player:addChip(db, cpu2)
+
+      -- verify
+      assert.is_true(cpu1added)
+      assert.is_true(cpu2added)
+
+      local owned = player:findChipByClass(db, "CPU")
+      assert.are.equal(cpu2, owned)
+
+    end)
+
+    it("upgrade existing fails if owns better", function()
+
+      -- add a higher chip
+      local cpu2 = chips:create(db, "CPU", 2)
+      local cpu2added = player:addChip(db, cpu2)
+
+      -- try add a lower chip
+      local cpu1 = chips:create(db, "CPU", 1)
+      local cpu1added = player:addChip(db, cpu1)
+
+      -- verify
+      assert.is_false(cpu1added)
+      assert.is_true(cpu2added)
+
+      local owned = player:findChipByClass(db, "CPU")
+      assert.are.equal(cpu2, owned)
+
+    end)
+
+    it("remove existing", function()
+
+      -- add a cpu chip
+      local cpu = chips:create(db, "CPU", 1)
+      local isAdded = player:addChip(db, cpu)
+      local isRemoved = player:removeChip(db, cpu)
+
+      -- verify
+      assert.is_true(isAdded)
+      assert.is_true(isRemoved)
+
+      local owned = player:findChipByClass(db, "CPU")
+      assert.is_nil(owned)
 
     end)
 
