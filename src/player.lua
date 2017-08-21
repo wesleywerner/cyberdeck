@@ -179,7 +179,6 @@ end
 
 -- Remove hardware from the player inventory.
 function Player:removeHardware(db, entity)
-  local hardware = require("hardware")
   for i,v in ipairs(db.player.hardware) do
     if v == entity then
       table.remove(db.player.hardware, i)
