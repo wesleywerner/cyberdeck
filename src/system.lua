@@ -130,7 +130,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
 
   -- The maximum nodes is a log function that increases rapidly at
   -- lower system sizes.
-  local maxnodes = 1 + math.log(entity.size)
+  local maxnodes = math.floor(math.log(entity.size+1)*4)
 
   -- the CPU node is always in the inner-most area, otherwise it gets a SPU.
   if areaNo == 1 then
@@ -171,7 +171,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   table.insert(nodes, {
     ["type"] = "data store node",
     ["minimum"] = 1,
-    ["maximum"] = math.random(maxnodes),
+    ["maximum"] = math.random(maxnodes/2, maxnodes),
   })
 
   -- Add the ICE port I/O node
@@ -186,14 +186,14 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   table.insert(nodes, {
     ["type"] = "coprocessor node",
     ["minimum"] = 0,
-    ["maximum"] = math.random(maxnodes),
+    ["maximum"] = math.random(maxnodes/2, maxnodes),
   })
 
   -- Optional IO nodes
   table.insert(nodes, {
     ["type"] = "input output node",
     ["minimum"] = 0,
-    ["maximum"] = math.random(maxnodes),
+    ["maximum"] = math.random(maxnodes/2, maxnodes),
   })
 
   -- Random high-speed IO node
