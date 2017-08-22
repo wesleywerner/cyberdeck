@@ -55,18 +55,19 @@ function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
     print(string.format("min area size is %d, randomized to %d", nmin, totalNodes))
 
     -- generate the area layout, based on the number of nodes to place
-    local map = self:newMap()
-    local gen = layoutfunc(map, entity, areaNo, totalNodes)
+    local map = self:newMap(totalNodes*2)
+    layoutfunc(map, entity, areaNo, totalNodes)
+    --self:assignNodesToMap(map, spec, totalNodes)
     table.insert(entity.areas, map)
   end
 
 end
 
-function System:newMap()
+function System:newMap(size)
   local map = {}
-  for h=1,10 do
+  for h=1,size do
     map[h] = {}
-    for w=1,10 do
+    for w=1,size do
       map[h][w] = 0
     end
   end
@@ -91,8 +92,10 @@ function System.defaultLayoutFunc(map, systemEntity, areaNo, nodeCount)
   local DN=2
   local LT=3
   local RT=4
-  local x,y=5,5
+  local mapsize=#map[1]
+  local x,y=math.floor(mapsize/2),math.floor(mapsize/2)
 
+  print(string.format("map size is %d. middle is %d/%d", mapsize, x, y))
   --local nodes=4+math.floor(math.log(systemEntity.size) * 2)
 
   -- Move in a random direction until an empty map space is encountered.
@@ -106,11 +109,11 @@ function System.defaultLayoutFunc(map, systemEntity, areaNo, nodeCount)
       if dir == UP then
         y=math.max(1,y-1)
       elseif dir == DN then
-        y=math.min(10,y+1)
+        y=math.min(mapsize,y+1)
       elseif dir == LT then
         x=math.max(1, x-1)
       elseif dir == RT then
-        x=math.min(10,x+1)
+        x=math.min(mapsize,x+1)
       end
     end
   end
@@ -256,10 +259,31 @@ function System:calculateMinMaxNodes(spec)
   return minimum, maximum
 end
 
+-- Take the map layout and assign the node specification to fill in
+-- the nodes.
+function System:assignNodesToMap(map, spec, nodeCount)
+
+  -- there are nodes left to assign
+  while nodeCount > 0 do
+
+    -- look at the node specification for guidance
+    for k,entry in ipairs(spec) do
+
+      -- assign the minimum number of nodes required
+      if entry.minimum > 0 then
+        entry.minimum = entry.minimum - 1
+        nodeCount = nodeCount - 1
+      end
+
+    end
+  end
+end
+
 function System:print(entity)
   for i,area in ipairs(entity.areas) do
-    for h=1,10 do
-      for w=1,10 do
+    local mapsize=#area[1]
+    for h=1,mapsize do
+      for w=1,mapsize do
         if area[w][h] == 1 then
           io.write("+")
         else
