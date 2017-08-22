@@ -47,12 +47,7 @@ function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
     local spec = nodeSpecification(entity, areaNo)
 
     -- get the min and max number of nodes for the specification
-    local nmin,nspare = self:calculateMinMaxNodes(spec)
-
-    -- add a random variance of max nodes allowed
-    local totalNodes = nmin + math.random(nspare-nmin) - 1
-
-    print(string.format("area can have between %d and %d nodes, I decided on %d.", nmin, nspare, totalNodes))
+    local totalNodes = self:getAreaNodeCount(spec)
 
     -- generate the area layout, based on the number of nodes to place
     local map = self:newMap(totalNodes*2)
@@ -130,7 +125,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
 
   -- The maximum nodes is a log function that increases rapidly at
   -- lower system sizes.
-  local maxnodes = math.floor(math.log(entity.size+1)*4)
+  local maxnodes = math.floor(math.log(entity.size+1)*2)
 
   -- the CPU node is always in the inner-most area, otherwise it gets a SPU.
   if areaNo == 1 then
@@ -251,14 +246,29 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
 
 end
 
--- Take a node specification table and return the min,max number of nodes.
-function System:calculateMinMaxNodes(spec)
-  local minimum, maximum = 0, 0
-  for k,entry in ipairs(spec) do
+-- Get the number of nodes for an area
+function System:getAreaNodeCount(nodeDef)
+
+  -- sum the minimum and spare values for all definition entries
+  local minimum, spare = 0, 0
+
+  for k,entry in ipairs(nodeDef) do
     minimum = minimum + entry.minimum
-    maximum = maximum + entry.spare
+    spare = spare + entry.spare
   end
-  return minimum, maximum
+
+  -- take the minimum plus a random number of spare
+  local total = minimum
+
+  if spare > 0 then
+    total = total + math.random(spare)
+  end
+
+  -- testing output
+  print(string.format("area can have %d to %d nodes. I decided on %d.", minimum, minimum+spare, total))
+
+  return total
+
 end
 
 -- Take the map layout and assign the node specification to fill in
