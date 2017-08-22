@@ -57,7 +57,7 @@ function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
     -- generate the area layout, based on the number of nodes to place
     local map = self:newMap(totalNodes*2)
     layoutfunc(map, entity, areaNo, totalNodes)
-    --self:assignNodesToMap(map, spec, totalNodes)
+    self:assignNodesToMap(map, spec, totalNodes)
     table.insert(entity.areas, map)
   end
 
@@ -103,8 +103,8 @@ function System.defaultLayoutFunc(map, systemEntity, areaNo, nodeCount)
   -- existing nodes until a free space is encountered. Every node will
   -- always be adjacent to at least one other node.
   for nsteps=1,nodeCount do
-    map[x][y] = 1
-    while map[x][y] > 0 do
+    map[x][y] = -1
+    while map[x][y] == -1 do
       local dir = math.random(1,4)
       if dir == UP then
         y=math.max(1,y-1)
@@ -263,18 +263,45 @@ end
 -- the nodes.
 function System:assignNodesToMap(map, spec, nodeCount)
 
+  local mapsize = #map[1]
+
+  local setMapValue = function(value)
+    local x,y=1,1
+    while map[x][y] == 0 or map[x][y] > 0 do
+      x = math.random(mapsize)
+      y = math.random(mapsize)
+    end
+    --print(string.format("setting map %d/%d",x,y))
+    map[x][y]=value
+  end
+
   -- there are nodes left to assign
   while nodeCount > 0 do
 
+    -- track whether minimum required nodes are left to place, they are placed first.
+    local hasMinimumLeft = false
+
     -- look at the node specification for guidance
-    for k,entry in ipairs(spec) do
+    for entryIndex,entry in ipairs(spec) do
 
-      -- assign the minimum number of nodes required
-      if entry.minimum > 0 then
-        entry.minimum = entry.minimum - 1
-        nodeCount = nodeCount - 1
+      if nodeCount > 0 then
+
+        -- assign the minimum number of nodes required
+        if entry.minimum > 0 then
+          entry.minimum = entry.minimum - 1
+          nodeCount = nodeCount - 1
+          hasMinimumLeft = true
+          setMapValue(entryIndex)
+        end
+
+        -- place optional maximum nodes if all minimum has been placed
+        if not hasMinimumLeft and entry.maximum > 0 then
+          entry.maximum = entry.maximum - 1
+          nodeCount = nodeCount - 1
+          setMapValue(entryIndex)
+        end
+
       end
-
     end
   end
 end
@@ -284,8 +311,11 @@ function System:print(entity)
     local mapsize=#area[1]
     for h=1,mapsize do
       for w=1,mapsize do
-        if area[w][h] == 1 then
+        local value = area[w][h]
+        if value == -1 then
           io.write("+")
+        elseif value > 0 then
+          io.write(value)
         else
           io.write(" ")
         end
