@@ -47,12 +47,12 @@ function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
     local spec = nodeSpecification(entity, areaNo)
 
     -- get the min and max number of nodes for the specification
-    local nmin,nmax = self:calculateMinMaxNodes(spec)
+    local nmin,nspare = self:calculateMinMaxNodes(spec)
 
     -- add a random variance of max nodes allowed
-    local totalNodes = nmin + math.random(nmax-nmin) - 1
+    local totalNodes = nmin + math.random(nspare-nmin) - 1
 
-    print(string.format("min area size is %d, randomized to %d", nmin, totalNodes))
+    print(string.format("area can have between %d and %d nodes, I decided on %d.", nmin, nspare, totalNodes))
 
     -- generate the area layout, based on the number of nodes to place
     local map = self:newMap(totalNodes*2)
@@ -137,13 +137,13 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
     table.insert(nodes, {
       ["type"] = "central processing node",
       ["minimum"] = 1,
-      ["maximum"] = 1,
+      ["spare"] = 0,
     })
   else
     table.insert(nodes, {
       ["type"] = "sub processing node",
       ["minimum"] = 1,
-      ["maximum"] = 1,
+      ["spare"] = 0,
     })
   end
 
@@ -152,7 +152,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
     table.insert(nodes, {
       ["type"] = "input output node",
       ["minimum"] = 1,
-      ["maximum"] = 1,
+      ["spare"] = 0,
       ["controls"] = { "external alarms" }
     })
   end
@@ -163,7 +163,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   table.insert(nodes, {
     ["type"] = "coprocessor node",
     ["minimum"] = 1,
-    ["maximum"] = 1,
+    ["spare"] = 0,
     ["controls"] = { "security" }
   })
 
@@ -171,14 +171,14 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   table.insert(nodes, {
     ["type"] = "data store node",
     ["minimum"] = 1,
-    ["maximum"] = math.random(maxnodes/2, maxnodes),
+    ["spare"] = math.random(maxnodes/2, maxnodes),
   })
 
   -- Add the ICE port I/O node
   table.insert(nodes, {
     ["type"] = "input output node",
     ["minimum"] = 1,
-    ["maximum"] = 1,
+    ["spare"] = 0,
     ["controls"] = { "ICE" }
   })
 
@@ -186,14 +186,14 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   table.insert(nodes, {
     ["type"] = "coprocessor node",
     ["minimum"] = 0,
-    ["maximum"] = math.random(maxnodes/2, maxnodes),
+    ["spare"] = math.random(maxnodes/2, maxnodes)*2,
   })
 
   -- Optional IO nodes
   table.insert(nodes, {
     ["type"] = "input output node",
     ["minimum"] = 0,
-    ["maximum"] = math.random(maxnodes/2, maxnodes),
+    ["spare"] = math.random(maxnodes/2, maxnodes),
   })
 
   -- Random high-speed IO node
@@ -201,7 +201,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
     table.insert(nodes, {
       ["type"] = "input output node",
       ["minimum"] = 1,
-      ["maximum"] = 1,
+      ["spare"] = 0,
       ["controls"] = { "high speed" }
     })
   end
@@ -209,17 +209,19 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   -- Portal IN node
   if areaNo > 1 then
     table.insert(nodes, {
-      ["type"] = "portal in node",
+      ["type"] = "portal node",
       ["minimum"] = 1,
-      ["maximum"] = 1,
+      ["spare"] = 0,
+      ["controls"] = { "in" }
     })
   end
 
   -- Portal out
   table.insert(nodes, {
-    ["type"] = "portal out node",
+    ["type"] = "portal node",
     ["minimum"] = 1,
-    ["maximum"] = 1,
+    ["spare"] = 0,
+    ["controls"] = { "out" }
   })
 
   return nodes
@@ -254,7 +256,7 @@ function System:calculateMinMaxNodes(spec)
   local minimum, maximum = 0, 0
   for k,entry in ipairs(spec) do
     minimum = minimum + entry.minimum
-    maximum = maximum + entry.maximum
+    maximum = maximum + entry.spare
   end
   return minimum, maximum
 end
@@ -295,8 +297,8 @@ function System:assignNodesToMap(map, spec, nodeCount)
         end
 
         -- place optional maximum nodes if all minimum has been placed
-        if not hasMinimumLeft and entry.maximum > 0 then
-          entry.maximum = entry.maximum - 1
+        if not hasMinimumLeft and entry.spare > 0 then
+          entry.spare = entry.spare - 1
           nodeCount = nodeCount - 1
           setMapValue(entryIndex)
         end
