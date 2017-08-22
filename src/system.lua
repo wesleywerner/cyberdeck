@@ -15,17 +15,23 @@
 
 local System = {}
 
-function System:create(size)
+function System:create(size, seed)
+
+  if type(size) ~= "number" or type(seed) ~= "number" then
+    error("system create needs the parameters [size, seed] as numbers.")
+  end
 
   local instance = {}
-  instance.size = size
+  instance.size = math.floor(size)
   instance.areas = {}
+  instance.seed = seed
   return instance
 
 end
 
 function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
 
+  math.randomseed(entity.seed)
   layoutfunc = layoutfunc or self.defaultLayoutFunc
   areafunc = areafunc or self.defaultAreasFunc
   nodeSpecification = nodeSpecification or self.defaultNodesSpecificationFunc
@@ -42,10 +48,11 @@ function System:generate(entity, areafunc, layoutfunc, nodeSpecification)
 
     -- get the min and max number of nodes for the specification
     local nmin,nmax = self:calculateMinMaxNodes(spec)
-    print(nmin,nmax,nmax-nmin)
 
     -- add a random variance of max nodes allowed
-    local totalNodes = nmin + math.random(nmax-nmin)
+    local totalNodes = nmin + math.random(nmax-nmin) - 1
+
+    print(string.format("min area size is %d, randomized to %d", nmin, totalNodes))
 
     -- generate the area layout, based on the number of nodes to place
     local map = self:newMap()
