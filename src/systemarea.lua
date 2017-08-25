@@ -20,7 +20,7 @@ function Area:create(db, number, definition)
   local instance = {}
   instance.number = number
   instance.definition = definition
-  instance.nodeCount = self:getnumberdeCount(db, definition)
+  instance.nodeCount = self:calculateAreaNodeCount(db, definition)
   -- map size is padded for extra room.
   instance.mapsize = instance.nodeCount*2
   instance.map = {}
@@ -41,7 +41,7 @@ function Area:create(db, number, definition)
 end
 
 -- Get the number of nodes for an area
-function Area:getnumberdeCount(db, definition)
+function Area:calculateAreaNodeCount(db, definition)
 
   -- sum the minimum and spare values for all definition entries
   local minimum, spare = 0, 0
@@ -51,12 +51,7 @@ function Area:getnumberdeCount(db, definition)
     spare = spare + entry.spare
   end
 
-  -- take the minimum plus a random number of spare
-  local total = minimum
-
-  if spare > 0 then
-    total = total + math.random(spare)
-  end
+  local total = minimum + spare
 
   -- testing output
   print(string.format("area can have %d to %d nodes. I decided on %d.", minimum, minimum+spare, total))
