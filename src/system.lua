@@ -29,12 +29,18 @@ function System:create(size, seed)
 
 end
 
-function System:generate(entity, nodeSpecification)
+-- Generate areas and nodes for a system, using a node definition.
+-- The definition defines the types of nodes to place on the map.
+-- If no definition is given, use the default one.
+-- The definition can be a table or function that returns a table.
+function System:generate(entity, nodeDefinition)
 
   local Area = require("systemarea")
 
   math.randomseed(entity.seed)
-  nodeSpecification = nodeSpecification or self.defaultNodesSpecificationFunc
+
+  -- use a default node definition if none was given
+  nodeDefinition = nodeDefinition or self.defaultNodesSpecificationFunc
 
   -- The higher the system level the more areas it has.
   -- The first areas are the inner areas, the last area would be
@@ -43,10 +49,13 @@ function System:generate(entity, nodeSpecification)
 
   for areaNo=1, areaCount do
 
-    -- get the node spec that defines which nodes should be placed
-    local spec = nodeSpecification(entity, areaNo)
-    local area = Area:create(nil, areaNo, spec)
-    table.insert(entity.areas, area)
+    if type(nodeDefinition) == "table" then
+      local area = Area:create(areaNo, nodeDefinition)
+      table.insert(entity.areas, area)
+    elseif type(nodeDefinition) == "function" then
+      local area = Area:create(areaNo, nodeSpecification(entity, areaNo) )
+      table.insert(entity.areas, area)
+    end
 
   end
 
