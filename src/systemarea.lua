@@ -53,9 +53,6 @@ function Area:calculateAreaNodeCount(db, definition)
 
   local total = minimum + spare
 
-  -- testing output
-  print(string.format("area can have %d to %d nodes. I decided on %d.", minimum, minimum+spare, total))
-
   return total
 
 end
@@ -67,9 +64,9 @@ function Area:generateLayout(db, entity)
   local DN=2
   local LT=3
   local RT=4
-  local x,y=math.floor(entity.mapsize/2),math.floor(entity.mapsize/2)
 
-  print(string.format("map size is %d. middle is %d/%d", entity.mapsize, x, y))
+  -- start in the center of the map
+  local x,y=math.floor(entity.mapsize/2),math.floor(entity.mapsize/2)
 
   -- Move in a random direction until an empty map space is encountered.
   -- this always creates the requested number of nodes, by walking over
@@ -121,8 +118,23 @@ function Area:assignNodesToMap(db, entity)
     -- track whether minimum required nodes are left to place
     local hasMinimumLeft = false
 
+    -- TODO copy the definition to preserve original from modification.
+    -- THIS IS A DEMO COPY THAT HANDLES 2 LEVELS ONLY.
+    -- FIND A BEST DEEP COPY SOLUTION.
+    local defcopy = {}
+    for k,v in pairs(entity.definition) do
+      if type(v) == "table" then
+        defcopy[k] = {}
+        for m,n in pairs(v) do
+          defcopy[k][m] = n
+        end
+      else
+        defcopy[k] = v
+      end
+    end
+
     -- look at the node specification for guidance
-    for entryIndex, entry in ipairs(entity.definition) do
+    for entryIndex, entry in ipairs(defcopy) do
 
       -- we must test this inside the loop to avoid an infinite loop
       if nodeCount > 0 then
