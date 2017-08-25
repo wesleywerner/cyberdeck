@@ -15,12 +15,12 @@
 
 local Area = {}
 
-function Area:create(db, number, definition)
+function Area:create(number, definition)
 
   local instance = {}
   instance.number = number
   instance.definition = definition
-  instance.nodeCount = self:calculateAreaNodeCount(db, definition)
+  instance.nodeCount = self:calculateAreaNodeCount(definition)
   -- map size is padded for extra room.
   instance.mapsize = instance.nodeCount*2
   instance.map = {}
@@ -33,15 +33,15 @@ function Area:create(db, number, definition)
     end
   end
 
-  self:generateLayout(db, instance)
-  self:assignNodesToMap(db, instance)
+  self:generateLayout(instance)
+  self:assignNodesToMap(instance)
 
   return instance
 
 end
 
 -- Get the number of nodes for an area
-function Area:calculateAreaNodeCount(db, definition)
+function Area:calculateAreaNodeCount(definition)
 
   -- sum the minimum and spare values for all definition entries
   local minimum, spare = 0, 0
@@ -58,7 +58,7 @@ function Area:calculateAreaNodeCount(db, definition)
 end
 
 -- Fill node positions on the map with a placeholder value.
-function Area:generateLayout(db, entity)
+function Area:generateLayout(entity)
 
   local UP=1
   local DN=2
@@ -97,7 +97,7 @@ end
 -- Replace placeholders on the map with items from the node definition.
 -- The minimum required nodes are placed first, and the spare nodes
 -- fill in the remaining placeholders.
-function Area:assignNodesToMap(db, entity)
+function Area:assignNodesToMap(entity)
 
   -- Puts a value in a random placeholder
   local setMapValue = function(value)
