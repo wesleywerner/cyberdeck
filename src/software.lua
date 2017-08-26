@@ -774,13 +774,6 @@ function Software:getText(sw)
   return string.format("%s (%s %d)", sw.name, sw.class, sw.potentialRating)
 end
 
-
--- get the highest rated active software
-function Software:findHighestActive(softwarelist)
-  -- TODO
-  -- where activeRating>0 and loadingTurns==0
-end
-
 -- Can load if not loaded already and no load turns are set.
 function Software:canLoad(entity)
   return not entity.loaded and entity.loadTurns == 0
