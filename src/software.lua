@@ -737,27 +737,20 @@ function Software:getActiveRating(entity)
   return entity.activeRating
 end
 
-function Software:getLoadTime(db, entity)
-  -- load time is dependent on your hardware bus and current node speed.
+-- load time is dependent on your hardware bus and node speed.
+function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthRate)
 
-  -- TODO If have a high-speed connection, time is 1 turn.
-  --      node would be the current node the player is in.
-  local node = db.player.node
-  if node and node:isHighSpeed() and node:isActivated() then
+  -- If have a high-speed connection, time is 1 turn.
+  if inActivatedHighSpeedNode == true then
     return 1
   end
 
   -- Time is size / (2^(bus size))
-  -- TODO implement player hardware
-  local hardware = db.player.hardware
-  if hardware then
-    local mp = self:getMemoryUsage(entity)
-    local speed = 2^hardware:getBandwidthRate()
-    --print("memory usage: " .. mp)
-    --print("bus speed: " .. speed)
-    -- clamp to 1 for lowest value
-    return math.max(1, ((mp + speed - 1) / speed))
-  end
+  local mp = self:getMemoryUsage(entity)
+  local speed = 2^playerBandwidthRate
+
+  -- clamp to 1 for lowest value
+  return math.max(1, ((mp + speed - 1) / speed))
 
 end
 
@@ -807,12 +800,12 @@ function Software:hasCrashed(entity)
   return entity.loaded and entity.activeRating < 1
 end
 
-function Software:beginLoad(db, entity)
+function Software:beginLoad(entity, inActivatedHighSpeedNode, playerBandwidthRate)
   -- TODO check if the deck won't overload
   -- TODO check how many other programs are loading, and if we have
   --      the memory to load this one asynchronously
   if self:canLoad(entity) then
-    entity.loadTurns = self:getLoadTime(db, entity)
+    entity.loadTurns = self:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthRate)
   end
 end
 
