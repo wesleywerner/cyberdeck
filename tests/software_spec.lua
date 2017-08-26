@@ -4,12 +4,12 @@ describe("Software", function()
 
   it("get the type definition", function()
     local sw = software:create("Attack", 1)
-    assert.are.equals(software:getType(sw), software.types['Attack'])
+    assert.are.equals(software.types['Attack'], software:getType(sw))
   end)
 
   it("get the potential rating", function()
     local sw = software:create("Attack", 4)
-    assert.are.equals(software:getPotentialRating(sw), 4)
+    assert.are.equals(4, software:getPotentialRating(sw))
   end)
 
   it("get the loaded rating", function()
@@ -35,42 +35,42 @@ describe("Software", function()
 
   it("get the default name", function()
     local sw = software:create("Attack", 3)
-    assert.are.equals(software:getDefaultName(sw), software.types["Attack"].names[3])
+    assert.are.equals(software.types["Attack"].names[3], software:getDefaultName(sw))
   end)
 
   it("get the custom name", function()
     local sw = software:create("Attack", 3, "Fritz 42")
-    assert.are.equals(sw.name, "Fritz 42")
+    assert.are.equals("Fritz 42", sw.name)
   end)
 
   it("get the descriptive text", function()
     local sw = software:create("Virus", 4)
-    assert.are.equals(software:getText(sw), "Arsenic (Virus 4)")
+    assert.are.equals("Arsenic (Virus 4)", software:getText(sw))
   end)
 
   it("get the price for L1 attack", function()
     local sw1 = software:create("Attack", 1)
-    assert.are.equals(software:getPrice(sw1), 50)  -- 2 * 1^2 * 25
+    assert.are.equals(50, software:getPrice(sw1))  -- 2 * 1^2 * 25
   end)
 
   it("get the price for L3 attack", function()
     local sw2 = software:create("Attack", 3)
-    assert.are.equals(software:getPrice(sw2), 450) -- 2 * 3^2 * 25
+    assert.are.equals(450, software:getPrice(sw2)) -- 2 * 3^2 * 25
   end)
 
   it("get the price for L3 virus", function()
     local sw3 = software:create("Virus", 3)
-    assert.are.equals(software:getPrice(sw3), 675) -- 3 * 3^2 * 25
+    assert.are.equals(675, software:getPrice(sw3)) -- 3 * 3^2 * 25
   end)
 
   it("get the memory usage for L1 attack", function()
     local attackSoftware = software:create("Attack", 1)
-    assert.are.equals(software:getMemoryUsage(attackSoftware), 2)
+    assert.are.equals(2, software:getMemoryUsage(attackSoftware))
   end)
 
   it("get the memory usage for L2 virus", function()
     local virusSoftware = software:create("Virus", 2)
-    assert.are.equals(software:getMemoryUsage(virusSoftware), 6)
+    assert.are.equals(6, software:getMemoryUsage(virusSoftware))
   end)
 
   it("get the load time within a high-speed node", function()
