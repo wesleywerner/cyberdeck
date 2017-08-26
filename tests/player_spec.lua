@@ -327,11 +327,34 @@ describe("Player", function()
 
     end)
 
-    it("limit points to lifestyle", function()
+    it("upgrade lifestyle with enough points", function()
 
-      player:alterReputation(playerdata, 15)
+      -- need 15 points to level up to reputation2
+      player:alterReputation(playerdata, 7)
+      player:alterReputation(playerdata, 7)
+      player:alterReputation(playerdata, 1)
       assert.are.equals(2, playerdata.reputation.level)
-      --assert.are.equals(1, playerdata.reputation.points)
+
+    end)
+
+    it("limit reputation by lifestyle", function()
+
+      -- max reputation for lifestyle 1 is 4
+      playerdata.reputation.level = 4
+      player:alterReputation(playerdata, 100) -- absurd increase, where 50 would be enough
+      assert.are.equals(4, playerdata.reputation.level)
+
+    end)
+
+    it("reduces level with enough points lost", function()
+
+      -- jump to level 2
+      player:alterReputation(playerdata, 15)
+      -- reduce points
+      player:alterReputation(playerdata, -1)
+      -- test if the level has dropped
+      assert.are.equals(1, playerdata.reputation.level)
+
 
     end)
 

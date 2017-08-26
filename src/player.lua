@@ -323,11 +323,21 @@ end
 -- Change the player's reputation with positive or negative points
 function Player:alterReputation(player, points)
 
-  -- alias
+  -- alias variable for ease of use
   local rep = player.reputation
 
+  -- apply the points
   rep.points = rep.points + points
   rep.points = math.max(0, rep.points)
+
+  -- Reputation level is limited by your lifestyle
+  local maxLevelPerLifestyle = player.lifestyle * 4
+
+  if rep.level >= maxLevelPerLifestyle then
+    --print("max points reached for lifestyle")
+    -- TODO message that max reputation is reached for this lifestyle
+    return false
+  end
 
   -- calculator for points needed per reputation level
   local calcPointsForLevel = function(level)
@@ -342,20 +352,9 @@ function Player:alterReputation(player, points)
     --print("need " .. pointsToUpgrade .. " has " .. rep.points)
 
     if rep.points >= pointsToUpgrade then
-
-      -- Reputation is limited by your lifestyle
-      local maxPerLifestyle = player.lifestyle * 4
-
-      if rep.level < maxPerLifestyle then
-        rep.level = rep.level + 1
-        --print("leveled up")
-        -- TODO message that our reputation has increased
-      else
-        --print("max points reached for lifestyle")
-        rep.points = maxPerLifestyle
-        -- TODO message that max reputation is reached for this lifestyle
-      end
-
+      rep.level = rep.level + 1
+      --print("leveled up")
+      -- TODO message that our reputation has increased
     end
 
   end
@@ -368,6 +367,7 @@ function Player:alterReputation(player, points)
 
     if rep.points < pointsToSustainLevel then
       rep.level = rep.level - 1
+      --print("not enough points to sustain level")
       -- TODO message that reputation was reduced
     end
 
