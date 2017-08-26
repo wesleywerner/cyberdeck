@@ -22,7 +22,8 @@ function Player:create()
   local instance = {}
   instance.name = "Hacker X"
   instance.credits = 0
-  instance.lifestyle = nil
+
+  instance.lifestyle = 1
 
   -- Mental and deck health reset when entering the matrix.
   instance.health = {
@@ -31,8 +32,9 @@ function Player:create()
     ["deck"] = 0
   }
 
+  -- Reputation is limited by your lifestyle*4
   instance.reputation = {
-    ["level"] = "Poverty",
+    ["level"] = 1,
     ["points"] = 0
   }
 
@@ -316,6 +318,62 @@ function Player:getSkillLevel(player, class)
   else
     return skills[class]
   end
+end
+
+-- Change the player's reputation with positive or negative points
+function Player:alterReputation(player, points)
+
+  -- alias
+  local rep = player.reputation
+
+  rep.points = rep.points + points
+  rep.points = math.max(0, rep.points)
+
+  -- calculator for points needed per reputation level
+  local calcPointsForLevel = function(level)
+    return math.floor((5 * level * (level+1)) / 2)
+  end
+
+  -- adding points can upgrade the reputation level
+  if points > 0 then
+
+    -- Check if we have enough points to move to the next level
+    local pointsToUpgrade = calcPointsForLevel(rep.level+1)
+    --print("need " .. pointsToUpgrade .. " has " .. rep.points)
+
+    if rep.points >= pointsToUpgrade then
+
+      -- Reputation is limited by your lifestyle
+      local maxPerLifestyle = player.lifestyle * 4
+
+      if rep.level < maxPerLifestyle then
+        rep.level = rep.level + 1
+        --print("leveled up")
+        -- TODO message that our reputation has increased
+      else
+        --print("max points reached for lifestyle")
+        rep.points = maxPerLifestyle
+        -- TODO message that max reputation is reached for this lifestyle
+      end
+
+    end
+
+  end
+
+  -- subtracting points can reduce the reputation level
+  -- if the player has reputation to lose.
+  if points < 0 and rep.level > 1 then
+
+    local pointsToSustainLevel = calcPointsForLevel(rep.level)
+
+    if rep.points < pointsToSustainLevel then
+      rep.level = rep.level - 1
+      -- TODO message that reputation was reduced
+    end
+
+  end
+
+
 end
 
 return Player

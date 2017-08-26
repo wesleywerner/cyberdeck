@@ -13,7 +13,7 @@ describe("Player", function()
     it("starts poor", function()
 
       -- verify starting credit amount
-      assert.are.equal(player:getCredits(playerdata), 0)
+      assert.are.equals(player:getCredits(playerdata), 0)
 
     end)
 
@@ -24,7 +24,7 @@ describe("Player", function()
       player:addCredits(playerdata, 20)
 
       -- verify the total
-      assert.are.equal(player:getCredits(playerdata), 42)
+      assert.are.equals(player:getCredits(playerdata), 42)
 
     end)
 
@@ -38,7 +38,7 @@ describe("Player", function()
 
       -- verify we spent it
       assert.is_true(didSpend)
-      assert.are.equal(player:getCredits(playerdata), 20)
+      assert.are.equals(player:getCredits(playerdata), 20)
 
     end)
 
@@ -52,7 +52,7 @@ describe("Player", function()
 
       -- verify result
       assert.is_false(didSpend)
-      assert.are.equal(player:getCredits(playerdata), 42)
+      assert.are.equals(player:getCredits(playerdata), 42)
 
     end)
 
@@ -70,7 +70,7 @@ describe("Player", function()
 
       -- verify the player owns it
       local owned = player:findHardwareByClass(playerdata, "Chip Burner")
-      assert.are.equal(burner, owned)
+      assert.are.equals(burner, owned)
 
     end)
 
@@ -88,11 +88,11 @@ describe("Player", function()
 
       -- verify the new hardware is owned by the player
       local owned = player:findHardwareByClass(playerdata, "Chip Burner")
-      assert.are.equal(burnerL2, owned)
+      assert.are.equals(burnerL2, owned)
 
       -- test the player received credits for selling the old hardware
       local resellValue = hardware:getResellPrice(burnerL1)
-      assert.are.equal(player:getCredits(playerdata), resellValue)
+      assert.are.equals(player:getCredits(playerdata), resellValue)
 
     end)
 
@@ -110,7 +110,7 @@ describe("Player", function()
 
       -- verify results
       local owned = player:findHardwareByClass(playerdata, "Chip Burner")
-      assert.are.equal(burnerL2, owned)
+      assert.are.equals(burnerL2, owned)
 
     end)
 
@@ -144,7 +144,7 @@ describe("Player", function()
       -- verify it was added
       assert.is_true(isAdded)
       local owned = player:findSoftwareByClass(playerdata, "Attack")
-      assert.are.equal(owned, prog)
+      assert.are.equals(owned, prog)
 
     end)
 
@@ -162,7 +162,7 @@ describe("Player", function()
       assert.is_true(isProg1Added)
       assert.is_true(isProg2Added)
       local owned = player:findSoftwareByClass(playerdata, "Attack")
-      assert.are.equal(owned, prog2)
+      assert.are.equals(owned, prog2)
 
     end)
 
@@ -180,7 +180,7 @@ describe("Player", function()
       assert.is_false(isProg1Added)
       assert.is_true(isProg2Added)
       local owned = player:findSoftwareByClass(playerdata, "Attack")
-      assert.are.equal(owned, prog2)
+      assert.are.equals(owned, prog2)
 
     end)
 
@@ -200,7 +200,7 @@ describe("Player", function()
       assert.is_true(isAdded)
 
       local owned = player:findChipByClass(playerdata, "CPU")
-      assert.are.equal(cpu, owned)
+      assert.are.equals(cpu, owned)
 
     end)
 
@@ -219,7 +219,7 @@ describe("Player", function()
       assert.is_true(cpu2added)
 
       local owned = player:findChipByClass(playerdata, "CPU")
-      assert.are.equal(cpu2, owned)
+      assert.are.equals(cpu2, owned)
 
     end)
 
@@ -238,7 +238,7 @@ describe("Player", function()
       assert.is_true(cpu2added)
 
       local owned = player:findChipByClass(playerdata, "CPU")
-      assert.are.equal(cpu2, owned)
+      assert.are.equals(cpu2, owned)
 
     end)
 
@@ -270,7 +270,7 @@ describe("Player", function()
     end)
 
     it("starts unskilled", function()
-      assert.are.equal(1, player:getSkillLevel(playerdata, "attack"))
+      assert.are.equals(1, player:getSkillLevel(playerdata, "attack"))
     end)
 
     it("add points", function()
@@ -279,7 +279,7 @@ describe("Player", function()
       player:addSkillPoints(playerdata, 2)
 
       -- verify
-      assert.are.equal(2, player:getSkillPoints(playerdata))
+      assert.are.equals(2, player:getSkillPoints(playerdata))
 
     end)
 
@@ -293,7 +293,7 @@ describe("Player", function()
 
       -- verify
       assert.is_true(didSpend)
-      assert.are.equal(2, player:getSkillLevel(playerdata, "attack"))
+      assert.are.equals(2, player:getSkillLevel(playerdata, "attack"))
 
     end)
 
@@ -304,7 +304,34 @@ describe("Player", function()
 
       -- verify the skill is still on level 1
       assert.is_false(didSpend)
-      assert.are.equal(1, player:getSkillLevel(playerdata, "attack"))
+      assert.are.equals(1, player:getSkillLevel(playerdata, "attack"))
+
+    end)
+
+  end)
+
+  describe("reputation", function()
+
+    it("starts unknown", function()
+
+      assert.are.equals(1, playerdata.reputation.level)
+      assert.are.equals(0, playerdata.reputation.points)
+
+    end)
+
+    it("add points", function()
+
+      player:alterReputation(playerdata, 1)
+      assert.are.equals(1, playerdata.reputation.level)
+      assert.are.equals(1, playerdata.reputation.points)
+
+    end)
+
+    it("limit points to lifestyle", function()
+
+      player:alterReputation(playerdata, 15)
+      assert.are.equals(2, playerdata.reputation.level)
+      --assert.are.equals(1, playerdata.reputation.points)
 
     end)
 
