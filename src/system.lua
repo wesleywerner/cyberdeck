@@ -53,7 +53,7 @@ function System:generate(entity, nodeDefinition)
       local area = Area:create(areaNo, nodeDefinition)
       table.insert(entity.areas, area)
     elseif type(nodeDefinition) == "function" then
-      local area = Area:create(areaNo, nodeSpecification(entity, areaNo) )
+      local area = Area:create(areaNo, nodeDefinition(entity, areaNo) )
       table.insert(entity.areas, area)
     end
 

@@ -28,7 +28,7 @@
 
 local Software = {}
 
-function Software:create(db, class, rating, name)
+function Software:create(class, rating, name)
 
   local instance = {}
 
@@ -44,7 +44,7 @@ function Software:create(db, class, rating, name)
   -- assign the given values
   instance.class = class
   instance.potentialRating = math.floor(rating)
-  instance.name = name or self:getDefaultName(db, instance)
+  instance.name = name or self:getDefaultName(instance)
 
   -- The effective rating while in the matrix.
   -- It will equal "rating" when loaded into your deck.
@@ -719,7 +719,7 @@ Software.types = {
 }
 
 --[[ Gets the definition for the class underlying this software ]]
-function Software:getType(db, sw)
+function Software:getType(sw)
   local def = self.types[sw.class]
   if not def then
     error( "No software class definition found for %q", sw.class)
@@ -728,12 +728,12 @@ function Software:getType(db, sw)
 end
 
 -- Get the potential rating.
-function Software:getPotentialRating(db, entity)
+function Software:getPotentialRating(entity)
   return entity.potentialRating
 end
 
 -- Get the active (current) rating.
-function Software:getActiveRating(db, entity)
+function Software:getActiveRating(entity)
   return entity.activeRating
 end
 
@@ -751,7 +751,7 @@ function Software:getLoadTime(db, entity)
   -- TODO implement player hardware
   local hardware = db.player.hardware
   if hardware then
-    local mp = self:getMemoryUsage(db, entity)
+    local mp = self:getMemoryUsage(entity)
     local speed = 2^hardware:getBandwidthRate()
     --print("memory usage: " .. mp)
     --print("bus speed: " .. speed)
@@ -761,49 +761,49 @@ function Software:getLoadTime(db, entity)
 
 end
 
-function Software:getMemoryUsage(db, sw)
-  local def = self:getType(db, sw)
+function Software:getMemoryUsage(sw)
+  local def = self:getType(sw)
   return def.complexity * sw.potentialRating
 end
 
-function Software:getDefaultName(db, sw)
-  local def = self:getType(db, sw)
+function Software:getDefaultName(sw)
+  local def = self:getType(sw)
   return def.names[sw.potentialRating]
 end
 
-function Software:getPrice(db, sw)
-  local def = self:getType(db, sw)
+function Software:getPrice(sw)
+  local def = self:getType(sw)
   return def.complexity * sw.potentialRating^2 * 25;
 end
 
-function Software:getText(db, sw)
+function Software:getText(sw)
   return string.format("%s (%s %d)", sw.name, sw.class, sw.potentialRating)
 end
 
 
 -- get the highest rated active software
-function Software:findHighestActive(db)
+function Software:findHighestActive(softwarelist)
   -- TODO
   -- where activeRating>0 and loadingTurns==0
 end
 
 -- Can load if not loaded already and no load turns are set.
-function Software:canLoad(db, entity)
+function Software:canLoad(entity)
   return not entity.loaded and entity.loadTurns == 0
 end
 
 -- Is loaded and ready for use
-function Software:isLoaded(db, entity)
+function Software:isLoaded(entity)
   return entity.loaded
 end
 
 -- Is loading when there are load turns left
-function Software:isLoading(db, entity)
+function Software:isLoading(entity)
   return entity.loadTurns > 0
 end
 
 -- Crashes when loaded and the active rating drops to zero or below
-function Software:hasCrashed(db, entity)
+function Software:hasCrashed(entity)
   return entity.loaded and entity.activeRating < 1
 end
 
@@ -811,14 +811,14 @@ function Software:beginLoad(db, entity)
   -- TODO check if the deck won't overload
   -- TODO check how many other programs are loading, and if we have
   --      the memory to load this one asynchronously
-  if self:canLoad(db, entity) then
+  if self:canLoad(entity) then
     entity.loadTurns = self:getLoadTime(db, entity)
   end
 end
 
 -- Update the entity state at the end of the player's turn.
-function Software:update(db, entity)
-  if self:isLoading(db, entity) then
+function Software:update(entity)
+  if self:isLoading(entity) then
     entity.loadTurns = entity.loadTurns - 1
     if entity.loadTurns == 0 then
       entity.loaded = true
@@ -827,7 +827,7 @@ function Software:update(db, entity)
     end
   else
     -- test if the program has crashed
-    if self:hasCrashed(db, entity) then
+    if self:hasCrashed(entity) then
       entity.loaded = false
       entity.activeRating = 0
       -- TODO send message for program crashed
@@ -835,11 +835,11 @@ function Software:update(db, entity)
   end
 end
 
-function Software:updateAll(db)
+function Software:updateAll(softwarelist)
   -- TODO loop through all software and update
   --- pseudocode:
-  for k,v in db.player.software do
-    self:update(db, v)
+  for k,v in softwarelist do
+    self:update(v)
   end
 end
 

@@ -15,7 +15,7 @@
 
 local Hardware = {}
 
-function Hardware:create(db, class, rating)
+function Hardware:create(class, rating)
 
   -- new instance
   local instance = {}
@@ -87,7 +87,7 @@ Hardware.types = {
   },
 }
 
-function Hardware:getType(db, hw)
+function Hardware:getType(hw)
   local def = self.types[hw.class]
   if not def then
     error( "No type definition found for %q", self.class)
@@ -95,30 +95,30 @@ function Hardware:getType(db, hw)
   return def
 end
 
-function Hardware:getRating(db, hw)
+function Hardware:getRating(hw)
   return hw.rating
 end
 
-function Hardware:getMaxRating(db, hw)
-  local def = self:getType(db, hw)
+function Hardware:getMaxRating(hw)
+  local def = self:getType(hw)
   return def.maxRating
 end
 
-function Hardware:getPrice(db, hw)
+function Hardware:getPrice(hw)
   -- the original calculation uses bitwise left shift on the rating.
   -- since only lua 5.3+ has native bitwise operator support we use a
   -- lookup here to keep compatiblity with older luas.
   local lookup = {1,2,4,8,16}
-  local def = self:getType(db, hw)
+  local def = self:getType(hw)
   return def.baseCost * lookup[hw.rating]
 end
 
-function Hardware:getResellPrice(db, entity)
-  return self:getPrice(db, entity) / 2
+function Hardware:getResellPrice(entity)
+  return self:getPrice(entity) / 2
 end
 
-function Hardware:getText(db, entity)
-  local def = self:getType(db, entity)
+function Hardware:getText(entity)
+  local def = self:getType(entity)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
     return entity.class

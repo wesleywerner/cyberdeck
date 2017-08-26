@@ -17,7 +17,7 @@ local Player = {}
 
 Player.MAXHEALTH = 20
 
-function Player:create(db)
+function Player:create()
 
   local instance = {}
   instance.name = "Hacker X"
@@ -113,32 +113,32 @@ function Player:create(db)
 
 end
 
-function Player:getName(db)
-  return db.player.name
+function Player:getName(player)
+  return player.name
 end
 
 -- Reset matrix-specific values.
-function Player:prepareForMatrix(db)
-  db.player.health.mental = self.MAXHEALTH
-  db.player.health.deck = self.MAXHEALTH
+function Player:prepareForMatrix(player)
+  player.health.mental = self.MAXHEALTH
+  player.health.deck = self.MAXHEALTH
 end
 
 -- Get bank balance
-function Player:getCredits(db)
-  return db.player.credits
+function Player:getCredits(player)
+  return player.credits
 end
 
 -- Increase credits
-function Player:addCredits(db, amount)
-  db.player.credits = db.player.credits + amount
+function Player:addCredits(player, amount)
+  player.credits = player.credits + amount
 end
 
 -- If there are not enough credits to spend, return false.
-function Player:spendCredits(db, amount)
-  if db.player.credits < amount then
+function Player:spendCredits(player, amount)
+  if player.credits < amount then
     return false
   else
-    db.player.credits = db.player.credits - amount
+    player.credits = player.credits - amount
     return true
   end
 end
@@ -147,17 +147,17 @@ end
 -- If the player already own this hardware at a lower rating, it is
 -- sold for a second-hand price. If the player owns a higher rated one
 -- this returns false.
-function Player:addHardware(db, entity)
+function Player:addHardware(player, entity)
   local hardware = require("hardware")
 
   -- check for existing of the same class
-  local existing = self:findHardwareByClass(db, entity.class)
+  local existing = self:findHardwareByClass(player, entity.class)
   if existing then
-    local currentRating = hardware:getRating(db, existing)
-    local proposedRating = hardware:getRating(db, entity)
+    local currentRating = hardware:getRating(existing)
+    local proposedRating = hardware:getRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
-      self:removeHardware(db, existing)
+      self:removeHardware(player, existing)
     else
       -- TODO send message: You already own that hardware at the same or higher rating
       return false
@@ -166,31 +166,30 @@ function Player:addHardware(db, entity)
 
   -- resell old hardware
   if existing then
-    local value = hardware:getResellPrice(db, existing)
-    self:removeHardware(db, existing)
-    self:addCredits(db, value)
+    local value = hardware:getResellPrice(existing)
+    self:removeHardware(player, existing)
+    self:addCredits(player, value)
     -- TODO send message: You sold your old hardware for %dcr
   end
 
   -- add the new hardware
-  table.insert(db.player.hardware, entity)
+  table.insert(player.hardware, entity)
   return true
 end
 
 -- Remove hardware from the player inventory.
-function Player:removeHardware(db, entity)
-  local hardware = require("hardware")
-  for i,v in ipairs(db.player.hardware) do
+function Player:removeHardware(player, entity)
+  for i,v in ipairs(player.hardware) do
     if v == entity then
-      table.remove(db.player.hardware, i)
+      table.remove(player.hardware, i)
       return true
     end
   end
 end
 
 -- Find player owned hardware by class name.
-function Player:findHardwareByClass(db, class)
-  for i,v in ipairs(db.player.hardware) do
+function Player:findHardwareByClass(player, class)
+  for i,v in ipairs(player.hardware) do
     if v.class == class then
       return v
     end
@@ -200,40 +199,40 @@ end
 -- Add software to the player inventory.
 -- Returns true on success.
 -- Returns false if the player owns the same or higher rated version.
-function Player:addSoftware(db, entity)
+function Player:addSoftware(player, entity)
   local software = require("software")
 
   -- check for existing of the same class
-  local existing = self:findSoftwareByClass(db, entity.class)
+  local existing = self:findSoftwareByClass(player, entity.class)
   if existing then
-    local currentRating = software:getPotentialRating(db, existing)
-    local proposedRating = software:getPotentialRating(db, entity)
+    local currentRating = software:getPotentialRating(existing)
+    local proposedRating = software:getPotentialRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
-      self:removeSoftware(db, existing)
+      self:removeSoftware(player, existing)
     else
       -- TODO send message: You already own that software at the same or higher rating
       return false
     end
   end
 
-  table.insert(db.player.software, entity)
+  table.insert(player.software, entity)
   return true
 end
 
 -- Remove software from the player inventory.
-function Player:removeSoftware(db, entity)
-  for i,v in ipairs(db.player.software) do
+function Player:removeSoftware(player, entity)
+  for i,v in ipairs(player.software) do
     if v == entity then
-      table.remove(db.player.software, i)
+      table.remove(player.software, i)
       return true
     end
   end
 end
 
 -- Find player owned software by class name.
-function Player:findSoftwareByClass(db, class)
-  for i,v in ipairs(db.player.software) do
+function Player:findSoftwareByClass(player, class)
+  for i,v in ipairs(player.software) do
     if v.class == class then
       return v
     end
@@ -241,38 +240,38 @@ function Player:findSoftwareByClass(db, class)
 end
 
 -- Add a chip to the player inventory.
-function Player:addChip(db, entity)
+function Player:addChip(player, entity)
   -- check for existing of the same class
   local chips = require("chips")
-  local existing = self:findChipByClass(db, entity.class)
+  local existing = self:findChipByClass(player, entity.class)
   if existing then
-    local currentRating = chips:getRating(db, existing)
-    local proposedRating = chips:getRating(db, entity)
+    local currentRating = chips:getRating(existing)
+    local proposedRating = chips:getRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
-      self:removeChip(db, existing)
+      self:removeChip(player, existing)
     else
       -- TODO send message: You already own that software at the same or higher rating
       return false
     end
   end
-  table.insert(db.player.chips, entity)
+  table.insert(player.chips, entity)
   return true
 end
 
 -- Remove a chip from the player inventory.
-function Player:removeChip(db, entity)
-  for i,v in ipairs(db.player.chips) do
+function Player:removeChip(player, entity)
+  for i,v in ipairs(player.chips) do
     if v == entity then
-      table.remove(db.player.chips, i)
+      table.remove(player.chips, i)
       return true
     end
   end
 end
 
 -- Find player owned chip by class name.
-function Player:findChipByClass(db, class)
-  for i,v in ipairs(db.player.chips) do
+function Player:findChipByClass(player, class)
+  for i,v in ipairs(player.chips) do
     if v.class == class then
       return v
     end
@@ -280,26 +279,26 @@ function Player:findChipByClass(db, class)
 end
 
 -- Get the total skill points available for spending.
-function Player:getSkillPoints(db)
-  return db.player.skills["points"]
+function Player:getSkillPoints(player)
+  return player.skills["points"]
 end
 
 -- Add skill points to the player that they can spend.
-function Player:addSkillPoints(db, amount)
-  local skills = db.player.skills
+function Player:addSkillPoints(player, amount)
+  local skills = player.skills
   skills["points"] = skills["points"] + amount
 end
 
 -- Increase one of the player skills.
 -- If not enough points are available, return false.
 -- The cost equals the current skill level.
-function Player:spendSkillPoints(db, class)
-  local skills = db.player.skills
+function Player:spendSkillPoints(player, class)
+  local skills = player.skills
   if not skills[class] then
     error(string.format("%q is not a valid skill class", class))
   end
   local points = skills["points"]
-  local cost = self:getSkillLevel(db, class)
+  local cost = self:getSkillLevel(player, class)
   if cost > points then
     return false
   else
@@ -310,8 +309,8 @@ function Player:spendSkillPoints(db, class)
 end
 
 -- Get the skill level of the requested skill class.
-function Player:getSkillLevel(db, class)
-  local skills = db.player.skills
+function Player:getSkillLevel(player, class)
+  local skills = player.skills
   if not skills[class] then
     error(string.format("%q is not a valid skill class", class))
   else

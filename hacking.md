@@ -29,15 +29,13 @@ You can consider all non-view source files as logic, and these modules do not re
 ```
 -- create a new chip burner, stored in local "hw"
 hardware = require('hardware')
-local someChip = hardware:create(db, "Chip Burner", 1)
+local someChip = hardware:create("Chip Burner", 1)
 
 -- later, we get the purchase price
-local howmuch = hardware:getPrice(db, someChip)
+local howmuch = hardware:getPrice(someChip)
 ```
 
 The entities we create will live in one table, affectionately thought of as the "db", which should live inside a single module only.
-
-All the logic methods take our affectionately named `db` as a parameter. Not all of the methods will use it, but we give it anyway so things stay consistent.
 
 Worst case of hard-coding is limited to logic modules storing lookup lists to ensure data integrity. Our hardware module has a list of possible hardware types to ensure that we create a "chip burner" and not a "pizza oven" by mistake.
 
@@ -159,7 +157,7 @@ The game can become a bit repetitive after a certain skill is reached. These ide
 
 * a warning should be shown if the player starts a new chip project, and they don't own a chip burner.
 * what is lifestyle and reputation, and how do they affect my game?
-* why do I have so many types of chips (co processor, attack, defense...) in my decker? 
+* why do I have so many types of chips (co processor, attack, defense...) in my decker?
 * when and how is my attack/defend rating modified?
 * how do I heal?
 * how do I turn off a red alert?

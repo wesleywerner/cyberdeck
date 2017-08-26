@@ -69,7 +69,7 @@
 local Ice = {}
 Ice.MAX_HEALTH = 20
 
-function Ice:create(db, class, rating, flags)
+function Ice:create(class, rating, flags)
 
   -- new instance
   local instance = {}
@@ -135,9 +135,9 @@ function Ice:create(db, class, rating, flags)
   -- attempt to fry a random one of the player's chips on successful dump
   instance.fryer = false
   -- apply any given flags
-  self:applyFlags(db, instance, flags)
+  self:applyFlags(instance, flags)
 
-  instance.name = self:getDefaultName(db, instance)
+  instance.name = self:getDefaultName(instance)
   return instance
 
 end
@@ -412,7 +412,7 @@ Ice.alternateNames = {
 }
 
 -- apply the given flags, a table of string values, to the ICE
-function Ice:applyFlags(db, ice, flags)
+function Ice:applyFlags(ice, flags)
   local allowedFlags = {
     ["hardened"] = true,
     ["phasing"] = true,
@@ -433,7 +433,7 @@ function Ice:applyFlags(db, ice, flags)
   end
 end
 
-function Ice:getType(db, ice)
+function Ice:getType(ice)
   local def = self.types[ice.class]
   if not def then
     error("No type definition found for %q", ice.class)
@@ -441,11 +441,11 @@ function Ice:getType(db, ice)
   return def
 end
 
-function Ice:getName(db, ice)
+function Ice:getName(ice)
   return ice.name
 end
 
-function Ice:getDefaultName(db, ice)
+function Ice:getDefaultName(ice)
   local nameList
   if ice.hardened then
     nameList = self.alternateNames["hardened"]
@@ -462,7 +462,7 @@ function Ice:getDefaultName(db, ice)
   elseif ice.dumper then
     nameList = self.alternateNames["dumper"]
   else
-    local def = self:getType(db, ice)
+    local def = self:getType(ice)
     nameList = def.names
   end
 
@@ -478,8 +478,8 @@ function Ice:getDefaultName(db, ice)
   end
 end
 
-function Ice:getNotes(db, ice)
-  local def = self:getType(db, ice)
+function Ice:getNotes(ice)
+  local def = self:getType(ice)
   if ice.analyzedLevel == 0 then
     -- give the ICE type note
     return def.note
@@ -508,15 +508,15 @@ function Ice:getNotes(db, ice)
   end
 end
 
-function Ice:getText(db, ice)
-  return string.format("%s (%s %d)", self:getName(db, ice), ice.class, ice.rating)
+function Ice:getText(ice)
+  return string.format("%s (%s %d)", self:getName(ice), ice.class, ice.rating)
 end
 
 -- get the ICE rating, adjusted by factors like health,
 -- if the ICE was analyzed and any weakened effects.
 -- larger results indicate a favorable outcome for the ICE.
 -- give optional parameter "versusHardwareOrOtherICE" as true to ignore player analysis effects.
-function Ice:getRating(db, ice, versusHardwareOrOtherICE)
+function Ice:getRating(ice, versusHardwareOrOtherICE)
 
   -- use the base rating
   local nRating = ice.rating
@@ -544,9 +544,9 @@ end
 
 -- get the ICE rating adjusted for combat.
 -- non-combat ICE take a penalty.
-function Ice:getAttackRating(db, ice, versusHardwareOrOtherICE)
-  local nRating = self:getRating(db, ice, versusHardwareOrOtherICE)
-  local def = self:getType(db, ice)
+function Ice:getAttackRating(ice, versusHardwareOrOtherICE)
+  local nRating = self:getRating(ice, versusHardwareOrOtherICE)
+  local def = self:getType(ice)
   if not def.isCombat then
     return nRating - 2
   else
@@ -557,9 +557,9 @@ end
 -- get the ICE rating adjusted for sensors.
 -- used when calculating odds of hide and deceive programs against ICE.
 -- non-combat ICE get a bonus if alarm set.
-function Ice:getSensorRating(db, ice, versusHardwareOrOtherICE)
-  local nRating = self:getRating(db, ice, versusHardwareOrOtherICE)
-  local def = self:getType(db, ice)
+function Ice:getSensorRating(ice, versusHardwareOrOtherICE)
+  local nRating = self:getRating(ice, versusHardwareOrOtherICE)
+  local def = self:getType(ice)
   -- TODO check if current system alert is not green
   if not def.isCombat then
     return nRating + 2
@@ -568,7 +568,7 @@ function Ice:getSensorRating(db, ice, versusHardwareOrOtherICE)
   end
 end
 
-function Ice:setState(db, ice, newstate)
+function Ice:setState(ice, newstate)
   local allowedStates = {
     ["inactive"] = true,
     ["guarding"] = true,

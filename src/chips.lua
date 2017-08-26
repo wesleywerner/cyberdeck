@@ -15,7 +15,7 @@
 
 local Chips = {}
 
-function Chips:create(db, class, rating)
+function Chips:create(class, rating)
 
   -- new instance
   local instance = {}
@@ -58,7 +58,7 @@ Chips.types = {
   },
 }
 
-function Chips:getType(db, ch)
+function Chips:getType(ch)
   local def = self.types[ch.class]
   if not def then
     error( "No type definition found for %q", ch.class)
@@ -66,21 +66,21 @@ function Chips:getType(db, ch)
   return def
 end
 
-function Chips:getName(db, ch)
+function Chips:getName(ch)
   return ch.class
 end
 
-function Chips:getRating(db, ch)
+function Chips:getRating(ch)
   return ch.rating
 end
 
-function Chips:getPrice(db, ch)
-  local def = self:getType(db, ch)
+function Chips:getPrice(ch)
+  local def = self:getType(ch)
   return math.pow(ch.rating, 2) * def.baseCost
 end
 
-function Chips:getText(db, ch)
-  return string.format("%s L%d", self:getName(db, ch), ch.rating)
+function Chips:getText(ch)
+  return string.format("%s L%d", self:getName(ch), ch.rating)
 end
 
 return Chips
