@@ -748,9 +748,10 @@ function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthR
   -- Time is size / (2^(bus size))
   local mp = self:getMemoryUsage(entity)
   local speed = 2^playerBandwidthRate
+  local loadtime = math.floor((mp + speed - 1) / speed)
 
   -- clamp to 1 for lowest value
-  return math.max(1, ((mp + speed - 1) / speed))
+  return math.max(1, loadtime)
 
 end
 

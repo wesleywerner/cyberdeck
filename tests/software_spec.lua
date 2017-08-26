@@ -12,25 +12,36 @@ describe("Software", function()
     assert.are.equals(4, software:getPotentialRating(sw))
   end)
 
-  it("get the loaded rating", function()
-    -- to test the rating, which is actually the "active rating" we must
-    -- load the software first
+  it("get the active rating", function()
+    -- to test the active rating we must load the software first and
+    -- then update it to forward it's load progress.
     local sw = software:create("Virus", 2)
+
     -- ensure the software can be loaded
     local canwe = software:canLoad(sw)
     assert.is_true(canwe)
+
     -- assume a high-speed node, which has a load time of 1
-    local bandwidthrate = 1
-    local highspeednode = true
+    local bandwidthrate = 2
+    local highspeednode = false
+
     -- load it
     software:beginLoad(sw, highspeednode, bandwidthrate)
+
+    -- test the expected load turns
+    assert.are.equal(2, sw.loadTurns)
+
     -- check it is in a loading state
     local isloading = software:isLoading(sw)
     assert.is_true(isloading)
-    -- call update to forward the loading process
+
+    -- call update twice, simulating 2 turns, to forward the loading process
     software:update(sw)
+    software:update(sw)
+
     -- now we can get the rating
     assert.are.equals(2, software:getActiveRating(sw))
+
   end)
 
   it("get the default name", function()
@@ -73,19 +84,19 @@ describe("Software", function()
     assert.are.equals(6, software:getMemoryUsage(virusSoftware))
   end)
 
-  it("get the load time within a high-speed node", function()
+  it("get the load time for a high-speed node", function()
     local sw = software:create("Attack", 1)
     local highspeednode = true
     local loadtime = software:getLoadTime(sw, highspeednode)
     assert.are.equals(1, loadtime)
   end)
 
-  it("get the load time with a high-bandwidth bus", function()
+  it("get the load time for a high-bandwidth bus", function()
     local sw = software:create("Virus", 2)  -- gives 6 memory points
     local bandwidthrate = 2
     local highspeednode = false
     local loadtime = software:getLoadTime(sw, highspeednode, bandwidthrate)
-    assert.are.equals(2.25, loadtime)
+    assert.are.equals(2, loadtime)
   end)
 
   it("errors on creating an invalid software", function()
