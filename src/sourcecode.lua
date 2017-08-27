@@ -158,9 +158,9 @@ function Sourcecode:workOnCode(player, entity)
     -- (source rating) - (relevant skill * design assist rating)
     local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
     local rolltarget = 10 + entity.rating - (entity.relevantSkillLevel + designAssistLevel)
-    local rollvalue, rollwin = Die:roll(rolltarget)
+    local roll = Die:roll(rolltarget)
 
-    if rollwin then
+    if roll.success then
       Player:addSource(player, entity)
       -- TODO message that the project is complete and now in your sources list
     else
