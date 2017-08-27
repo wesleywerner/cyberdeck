@@ -316,6 +316,7 @@ describe("Player", function()
 
       assert.are.equals(1, playerdata.reputation.level)
       assert.are.equals(0, playerdata.reputation.points)
+      assert.are.equals("Nobody", playerdata.reputation.text)
 
     end)
 
@@ -334,6 +335,7 @@ describe("Player", function()
       player:alterReputation(playerdata, 7)
       player:alterReputation(playerdata, 1)
       assert.are.equals(2, playerdata.reputation.level)
+      assert.are.equals("Wannabe", playerdata.reputation.text)
 
     end)
 
@@ -355,7 +357,6 @@ describe("Player", function()
       -- test if the level has dropped
       assert.are.equals(1, playerdata.reputation.level)
 
-
     end)
 
     it("reduce level when at max for lifestyle", function()
@@ -376,6 +377,7 @@ describe("Player", function()
 
       -- test if the level has dropped
       assert.are.equals(3, playerdata.reputation.level)
+      assert.are.equals("Cyber Surfer", playerdata.reputation.text)
 
 
     end)

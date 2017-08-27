@@ -35,8 +35,11 @@ function Player:create()
   -- Reputation is limited by your lifestyle*4
   instance.reputation = {
     ["level"] = 1,
-    ["points"] = 0
+    ["points"] = 0,
+    ["text"] = ""
   }
+
+  instance.reputation.text = self:getReputationText(instance)
 
   instance.skills = {
     ["points"] = 0,
@@ -373,6 +376,8 @@ function Player:alterReputation(player, points)
 
   end
 
+  rep.text = self:getReputationText(player)
+
 end
 
 function Player:getLifestyleText(player)
@@ -410,7 +415,11 @@ function Player:getReputationText(player)
     "Master of the Matrix",
     "Matrix God",
   }
-
+  if player.reputation.level > #reputations then
+    return reputations[#reputations]
+  else
+    return reputations[player.reputation.level]
+  end
 end
 
 return Player
