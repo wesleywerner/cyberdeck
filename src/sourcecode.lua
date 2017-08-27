@@ -57,23 +57,6 @@ function Sourcecode:create(player, class, rating)
     relevantSkillLevel = Player:getSkillLevel(player, "chip design")
   end
 
-  -- Owning design assistant hardware reduces the time
-  local designAssistant = Player:findHardwareByClass(player, "Design Assistant")
-  local designAssistLevel = designAssistant and designAssistant.rating or 0
-  local appliedSkill = relevantSkillLevel * (1 + designAssistLevel)
-  local baseTime = complexity * math.pow(rating, 2)
-
-  -- Receive a time bonus if the player owns source for this class already
-  local ownedSource = Player:findSourceByClass(player, class)
-  if ownedSource then
-    local previousBaseTime = (complexity * math.pow(ownedSource.rating, 2))
-    baseTime = baseTime - previousBaseTime
-    --print(string.format("owned %d, reduced by %d", ownedSource.rating, previousBaseTime))
-  end
-
-  local daysToComplete = math.ceil((baseTime + appliedSkill - 1) / appliedSkill)
-
-
   local instance = {}
   instance.class = class
   instance.rating = math.min(relevantSkillLevel, rating)
@@ -83,7 +66,31 @@ function Sourcecode:create(player, class, rating)
   instance.isSoftware = isSoftware
   instance.isChip = isChip
   instance.daysToComplete = daysToComplete
+  instance.daysToComplete = self:calculateTimeToDevelop(player, instance)
   return instance
+
+end
+
+
+function Sourcecode:calculateTimeToDevelop(player, entity)
+
+  local Player = require("player")
+
+  -- Owning design assistant hardware reduces the time
+  local designAssistant = Player:findHardwareByClass(player, "Design Assistant")
+  local designAssistLevel = designAssistant and designAssistant.rating or 0
+  local appliedSkill = entity.relevantSkillLevel * (1 + designAssistLevel)
+  local baseTime = entity.complexity * math.pow(entity.rating, 2)
+
+  -- Receive a time bonus if the player owns source for this class already
+  local ownedSource = Player:findSourceByClass(player, entity.class)
+  if ownedSource then
+    local previousBaseTime = (entity.complexity * math.pow(ownedSource.rating, 2))
+    baseTime = baseTime - previousBaseTime
+    --print(string.format("owned %d, reduced by %d", ownedSource.rating, previousBaseTime))
+  end
+
+  return math.ceil((baseTime + appliedSkill - 1) / appliedSkill)
 
 end
 
