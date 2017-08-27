@@ -17,6 +17,7 @@ local Player = {}
 
 Player.MAXHEALTH = 20
 
+-- The list of lifestyle levels
 Player.lifestyles = {
   {
     ["cost"] = 500,

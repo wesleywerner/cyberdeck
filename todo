@@ -11,6 +11,8 @@ Decker.h
 Decker.cpp
 
 ## wip
+ProjectDataDlg.cpp
+ProjectDataDlg.h
 Character.cpp
 Character.h
 Ice.cpp
@@ -92,8 +94,6 @@ OptionsDlg.cpp
 OptionsDlg.h
 OrderDlg.cpp
 OrderDlg.h
-ProjectDataDlg.cpp
-ProjectDataDlg.h
 resource.h
 RestDlg.cpp
 RestDlg.h
