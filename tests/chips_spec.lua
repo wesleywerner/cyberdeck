@@ -32,11 +32,16 @@ describe("Chips", function()
     assert.are.equals(chips:getText(cop), "Coprocessor L3")
   end)
 
-  it("erros when creating an invalid chip", function()
+  it("error when creating an invalid chip", function()
     local func = function()
       chips:create("Unreal item", 3)
     end
     assert.has.errors(func)
+  end)
+
+  it("get complexity", function()
+    local cpu = chips:create("CPU", 1)
+    assert.are.equals(5, chips:getComplexity(cpu))
   end)
 
 end)

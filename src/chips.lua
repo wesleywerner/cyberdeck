@@ -40,21 +40,27 @@ end
 Chips.types = {
   ["CPU"] = {
     baseCost = 150,
+    complexity = 5
   },
   ["Attack Firmware"] = {
     baseCost = 100,
+    complexity = 4
   },
   ["Defense Firmware"] = {
     baseCost = 100,
+    complexity = 4
   },
   ["Stealth Firmware"] = {
     baseCost = 100,
+    complexity = 4
   },
   ["Analysis Firmware"] = {
     baseCost = 100,
+    complexity = 4
   },
   ["Coprocessor"] = {
     baseCost = 125,
+    complexity = 5
   },
 }
 
@@ -81,6 +87,11 @@ end
 
 function Chips:getText(ch)
   return string.format("%s L%d", self:getName(ch), ch.rating)
+end
+
+function Chips:getComplexity(entity)
+  local definition = self:getType(entity)
+  return definition.complexity
 end
 
 return Chips
