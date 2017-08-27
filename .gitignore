@@ -6,3 +6,6 @@ luacov.stats.out
 luacov.report.out
 lint.sh
 
+# mergetool backups
+src/*.orig
+tests/*.orig
