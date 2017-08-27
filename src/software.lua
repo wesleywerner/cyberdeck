@@ -710,6 +710,7 @@ Software.types = {
     }
   },
   ["Client Software"] = {
+    clientOnly = true,
     complexity = 4,
     names = {
       "Client Supplied Software"
