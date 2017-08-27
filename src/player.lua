@@ -232,6 +232,13 @@ function Player:findHardwareByClass(player, class)
   end
 end
 
+-- Find the rating of hardware owned by the player.
+-- Returns 0 if no hardware was found.
+function Player:findHardwareRatingByClass(player, class)
+  local ware = self:findHardwareByClass(player, class)
+  return ware and ware.rating or 0
+end
+
 -- Add software to the player inventory.
 -- Returns true on success.
 -- Returns false if the player owns the same or higher rated version.
