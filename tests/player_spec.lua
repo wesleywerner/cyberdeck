@@ -346,7 +346,7 @@ describe("Player", function()
 
     end)
 
-    it("reduces level with enough points lost", function()
+    it("reduce level with enough points lost", function()
 
       -- jump to level 2
       player:alterReputation(playerdata, 15)
@@ -354,6 +354,28 @@ describe("Player", function()
       player:alterReputation(playerdata, -1)
       -- test if the level has dropped
       assert.are.equals(1, playerdata.reputation.level)
+
+
+    end)
+
+    it("reduce level when at max for lifestyle", function()
+
+      -- jump to max level for lifstyle
+
+      -- level 2
+      player:alterReputation(playerdata, 15)
+      -- level 3
+      player:alterReputation(playerdata, 15)
+      -- level 4
+      player:alterReputation(playerdata, 20)
+
+      assert.are.equals(4, playerdata.reputation.level)
+
+      -- reduce points
+      player:alterReputation(playerdata, -1)
+
+      -- test if the level has dropped
+      assert.are.equals(3, playerdata.reputation.level)
 
 
     end)

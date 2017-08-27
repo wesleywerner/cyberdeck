@@ -330,15 +330,6 @@ function Player:alterReputation(player, points)
   rep.points = rep.points + points
   rep.points = math.max(0, rep.points)
 
-  -- Reputation level is limited by your lifestyle
-  local maxLevelPerLifestyle = player.lifestyle * 4
-
-  if rep.level >= maxLevelPerLifestyle then
-    --print("max points reached for lifestyle")
-    -- TODO message that max reputation is reached for this lifestyle
-    return false
-  end
-
   -- calculator for points needed per reputation level
   local calcPointsForLevel = function(level)
     return math.floor((5 * level * (level+1)) / 2)
@@ -346,6 +337,15 @@ function Player:alterReputation(player, points)
 
   -- adding points can upgrade the reputation level
   if points > 0 then
+
+    -- Reputation level is limited by your lifestyle
+    local maxLevelPerLifestyle = player.lifestyle * 4
+
+    if rep.level >= maxLevelPerLifestyle then
+      --print("max points reached for lifestyle")
+      -- TODO message that max reputation is reached for this lifestyle
+      return false
+    end
 
     -- Check if we have enough points to move to the next level
     local pointsToUpgrade = calcPointsForLevel(rep.level+1)
@@ -373,6 +373,43 @@ function Player:alterReputation(player, points)
 
   end
 
+end
+
+function Player:getLifestyleText(player)
+  local lifestyles = {
+    "Poverty",
+    "Lower Class",
+    "Middle Class",
+    "Upper Class",
+    "Elite"
+  }
+
+end
+
+function Player:getReputationText(player)
+  local reputations = {
+    "Nobody",
+    "Wannabe",
+    "Cyber Surfer",
+    "Matrix Runner",
+    "Newbie Hacker",
+    "Journeyman Hacker",
+    "Competent Hacker",
+    "Experienced Hacker",
+    "Hacker Extraordinaire",
+    "Cyber Thief",
+    "Cyber Sleuth",
+    "Cyber Warrior",
+    "Cyber Wizard",
+    "Ice Crusher",
+    "Node Master",
+    "System Master",
+    "Ghost in the Machine",
+    "Digital Dream",
+    "Digital Nightmare",
+    "Master of the Matrix",
+    "Matrix God",
+  }
 
 end
 
