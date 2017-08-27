@@ -384,4 +384,58 @@ describe("Player", function()
 
   end)
 
+  describe("lifestyle", function()
+
+    it("starts at poverty", function()
+      assert.are.equals("Poverty", playerdata.lifestyle.text)
+    end)
+
+    it("get lowest cost", function()
+      local cost = player:getLifestyleCost(playerdata)
+      assert.are.equals(500, cost)
+    end)
+
+    it("get highest cost", function()
+      playerdata.lifestyle.level = 100
+      local cost = player:getLifestyleCost(playerdata)
+      assert.are.equals(10000, cost)
+    end)
+
+    it("can't upgrade when broke", function()
+      player:upgradeLifestyle(playerdata)
+      assert.are.equals(1, playerdata.lifestyle.level)
+    end)
+
+    it("can upgrade with enough credits", function()
+      player:addCredits(playerdata, 3042)
+      player:upgradeLifestyle(playerdata)
+      assert.are.equals(2, playerdata.lifestyle.level)
+      assert.are.equals(42, playerdata.credits)
+      assert.are.equals("Lower Class", playerdata.lifestyle.text)
+    end)
+
+    it("can downgrade at higher lifestyle levels", function()
+      player:addCredits(playerdata, 3000)
+      local hasUpgraded = player:upgradeLifestyle(playerdata)
+      assert.is_true(hasUpgraded)
+      local hasDowngraded = player:downgradeLifestyle(playerdata)
+      assert.is_true(hasDowngraded)
+      assert.are.equals(1, playerdata.lifestyle.level)
+      assert.are.equals("Poverty", playerdata.lifestyle.text)
+    end)
+
+    it("can't downgrade at the lowest level", function()
+      local hasDowngraded = player:downgradeLifestyle(playerdata)
+      assert.are.equals(1, playerdata.lifestyle.level)
+      assert.is_false(hasDowngraded)
+    end)
+
+    it("cost increased after lifestyle upgraded", function()
+      player:addCredits(playerdata, 3000)
+      player:upgradeLifestyle(playerdata)
+      assert.are.equals(1000, player:getLifestyleCost(playerdata))
+    end)
+
+  end)
+
 end)

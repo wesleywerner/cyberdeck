@@ -17,13 +17,39 @@ local Player = {}
 
 Player.MAXHEALTH = 20
 
+Player.lifestyles = {
+  {
+    ["cost"] = 500,
+    ["text"] = "Poverty"
+  },
+  {
+    ["cost"] = 1000,
+    ["text"] = "Lower Class"
+  },
+  {
+    ["cost"] = 2000,
+    ["text"] = "Middle Class"
+  },
+  {
+    ["cost"] = 4000,
+    ["text"] = "Upper Class"
+  },
+  {
+    ["cost"] = 10000,
+    ["text"] = "Elite"
+  },
+}
+
 function Player:create()
 
   local instance = {}
   instance.name = "Hacker X"
   instance.credits = 0
 
-  instance.lifestyle = 1
+  instance.lifestyle = {
+    ["level"] = 1,
+    ["text"] = ""
+  }
 
   -- Mental and deck health reset when entering the matrix.
   instance.health = {
@@ -39,8 +65,6 @@ function Player:create()
     ["text"] = ""
   }
 
-  instance.reputation.text = self:getReputationText(instance)
-
   instance.skills = {
     ["points"] = 0,
     ["attack"] = 1,
@@ -50,6 +74,9 @@ function Player:create()
     ["programming"] = 1,
     ["chip design"] = 1,
   }
+
+  instance.reputation.text = self:getReputationText(instance)
+  instance.lifestyle.text = self:getLifestyleText(instance)
 
   -- list of corporation names we visited, stores alert status and backdoors installed
   instance.corporations = {}
@@ -342,7 +369,7 @@ function Player:alterReputation(player, points)
   if points > 0 then
 
     -- Reputation level is limited by your lifestyle
-    local maxLevelPerLifestyle = player.lifestyle * 4
+    local maxLevelPerLifestyle = player.lifestyle.level * 4
 
     if rep.level >= maxLevelPerLifestyle then
       --print("max points reached for lifestyle")
@@ -380,17 +407,6 @@ function Player:alterReputation(player, points)
 
 end
 
-function Player:getLifestyleText(player)
-  local lifestyles = {
-    "Poverty",
-    "Lower Class",
-    "Middle Class",
-    "Upper Class",
-    "Elite"
-  }
-
-end
-
 function Player:getReputationText(player)
   local reputations = {
     "Nobody",
@@ -421,5 +437,57 @@ function Player:getReputationText(player)
     return reputations[player.reputation.level]
   end
 end
+
+function Player:getLifestyleCost(player, nextlevel)
+
+  local level = player.lifestyle.level
+
+  if nextlevel == true then
+    level = level + 1
+  end
+
+  if level > #self.lifestyles then
+    return self.lifestyles[#self.lifestyles].cost
+  else
+    return self.lifestyles[level].cost
+  end
+
+end
+
+function Player:getLifestyleUpgradeCost(player)
+  return self:getLifestyleCost(player, true) * 3
+end
+
+function Player:upgradeLifestyle(player)
+  local cost = self:getLifestyleUpgradeCost(player)
+  if player.credits >= cost then
+    player.credits = player.credits - cost
+    player.lifestyle.level = player.lifestyle.level + 1
+    player.lifestyle.text = self:getLifestyleText(player)
+    -- TODO message that lifestyle has been upgraded
+    return true
+  end
+end
+
+function Player:downgradeLifestyle(player)
+  if player.lifestyle.level > 1 then
+    player.lifestyle.level = player.lifestyle.level - 1
+    player.lifestyle.text = self:getLifestyleText(player)
+    -- TODO message that lifestyle has been downupgraded
+    return true
+  else
+    -- downgrade is not possible
+    return false
+  end
+end
+
+function Player:getLifestyleText(player)
+  if player.lifestyle.level > #self.lifestyles then
+    return self.lifestyles[#lifestyles].text
+  else
+    return self.lifestyles[player.lifestyle.level].text
+  end
+end
+
 
 return Player
