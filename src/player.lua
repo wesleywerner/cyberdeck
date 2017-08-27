@@ -96,6 +96,9 @@ function Player:create()
   -- current contract
   instance.contract = nil
 
+  -- source codes owned
+  instance.sourcecodes = {}
+
   -- project we are working on
   instance.project = nil
   -- create project module?
@@ -484,11 +487,18 @@ end
 
 function Player:getLifestyleText(player)
   if player.lifestyle.level > #self.lifestyles then
-    return self.lifestyles[#lifestyles].text
+    return self.lifestyles[#self.lifestyles].text
   else
     return self.lifestyles[player.lifestyle.level].text
   end
 end
 
+function Player:findSourceByClass(player, class)
+  for k, source in pairs(player.sourcecodes) do
+    if source.class == class then
+      return source
+    end
+  end
+end
 
 return Player
