@@ -65,7 +65,6 @@ function Sourcecode:create(player, class, rating)
   instance.complexity = complexity
   instance.isSoftware = isSoftware
   instance.isChip = isChip
-  instance.daysToComplete = daysToComplete
   instance.daysToComplete = self:calculateTimeToDevelop(player, instance)
   return instance
 
@@ -77,8 +76,7 @@ function Sourcecode:calculateTimeToDevelop(player, entity)
   local Player = require("player")
 
   -- Owning design assistant hardware reduces the time
-  local designAssistant = Player:findHardwareByClass(player, "Design Assistant")
-  local designAssistLevel = designAssistant and designAssistant.rating or 0
+  local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
   local appliedSkill = entity.relevantSkillLevel * (1 + designAssistLevel)
   local baseTime = entity.complexity * math.pow(entity.rating, 2)
 
@@ -143,6 +141,35 @@ function Sourcecode:getSourceList(player)
   end
 
   return sourcelist
+
+end
+
+-- Spend time to complete a sourcecode project.
+-- When the project completes it is added to the player's sourcecode list.
+function Sourcecode:workOnCode(player, entity)
+
+  local Die = require("die")
+  local Player = require("player")
+  entity.daysToComplete = entity.daysToComplete - 1
+
+  if entity.daysToComplete <= 0 then
+
+    -- roll to see if we found any bugs in our sourcecode.
+    -- (source rating) - (relevant skill * design assist rating)
+    local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
+    local rolltarget = 10 + entity.rating - (entity.relevantSkillLevel + designAssistLevel)
+    local rollvalue, rollwin = Die:roll(rolltarget)
+
+    if rollwin then
+      Player:addSource(player, entity)
+      -- TODO message that the project is complete and now in your sources list
+    else
+      entity.daysToComplete = (self:calculateTimeToDevelop(player, entity) + 3) / 4
+      --TODO message that "You have discovered a flaw in your code. Additional time will be required."
+    end
+
+
+  end
 
 end
 
