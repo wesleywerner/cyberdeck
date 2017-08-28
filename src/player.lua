@@ -96,20 +96,14 @@ function Player:create()
   -- current contract
   instance.contract = nil
 
-  -- source code owned
-  instance.sourcecode = {}
-
-  -- project we are working on
-  instance.project = nil
-  -- create project module?
-  --int m_nProjectType;
-  --int m_nProjectClass;
-  --int m_nProjectRating;
-  --int m_nProjectInitialTime;
-  --int m_nProjectTimeLeft;
-
-  -- chip burning
-  instance.chipBurner = nil
+  -- Source code owned by the player is stored in their repository.
+  -- The project tracks progress of a current development effort on new code.
+  -- Cooking tracks progress of a chip being burned.
+  instance.sourcecode = {
+    ["repository"] = {},
+    ["project"] = nil,
+    ["cooking"] = nil
+  }
 
   -- item on special order
   instance.order = nil
@@ -294,7 +288,7 @@ function Player:addChip(player, entity)
     if currentRating < proposedRating then
       self:removeChip(player, existing)
     else
-      -- TODO send message: You already own that software at the same or higher rating
+      -- TODO send message: You already own that chip at the same or higher rating
       return false
     end
   end
@@ -500,12 +494,20 @@ function Player:getLifestyleText(player)
   end
 end
 
+function Player:addSourcecode(player, code)
+  table.insert(player.sourcecode.repository, code)
+end
+
 function Player:findSourceByClass(player, class)
-  for k, source in pairs(player.sourcecode) do
+  for k, source in pairs(player.sourcecode.repository) do
     if source.class == class then
       return source
     end
   end
+end
+
+function Player:getCookingChip(player)
+  return player.sourcecode.cooking
 end
 
 return Player

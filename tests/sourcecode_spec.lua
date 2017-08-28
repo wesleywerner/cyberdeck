@@ -56,13 +56,65 @@ describe("sourcecode", function()
 
     -- add an lower rated source of the same class
     local oldversion = Sourcecode:create(playerdata, "CPU", 1)
-    table.insert(playerdata.sourcecode, oldversion)
+    Player:addSourcecode(playerdata, oldversion)
 
     -- create a higher rated source
     local code = Sourcecode:create(playerdata, "CPU", 2)
 
     -- test the days are reduced because we own older source
     assert.are.equals(8, code.daysToComplete)
+
+  end)
+
+  it("cannot build undeveloped source code", function()
+
+    local code = Sourcecode:create(playerdata, "Medic", 1)
+    Sourcecode:build(playerdata, code)
+    local ware = Player:findSoftwareByClass(playerdata, "Medic")
+    assert.is_nil(ware)
+
+  end)
+
+  it("build software source code", function()
+
+    -- this adds new software to the player's software list.
+    local code = Sourcecode:create(playerdata, "Medic", 1)
+
+    -- complete the development
+    while code.daysToComplete > 0 do
+      Sourcecode:workOnCode(playerdata, code)
+    end
+
+    -- compile it
+    Sourcecode:build(playerdata, code)
+
+    -- test the player has it in the software list
+    local ware = Player:findSoftwareByClass(playerdata, "Medic")
+    assert.is.truthy(ware)
+
+  end)
+
+  it("burn chip source code", function()
+
+    -- give the player a chip burner
+    local Hardware = require("hardware")
+    local burner = Hardware:create("Chip Burner", 1)
+    Player:addHardware(playerdata, burner)
+
+    -- create the chip source
+    local code = Sourcecode:create(playerdata, "CPU", 1)
+
+    -- complete the development
+    while code.daysToComplete > 0 do
+      Sourcecode:workOnCode(playerdata, code)
+    end
+
+    -- compile it
+    Sourcecode:build(playerdata, code)
+
+    -- test the chip is cooking
+    local project = Player:getCookingChip(playerdata)
+    assert.are.equals(code, project)
 
   end)
 

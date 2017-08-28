@@ -80,6 +80,7 @@ function Sourcecode:create(player, class, rating)
   instance.isSoftware = isSoftware
   instance.isChip = isChip
   instance.daysToComplete = self:calculateTimeToDevelop(player, instance)
+  instance.isCooking = false
   return instance
 
 end
@@ -201,13 +202,55 @@ function Sourcecode:workOnCode(player, entity)
     local roll = Die:roll(rolltarget)
 
     if roll.success then
-      Player:addSource(player, entity)
+      Player:addSourcecode(player, entity)
       -- TODO message that the project is complete and now in your sources list
     else
       entity.daysToComplete = (self:calculateTimeToDevelop(player, entity) + 3) / 4
       --TODO message that "You have discovered a flaw in your code. Additional time will be required."
     end
 
+  end
+
+end
+
+-- "Compile" software source into the player's software list, or
+-- "cook" chip source onto a chip.
+function Sourcecode:build(player, sourcecode)
+
+  local Player = require("player")
+  local software = require("software")
+
+  if sourcecode.daysToComplete > 0 then
+    -- TODO message that the source is undeveloped
+    return false
+  end
+
+  if sourcecode.isSoftware then
+    local program = software:create(sourcecode.class, sourcecode.rating)
+    Player:addSoftware(player, program)
+  end
+
+  if sourcecode.isChip then
+
+    -- player must own a chip burner
+    local burner = Player:findHardwareRatingByClass(player, "Chip Burner")
+
+    if burner == 0 then
+      -- TODO message that a chip burner is required
+      --print("you need a burner")
+      return false
+    end
+
+    local currentproject = Player:getCookingChip(player)
+    if currentproject then
+      -- TODO message that a chip is already cooking
+      --print("chip already cooking")
+      return false
+    end
+
+    -- cook it
+    sourcecode.cooktime = sourcecode.complexity * sourcecode.rating
+    player.sourcecode.cooking = sourcecode
 
   end
 
