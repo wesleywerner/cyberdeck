@@ -13,6 +13,20 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
+-- Source code is what you use to build software, or burn chips.
+-- You can obtain it via a file download in the matrix, in this case
+-- it is added to the player's source code list.
+
+-- It can also be created by spending days developing your own, in this
+-- case it is considered a "project", and only once development is
+-- complete will it be added to your source code list.
+
+-- Building source code for software will add it to your software list
+-- where it can be loaded and used by your deck in the matrix.
+
+-- Building the code for chips involves burning it to a chip. This can
+-- take several days.
+
 
 local Sourcecode = {}
 

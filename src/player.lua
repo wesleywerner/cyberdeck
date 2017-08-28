@@ -96,8 +96,8 @@ function Player:create()
   -- current contract
   instance.contract = nil
 
-  -- source codes owned
-  instance.sourcecodes = {}
+  -- source code owned
+  instance.sourcecode = {}
 
   -- project we are working on
   instance.project = nil
@@ -501,7 +501,7 @@ function Player:getLifestyleText(player)
 end
 
 function Player:findSourceByClass(player, class)
-  for k, source in pairs(player.sourcecodes) do
+  for k, source in pairs(player.sourcecode) do
     if source.class == class then
       return source
     end

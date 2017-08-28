@@ -56,7 +56,7 @@ describe("sourcecode", function()
 
     -- add an lower rated source of the same class
     local oldversion = Sourcecode:create(playerdata, "CPU", 1)
-    table.insert(playerdata.sourcecodes, oldversion)
+    table.insert(playerdata.sourcecode, oldversion)
 
     -- create a higher rated source
     local code = Sourcecode:create(playerdata, "CPU", 2)
@@ -68,8 +68,8 @@ describe("sourcecode", function()
 
   --it("example usage", function()
 
-    --table.insert(playerdata.sourcecodes, Sourcecode:create(playerdata, "Smoke", 5))
-    --table.insert(playerdata.sourcecodes, Sourcecode:create(playerdata, "CPU", 5))
+    --table.insert(playerdata.sourcecode, Sourcecode:create(playerdata, "Smoke", 5))
+    --table.insert(playerdata.sourcecode, Sourcecode:create(playerdata, "CPU", 5))
 
     --local list = Sourcecode:getSourceList(playerdata)
 
