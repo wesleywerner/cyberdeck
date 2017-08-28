@@ -16,11 +16,11 @@
 local Die = {}
 
 -- Roll a 20-sided die against a target value.
--- 1 in 20 chance of critical failure.
--- The player has to roll at least the target number for a success.
--- A larger target is harder to beat. Smaller targets favor the player.
+-- The roll has to be at least the target value for success.
+-- A larger target is harder to beat, smaller targets favor the player.
 -- A larger target also yields smaller roll values on success.
--- Returns a table of three values: value, success, critical.
+-- There is always a 1 in 20 chance of critical failure.
+-- Returns a table { value=[1..5], success=[true/false], critical=[true/false] }.
 function Die:roll(target)
 
   target = math.min(20, target)

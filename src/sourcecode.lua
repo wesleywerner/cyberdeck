@@ -70,7 +70,26 @@ function Sourcecode:create(player, class, rating)
 
 end
 
-
+-- The time to develop source code has a lot of variables. Try to keep up:
+-- If the source is for software, the player's "programming" skill is used
+-- and if it is for a chip, the "chip design" skill is used.
+-- This skill is then multiplied by the "design assistant" hardware rating
+-- if owned by the player.
+--  applied skill = skill * design assistant rating
+--
+-- A base time is calculated as the product of the source complexity
+-- and the source rating to the second power.
+--  base time = complexity * rating^2
+--
+-- Next we look if the player owns sourcecode for the same software/chip
+-- and if so, reduce the base time by the existing sourcecode's base time.
+-- This gives a time bonus with the reasoning that the player is using
+-- the existing sourcecode to speed up their progress.
+--  base time -= existing sourcecode base time
+--
+-- Finally we add and divide the base time by the skill.
+-- We subtract 1 so that only skills above 1 have significant effect.
+--  return (base time + applied skill - 1) / applied skill
 function Sourcecode:calculateTimeToDevelop(player, entity)
 
   local Player = require("player")
@@ -152,12 +171,19 @@ function Sourcecode:workOnCode(player, entity)
   local Player = require("player")
   entity.daysToComplete = entity.daysToComplete - 1
 
+  -- project complete, now we roll to see if we found any bugs
+  -- in our sourcecode, which can delay the completion.
   if entity.daysToComplete <= 0 then
 
-    -- roll to see if we found any bugs in our sourcecode.
-    -- (source rating) - (relevant skill * design assist rating)
+    -- owning design assistant hardware improves our success rate
     local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
-    local rolltarget = 10 + entity.rating - (entity.relevantSkillLevel + designAssistLevel)
+
+    -- roll for success against:
+    -- (10 + source rating) - (relevant skill * design assist rating).
+    -- 10 gives about 50% chance of success.
+    -- Increase the target by the source rating (reduces success).
+    -- Subtract the programming/chip design skill and assistant (increases success).
+    local rolltarget = (10 + entity.rating) - (entity.relevantSkillLevel + designAssistLevel)
     local roll = Die:roll(rolltarget)
 
     if roll.success then
