@@ -214,11 +214,11 @@ function Sourcecode:workOnCode(player, entity)
 end
 
 -- "Compile" software source into the player's software list, or
--- "cook" chip source onto a chip.
+-- prepare to "cook" the source onto a chip.
 function Sourcecode:build(player, sourcecode)
 
   local Player = require("player")
-  local software = require("software")
+  local Software = require("software")
 
   if sourcecode.daysToComplete > 0 then
     -- TODO message that the source is undeveloped
@@ -226,7 +226,7 @@ function Sourcecode:build(player, sourcecode)
   end
 
   if sourcecode.isSoftware then
-    local program = software:create(sourcecode.class, sourcecode.rating)
+    local program = Software:create(sourcecode.class, sourcecode.rating)
     Player:addSoftware(player, program)
   end
 
@@ -253,6 +253,35 @@ function Sourcecode:build(player, sourcecode)
     player.sourcecode.cooking = sourcecode
 
   end
+
+end
+
+-- Reduce the burning chip cook time by one day.
+-- Install it in the deck when it is done.
+function Sourcecode:cookChip(player)
+
+    local Player = require("player")
+    local Chips = require("chips")
+    local burner = Player:getCookingChip(player)
+
+    if burner then
+
+      -- reduce cooking time
+      burner.cooktime = burner.cooktime - 1
+
+      -- it is done
+      if burner.cooktime < 1 then
+
+        -- install the new chip
+        local chip = Chips:create(burner.class, burner.rating)
+        Player:addChip(player, chip)
+
+        -- remove the project
+        player.sourcecode.cooking = nil
+
+      end
+
+    end
 
 end
 

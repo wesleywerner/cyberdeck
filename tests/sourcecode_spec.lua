@@ -37,7 +37,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("estimated time to completion for new source", function()
+  it("development time for new code", function()
 
     -- upgrade the player chip design to level 2
     Player:addSkillPoints(playerdata, 1)
@@ -48,7 +48,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("estimated time to completion for existing source", function()
+  it("development time reduced when updating code", function()
 
     -- upgrade the player chip design to level 2
     Player:addSkillPoints(playerdata, 1)
@@ -66,7 +66,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("cannot build undeveloped source code", function()
+  it("cannot build undeveloped code", function()
 
     local code = Sourcecode:create(playerdata, "Medic", 1)
     Sourcecode:build(playerdata, code)
@@ -75,7 +75,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("build software source code", function()
+  it("build software", function()
 
     -- this adds new software to the player's software list.
     local code = Sourcecode:create(playerdata, "Medic", 1)
@@ -94,7 +94,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("burn chip source code", function()
+  it("cook it to a chip", function()
 
     -- give the player a chip burner
     local Hardware = require("hardware")
@@ -116,7 +116,25 @@ describe("sourcecode", function()
     local project = Player:getCookingChip(playerdata)
     assert.are.equals(code, project)
 
+    -- pass time so it cooks
+    while code.cooktime > 0 do
+      Sourcecode:cookChip(playerdata)
+    end
+
+    -- test the cooking project has been removed
+    project = Player:getCookingChip(playerdata)
+    assert.is_nil(project)
+
+    -- test the player has this chip installed
+    local ownedChip = Player:findChipByClass(playerdata, code.class)
+    assert.is.truthy(ownedChip)
+    assert.are.equals(code.class, ownedChip.class)
+
+    -- and the class and rating match
+    assert.are.equals(code.rating, ownedChip.rating)
+
   end)
+
 
   --it("example usage", function()
 
