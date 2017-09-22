@@ -25,7 +25,7 @@
 -- The types table lists all the classes and predefined
 -- names for each class.
 
-
+--- An interface to manage software for your deck.
 local Software = {}
 
 function Software:create(class, rating, name)
@@ -68,10 +68,15 @@ function Software:create(class, rating, name)
 
 end
 
--- Definitions for the different software types.
--- complexity: affects the software price and memory usage (among other things).
--- names: list of predefined software names, indexed to correlate to the software rating.
--- includeOnNewGame: the player starts with this software.
+--- List of the available software type the player can use in the matrix.
+-- The list of software types are: Attack, Area Attack, Piercing Attack, Slow,
+-- Virus, Silence, Confuse, Weaken, Shield, Smoke, Decoy, Medic, Armor, Hide,
+-- Deceive, Relocate, Analyze, Scan, Evaluate, Decrypt, Reflect, Attack Boost,
+-- Defense Boost, Stealth Boost, Analysis Boost, Client Software.
+-- @table Software.types
+-- @field complexity Affects the software price and memory usage (among other things).
+-- @field names List of predefined software names, indexed to correlate to the software rating.
+-- @field includeOnNewGame The player starts with this software.
 Software.types = {
   ["Attack"] = {
     includeOnNewGame = true,

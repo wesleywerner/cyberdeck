@@ -27,9 +27,16 @@
 -- Building the code for chips involves burning it to a chip. This can
 -- take several days.
 
-
+--- An interface to manage the in-game source code used by the player as part of building their own projects.
+-- A project is about developing your own @{chips} or @{software}.
+-- It must be noted this is not actual source code, but the source that the player can use as part of the game world.
 local Sourcecode = {}
 
+--- Create a new instance of source code.
+-- @tparam table player Reference to the player instance.
+-- @tparam string class The class of the source, one of @{chips.types} or @{software.types}
+-- @tparam number rating The rating.
+-- @treturn table A source code instance.
 function Sourcecode:create(player, class, rating)
 
   local Player = require("player")
@@ -70,6 +77,20 @@ function Sourcecode:create(player, class, rating)
   elseif isChip then
     relevantSkillLevel = Player:getSkillLevel(player, "chip design")
   end
+
+  --- @table definition
+  -- @field class The instance class.
+  -- @field rating The instance rating, clamped to the player's relevantSkillLevel.
+  -- @field relevantSkillLevel The rating of the player's skill relevant to the class.
+  -- For software sources this will be the player "programming" skill,
+  -- and for chip sources the "chip design" skill.
+  -- @field maxBuildRating NOT CURRENTLY USED, MAY BE REMOVED.
+  -- @field complexity The chip complexity derived from the chip type.
+  -- Affects the time required to complete the project.
+  -- @field isSoftware = isSoftware
+  -- @field isChip = isChip
+  -- @field daysToComplete = self:calculateTimeToDevelop(player, instance)
+  -- @field isCooking = false
 
   local instance = {}
   instance.class = class

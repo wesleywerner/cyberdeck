@@ -13,6 +13,7 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
+--- An interface to manage chips for your deck.
 local Chips = {}
 
 function Chips:create(class, rating)
@@ -37,6 +38,9 @@ function Chips:create(class, rating)
 
 end
 
+--- List of the available chips you can use with your deck.
+-- The list of chip types are: CPU, Attack Firmware, Defense Firmware, Stealth Firmware, Analysis Firmware, Coprocessor.
+-- @table Chips.types
 Chips.types = {
   ["CPU"] = {
     baseCost = 150,
