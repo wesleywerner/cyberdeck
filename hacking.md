@@ -98,6 +98,20 @@ busted && luacov
 less luacov.report.out
 ```
 
+# document generation
+
+LDoc is used to generate documentation for the source code, it is included as a git submodule. It requires the penlight rock.
+
+```
+luarocks install penlight
+```
+
+Run generation:
+
+```
+lua LDoc/ldoc.lua .
+```
+
 # notes
 
 * The original game source can be found on [sourceforge](https://sourceforge.net/projects/decker/files/decker/Decker%201.12/). The `Help/Decker.rtf` file is particulary helpful.
