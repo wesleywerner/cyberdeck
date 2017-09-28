@@ -48,11 +48,10 @@ function Sourcecode:create(player, class, rating)
   local isChip = false
   local complexity = 0
 
-  for warekey, ware in pairs(Software.types) do
-    if warekey == class then
+  local softwareDefinition = Software:getType(class)
+  if softwareDefinition then
       isSoftware = true
-      complexity = ware.complexity
-    end
+      complexity = softwareDefinition.complexity
   end
 
   if not isSoftware then

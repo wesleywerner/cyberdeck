@@ -4,7 +4,8 @@ describe("Software", function()
 
   it("get the type definition", function()
     local sw = software:create("Attack", 1)
-    assert.are.equals(software.types['Attack'], software:getType(sw))
+    local expected = software:getType("Attack")
+    assert.are.same(expected, software:getType(sw.class))
   end)
 
   it("get the potential rating", function()
@@ -46,7 +47,8 @@ describe("Software", function()
 
   it("get the default name", function()
     local sw = software:create("Attack", 3)
-    assert.are.equals(software.types["Attack"].names[3], software:getDefaultName(sw))
+    local expected = software:getType("Attack")
+    assert.are.equals(expected.names[3], software:getDefaultName(sw))
   end)
 
   it("get the custom name", function()

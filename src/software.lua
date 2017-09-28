@@ -33,8 +33,9 @@ function Software:create(class, rating, name)
   local instance = {}
 
   -- validate the given values
-  if not self.types[class] then
-    error (string.format("%q is not a valid software class.", class))
+  local typeDefinition = self:getType(class)
+  if not typeDefinition then
+    error(string.format("No software class definition found for %q", class))
   end
 
   if not rating or rating < 1 then
@@ -74,11 +75,14 @@ end
 -- Deceive, Relocate, Analyze, Scan, Evaluate, Decrypt, Reflect, Attack Boost,
 -- Defense Boost, Stealth Boost, Analysis Boost, Client Software.
 -- @table Software.types
+-- @field class Software class name.
 -- @field complexity Affects the software price and memory usage (among other things).
 -- @field names List of predefined software names, indexed to correlate to the software rating.
 -- @field includeOnNewGame The player starts with this software.
+-- @field clientOnly Only available as a client supplied program, ie not for sale in the @{shop}.
 Software.types = {
-  ["Attack"] = {
+  {
+    class = "Attack",
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -104,7 +108,8 @@ Software.types = {
       "GigaBlaster",
     }
   },
-  ["Area Attack"] = {
+  {
+    class = "Area Attack",
     complexity = 3,
     names = {
       "Grenade 1.0",
@@ -129,7 +134,8 @@ Software.types = {
       "Nuke",
     }
   },
-  ["Piercing Attack"] = {
+  {
+    class = "Piercing Attack",
     complexity = 3,
     names = {
       "Spear 1.0a",
@@ -154,7 +160,8 @@ Software.types = {
       "Shredder",
     }
   },
-  ["Slow"] = {
+  {
+    class = "Slow",
     complexity = 2,
     names = {
       "Slow",
@@ -179,7 +186,8 @@ Software.types = {
       "TimeStop",
     }
   },
-  ["Virus"] = {
+  {
+    class = "Virus",
     complexity = 3,
     names = {
       "Flu 1.0",
@@ -204,7 +212,8 @@ Software.types = {
       "Ebola",
     }
   },
-  ["Silence"] = {
+  {
+    class = "Silence",
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -230,7 +239,8 @@ Software.types = {
       "MegaMute",
     }
   },
-  ["Confuse"] = {
+  {
+    class = "Confuse",
     complexity = 4,
     names = {
       "Confusion",
@@ -255,7 +265,8 @@ Software.types = {
       "DanQuayle",
     }
   },
-  ["Weaken"] = {
+  {
+    class = "Weaken",
     complexity = 2,
     names = {
       "Weaken",
@@ -280,7 +291,8 @@ Software.types = {
       "Impotence",
     }
   },
-  ["Shield"] = {
+  {
+    class = "Shield",
     complexity = 3,
     names = {
       "Shield",
@@ -305,7 +317,8 @@ Software.types = {
       "Aegis",
     }
   },
-  ["Smoke"] = {
+  {
+    class = "Smoke",
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -331,7 +344,8 @@ Software.types = {
       "Houdini",
     }
   },
-  ["Decoy"] = {
+  {
+    class = "Decoy",
     complexity = 4,
     names = {
       "Decoy",
@@ -356,7 +370,8 @@ Software.types = {
       "Simulacrum",
     }
   },
-  ["Medic"] = {
+  {
+    class = "Medic",
     includeOnNewGame = true,
     complexity = 4,
     names = {
@@ -382,7 +397,8 @@ Software.types = {
       "M.A.S.H",
     }
   },
-  ["Armor"] = {
+  {
+    class = "Armor",
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -408,7 +424,8 @@ Software.types = {
       "Adamantium",
     }
   },
-  ["Hide"] = {
+  {
+    class = "Hide",
     includeOnNewGame = true,
     complexity = 3,
     names = {
@@ -434,7 +451,8 @@ Software.types = {
       "HollowMan",
     }
   },
-  ["Deceive"] = {
+  {
+    class = "Deceive",
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -460,7 +478,8 @@ Software.types = {
       "Politician",
     }
   },
-  ["Relocate"] = {
+  {
+    class = "Relocate",
     complexity = 2,
     names = {
       "Relocate",
@@ -485,7 +504,8 @@ Software.types = {
       "Trail-B-Gone",
     }
   },
-  ["Analyze"] = {
+  {
+    class = "Analyze",
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -511,7 +531,8 @@ Software.types = {
       "Forensics",
     }
   },
-  ["Scan"] = {
+  {
+    class = "Scan",
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -537,7 +558,8 @@ Software.types = {
       "SuperScan",
     }
   },
-  ["Evaluate"] = {
+  {
+    class = "Evaluate",
     includeOnNewGame = true,
     complexity = 1,
     names = {
@@ -563,7 +585,8 @@ Software.types = {
       "ShowMeTheMoney",
     }
   },
-  ["Decrypt"] = {
+  {
+    class = "Decrypt",
     includeOnNewGame = true,
     complexity = 2,
     names = {
@@ -589,7 +612,8 @@ Software.types = {
       "SuperCracker",
     }
   },
-  ["Reflect"] = {
+  {
+    class = "Reflect",
     complexity = 4,
     names = {
       "Reflect",
@@ -614,7 +638,8 @@ Software.types = {
       "Trampoline",
     }
   },
-  ["Attack Boost"] = {
+  {
+    class = "Attack Boost",
     complexity = 3,
     names = {
       "Attack Boost 1.0",
@@ -639,7 +664,8 @@ Software.types = {
       "Attack Boost 6.0",
     }
   },
-  ["Defense Boost"] = {
+  {
+    class = "Defense Boost",
     complexity = 3,
     names = {
       "Defense Boost 1.0",
@@ -664,7 +690,8 @@ Software.types = {
       "Defense Boost 6.0",
     }
   },
-  ["Stealth Boost"] = {
+  {
+    class = "Stealth Boost",
     complexity = 3,
     names = {
       "Stealth Boost 1.0",
@@ -689,7 +716,8 @@ Software.types = {
       "Stealth Boost 6.0",
     }
   },
-  ["Analysis Boost"] = {
+  {
+    class = "Analysis Boost",
     complexity = 3,
     names = {
       "Analysis Boost 1.0",
@@ -714,7 +742,8 @@ Software.types = {
       "Analysis Boost 6.0",
     }
   },
-  ["Client Software"] = {
+  {
+    class = "Client Software",
     clientOnly = true,
     complexity = 4,
     names = {
@@ -725,10 +754,12 @@ Software.types = {
 }
 
 --[[ Gets the definition for the class underlying this software ]]
-function Software:getType(sw)
-  local def = self.types[sw.class]
-  if not def then
-    error( "No software class definition found for %q", sw.class)
+function Software:getType(class)
+  local def = nil
+  for i,v in ipairs(self.types) do
+    if v.class == class then
+      def = v
+    end
   end
   return def
 end
@@ -762,17 +793,17 @@ function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthR
 end
 
 function Software:getMemoryUsage(sw)
-  local def = self:getType(sw)
+  local def = self:getType(sw.class)
   return def.complexity * sw.potentialRating
 end
 
 function Software:getDefaultName(sw)
-  local def = self:getType(sw)
+  local def = self:getType(sw.class)
   return def.names[sw.potentialRating]
 end
 
 function Software:getPrice(sw)
-  local def = self:getType(sw)
+  local def = self:getType(sw.class)
   return def.complexity * sw.potentialRating^2 * 25;
 end
 
