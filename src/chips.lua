@@ -38,7 +38,7 @@ function Chips:create(class, rating)
 
 end
 
---- List of the available chips you can use with your deck.
+--- List of the available chips the player can use with their deck.
 -- The list of chip types are: CPU, Attack Firmware, Defense Firmware, Stealth Firmware, Analysis Firmware, Coprocessor.
 -- @table Chips.types
 Chips.types = {

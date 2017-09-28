@@ -68,7 +68,7 @@ function Software:create(class, rating, name)
 
 end
 
---- List of the available software type the player can use in the matrix.
+--- List of the available software the player can load in their deck.
 -- The list of software types are: Attack, Area Attack, Piercing Attack, Slow,
 -- Virus, Silence, Confuse, Weaken, Shield, Smoke, Decoy, Medic, Armor, Hide,
 -- Deceive, Relocate, Analyze, Scan, Evaluate, Decrypt, Reflect, Attack Boost,

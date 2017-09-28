@@ -27,9 +27,9 @@
 -- Building the code for chips involves burning it to a chip. This can
 -- take several days.
 
---- An interface to manage the in-game source code used by the player as part of building their own projects.
--- A project is about developing your own @{chips} or @{software}.
--- It must be noted this is not actual source code, but the source that the player can use as part of the game world.
+--- An interface to manage chip and software sources.
+-- Source code is used in-game to create @{chips} or @{software} for your deck.
+-- The other way to acquire chips or software is through the @{shop}.
 local Sourcecode = {}
 
 --- Create a new instance of source code.
