@@ -14,6 +14,8 @@
 ]]--
 
 --- An interface to manage chips for your deck.
+-- Chips are items that enhance player skills or provide new features.
+-- They can be purchased from the @{shop} or by building @{sourcecode}.
 local Chips = {}
 
 function Chips:create(class, rating)
@@ -22,8 +24,9 @@ function Chips:create(class, rating)
   local instance = {}
 
   -- validate the given values
-  if not self.types[class] then
-    error (string.format("%q is not a valid chip class.", class))
+  local typeDefinition = self:getType(class)
+  if not typeDefinition then
+    error(string.format("No type definition found for %q", class))
   end
 
   if not rating or rating < 1 then
@@ -38,63 +41,74 @@ function Chips:create(class, rating)
 
 end
 
---- List of the available chips the player can use with their deck.
+--- A table of all chip types.
 -- The list of chip types are: CPU, Attack Firmware, Defense Firmware, Stealth Firmware, Analysis Firmware, Coprocessor.
 -- @table Chips.types
+-- @field class Chip class name.
+-- @field baseCost Cost used to derive market price.
+-- @field complexity Affects price, memory usage and development time as a @{sourcecode} item.
 Chips.types = {
-  ["CPU"] = {
+  {
+    class = "CPU",
     baseCost = 150,
     complexity = 5
   },
-  ["Attack Firmware"] = {
+  {
+    class = "Attack Firmware",
     baseCost = 100,
     complexity = 4
   },
-  ["Defense Firmware"] = {
+  {
+    class = "Defense Firmware",
     baseCost = 100,
     complexity = 4
   },
-  ["Stealth Firmware"] = {
+  {
+    class = "Stealth Firmware",
     baseCost = 100,
     complexity = 4
   },
-  ["Analysis Firmware"] = {
+  {
+    class = "Analysis Firmware",
     baseCost = 100,
     complexity = 4
   },
-  ["Coprocessor"] = {
+  {
+    class = "Coprocessor",
     baseCost = 125,
     complexity = 5
   },
 }
 
-function Chips:getType(ch)
-  local def = self.types[ch.class]
-  if not def then
-    error( "No type definition found for %q", ch.class)
+function Chips:getType(class)
+  local def = nil
+  for i,v in ipairs(self.types) do
+    if v.class == class then
+      def = v
+    end
   end
   return def
 end
 
-function Chips:getName(ch)
-  return ch.class
+function Chips:getName(chip)
+  return chip.class
 end
 
-function Chips:getRating(ch)
-  return ch.rating
+function Chips:getRating(chip)
+  return chip.rating
 end
 
-function Chips:getPrice(ch)
-  local def = self:getType(ch)
-  return math.pow(ch.rating, 2) * def.baseCost
+function Chips:getPrice(chip)
+  local def = self:getType(chip.class)
+  return math.pow(chip.rating, 2) * def.baseCost
 end
 
-function Chips:getText(ch)
-  return string.format("%s L%d", self:getName(ch), ch.rating)
+function Chips:getText(chip)
+  return string.format("%s L%d", self:getName(chip), chip.rating)
 end
 
-function Chips:getComplexity(entity)
-  local definition = self:getType(entity)
+function Chips:getComplexity(chip)
+  local definition = self:getType(chip.class)
   return definition.complexity
 end
 

@@ -56,11 +56,10 @@ function Sourcecode:create(player, class, rating)
   end
 
   if not isSoftware then
-    for chipkey, chip in pairs(Chips.types) do
-      if chipkey == class then
+    local chipDefinition = Chips:getType(class)
+    if chipDefinition then
         isChip = true
-        complexity = chip.complexity
-      end
+        complexity = chipDefinition.complexity
     end
   end
 
