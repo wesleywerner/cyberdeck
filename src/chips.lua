@@ -16,12 +16,15 @@
 --- An interface to manage chips for your deck.
 -- Chips are items that enhance player skills or provide new features.
 -- They can be purchased from the @{shop} or by building @{sourcecode}.
+-- @author Wesley Werner
+-- @license GPL v3
 local Chips = {}
 
+--- Create a new instance of a chip.
+-- @tparam string class The class of the chip, one of @{chips.types}.
+-- @tparam number rating The rating of the chip affects the price and affectiveness.
+-- @treturn chips:instance
 function Chips:create(class, rating)
-
-  -- new instance
-  local instance = {}
 
   -- validate the given values
   local typeDefinition = self:getType(class)
@@ -33,10 +36,14 @@ function Chips:create(class, rating)
     error (string.format("%q is not a valid rating for chips.", rating or "nil" ))
   end
 
-  -- assign the given values
+  --- @table instance
+  -- @field class The chip's class name.
+  -- @field rating The chip's rating.
+  -- An instance of a chip.
+
+  local instance = {}
   instance.class = class
   instance.rating = rating
-
   return instance
 
 end
@@ -80,6 +87,9 @@ Chips.types = {
   },
 }
 
+--- Gets the type definition of a chip.
+-- @tparam string class The class name to look up.
+-- @treturn table The @{chips.types} entry, or nil if no match is found.
 function Chips:getType(class)
   local def = nil
   for i,v in ipairs(self.types) do
@@ -90,23 +100,39 @@ function Chips:getType(class)
   return def
 end
 
+--- Gets the name of a chip.
+-- @tparam table chip The chip to query.
+-- @treturn string The name of the chip.
 function Chips:getName(chip)
   return chip.class
 end
 
+--- Gets the rating of a chip.
+-- @tparam table chip The chip to query.
+-- @treturn number The rating of the chip.
 function Chips:getRating(chip)
   return chip.rating
 end
 
+--- Gets the price of a chip.
+-- The chip rating affects the price.
+-- @tparam table chip The chip to query.
 function Chips:getPrice(chip)
   local def = self:getType(chip.class)
   return math.pow(chip.rating, 2) * def.baseCost
 end
 
+--- Gets the display text of a chip.
+-- Formatted as the chip name and rating.
+-- @tparam table chip The chip to query.
 function Chips:getText(chip)
   return string.format("%s L%d", self:getName(chip), chip.rating)
 end
 
+--- Gets the complexity of a chip.
+-- For more on how this is used, see @{sourcecode:instance}
+-- @tparam table chip The chip to query.
+-- @treturn number The complexity of the chip.
 function Chips:getComplexity(chip)
   local definition = self:getType(chip.class)
   return definition.complexity

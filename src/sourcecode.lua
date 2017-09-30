@@ -30,13 +30,17 @@
 --- An interface to manage chip and software sources.
 -- Source code is used in-game to create @{chips} or @{software} for your deck.
 -- The other way to acquire chips or software is through the @{shop}.
+-- @author Wesley Werner
+-- @license GPL v3
 local Sourcecode = {}
 
 --- Create a new instance of source code.
--- @tparam table player Reference to the player instance.
--- @tparam string class The class of the source, one of @{chips.types} or @{software.types}
--- @tparam number rating The rating.
--- @treturn table A source code instance.
+-- Source code can be based on either @{chips} or @{software},
+-- the determining factor is the class name given during creation.
+-- @tparam player:instance player Reference to the player instance.
+-- @tparam string class The class of the source, one of @{chips.types} or @{software.types}.
+-- @tparam number rating The rating of chip or software that is built from this source.
+-- @treturn sourcecode:instance
 function Sourcecode:create(player, class, rating)
 
   local Player = require("player")
@@ -76,15 +80,16 @@ function Sourcecode:create(player, class, rating)
     relevantSkillLevel = Player:getSkillLevel(player, "chip design")
   end
 
-  --- @table definition
+  --- @table instance
   -- @field class The instance class.
   -- @field rating The instance rating, clamped to the player's relevantSkillLevel.
   -- @field relevantSkillLevel The rating of the player's skill relevant to the class.
   -- For software sources this will be the player "programming" skill,
   -- and for chip sources the "chip design" skill.
   -- @field maxBuildRating NOT CURRENTLY USED, MAY BE REMOVED.
-  -- @field complexity The chip complexity derived from the chip type.
-  -- Affects the time required to complete the project.
+  -- @field complexity The chip or software complexity.
+  -- Affects the time required to complete the project,
+  -- and the burn time (when cooked in a chip burner).
   -- @field isSoftware = isSoftware
   -- @field isChip = isChip
   -- @field daysToComplete = self:calculateTimeToDevelop(player, instance)
@@ -104,26 +109,34 @@ function Sourcecode:create(player, class, rating)
 
 end
 
--- The time to develop source code has a lot of variables. Try to keep up:
+--- Gets the time to develop source code.
 -- If the source is for software, the player's "programming" skill is used
 -- and if it is for a chip, the "chip design" skill is used.
 -- This skill is then multiplied by the "design assistant" hardware rating
 -- if owned by the player.
---  applied skill = skill * design assistant rating
+--
+-- applied skill = skill * design assistant rating
 --
 -- A base time is calculated as the product of the source complexity
 -- and the source rating to the second power.
---  base time = complexity * rating^2
+--
+-- base time = complexity * (rating^2)
 --
 -- Next we look if the player owns sourcecode for the same software/chip
 -- and if so, reduce the base time by the existing sourcecode's base time.
 -- This gives a time bonus with the reasoning that the player is using
--- the existing sourcecode to speed up their progress.
---  base time -= existing sourcecode base time
+-- the existing sourcecode to speed up development time.
+--
+-- base time = base time - existing sourcecode base time
 --
 -- Finally we add and divide the base time by the skill.
--- We subtract 1 so that only skills above 1 have significant effect.
---  return (base time + applied skill - 1) / applied skill
+-- We subtract 1 so that only skills above 1 have any significant effect.
+--
+-- ceil((base time + applied skill - 1) / applied skill)
+--
+-- @tparam player:instance player The player instance.
+-- @tparam sourcecode:instance entity The source code instance to query.
+-- @treturn number The days to develop the code to completion
 function Sourcecode:calculateTimeToDevelop(player, entity)
 
   local Player = require("player")
@@ -145,9 +158,10 @@ function Sourcecode:calculateTimeToDevelop(player, entity)
 
 end
 
-
--- Gets the list of source code we can work on as a project.
+--- Gets the list of source code available.
 -- This is a join of software classes and chip classes.
+-- @tparam player:instance player The player instance.
+-- @treturn sourcecode:sourcelist
 function Sourcecode:getSourceList(player)
 
   local Player = require("player")
@@ -193,12 +207,22 @@ function Sourcecode:getSourceList(player)
 
   end
 
+  --- @table sourcelist
+  -- @field type The type of the source as "software" or "chip".
+  -- @field class The class name of the item.
+  -- @field complexity The complexity of the chip or software.
+  -- @field max_build_rating The rating limit for newly created instances.
+  -- Equates to the player's programming/chip design skills.
+  -- @field owned_rating The rating of any owned sources of the same class.
   return sourcelist
 
 end
 
--- Spend time to complete a sourcecode project.
+--- Spend time to complete a source code project.
+-- On successful work, the instance's daysToComplete value is decreased by one day.
 -- When the project completes it is added to the player's sourcecode list.
+-- @tparam player:instance player The player instance.
+-- @tparam sourcecode:instance entity The source code instance to work on.
 function Sourcecode:workOnCode(player, entity)
 
   local Die = require("die")
@@ -232,8 +256,13 @@ function Sourcecode:workOnCode(player, entity)
 
 end
 
--- "Compile" software source into the player's software list, or
--- prepare to "cook" the source onto a chip.
+--- Build developed source code.
+-- If the source is of the @{software} type, it will be built into
+-- the player's software list. If it is of the @{chips} type it is added
+-- to the player.sourcecode.cooking property.
+-- @tparam player:instance player The player instance.
+-- @tparam sourcecode:instance sourcecode The source to build.
+-- @treturn bool Build success.
 function Sourcecode:build(player, sourcecode)
 
   local Player = require("player")
@@ -247,6 +276,7 @@ function Sourcecode:build(player, sourcecode)
   if sourcecode.isSoftware then
     local program = Software:create(sourcecode.class, sourcecode.rating)
     Player:addSoftware(player, program)
+    return true
   end
 
   if sourcecode.isChip then
@@ -270,13 +300,16 @@ function Sourcecode:build(player, sourcecode)
     -- cook it
     sourcecode.cooktime = sourcecode.complexity * sourcecode.rating
     player.sourcecode.cooking = sourcecode
+    return true
 
   end
 
 end
 
--- Reduce the burning chip cook time by one day.
--- Install it in the deck when it is done.
+--- Reduce the cook time of the burning chip by one day.
+-- On completion the chip is installed in the deck.
+-- @tparam player:instance player The player instance where the cooking chip
+-- information is located.
 function Sourcecode:cookChip(player)
 
     local Player = require("player")

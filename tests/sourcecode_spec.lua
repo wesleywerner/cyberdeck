@@ -86,7 +86,8 @@ describe("sourcecode", function()
     end
 
     -- compile it
-    Sourcecode:build(playerdata, code)
+    local buildResult = Sourcecode:build(playerdata, code)
+    assert.is_true(buildResult)
 
     -- test the player has it in the software list
     local ware = Player:findSoftwareByClass(playerdata, "Medic")
@@ -110,7 +111,8 @@ describe("sourcecode", function()
     end
 
     -- compile it
-    Sourcecode:build(playerdata, code)
+    local buildResult = Sourcecode:build(playerdata, code)
+    assert.is_true(buildResult)
 
     -- test the chip is cooking
     local project = Player:getCookingChip(playerdata)
