@@ -13,11 +13,17 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
+--- An interface to manage the player.
+-- @author Wesley Werner
+-- @license GPL v3
 local Player = {}
 
 Player.MAXHEALTH = 20
 
--- The list of lifestyle levels
+--- A lookup list of all the lifestyles available.
+-- @table lifestyles
+-- @tfield number cost
+-- @tfield string text
 Player.lifestyles = {
   {
     ["cost"] = 500,
@@ -41,31 +47,80 @@ Player.lifestyles = {
   },
 }
 
+--- Create a new player instance.
+-- @treturn player:instance
 function Player:create()
+
+  --- @table instance
+  -- @tfield string name The player name.
+  -- @tfield number credits Money owned by the player.
+  -- @tfield player:lifestyle lifestyle Living data.
+  -- @tfield player:health health Health data.
+  -- @tfield player:reputation reputation
+  -- @tfield player:skills skills
+  -- @tfield player:corporations corporations
+  -- @tfield player:hardware hardware
+  -- @tfield player:software software
+  -- @tfield player:chips chips
+  -- @tfield player:load load
+  -- @tfield player:contract contract
+  -- @tfield player:sourcecode sourcecode
+  -- @tfield player:order order
 
   local instance = {}
   instance.name = "Hacker X"
   instance.credits = 0
 
+  --- The player's current lifestyle information.
+  -- One of @{player.lifestyles}
+  -- @table lifestyle
+  -- @tfield number level Current lifestyle level.
+  -- @tfield string text Current lifestyle title.
   instance.lifestyle = {
     ["level"] = 1,
     ["text"] = ""
   }
 
-  -- Mental and deck health reset when entering the matrix.
+  --- Player mental, physical and deck health information.
+  -- Mental and deck health resets to max when entering the matrix.
+  -- Physical health only gets restored through rest or hospital visits.
+  -- @table health
+  -- @tfield number physical Death occurs when this drops to zero.
+  -- @tfield number mental Player falls unconscious when this drops
+  -- below zero, and negative values carry over to physical health.
+  -- Lethal @{ice} does mental damage instead of deck damage.
+  -- @tfield number deck Deck health inside the matrix.
+  -- This value is reduced when attacked by @{ice}, and restored by
+  -- the Medic @{software}.
   instance.health = {
     ["physical"] = self.MAXHEALTH,
     ["mental"] = 0,
     ["deck"] = 0
   }
 
-  -- Reputation is limited by your lifestyle*4
+  --- Player reputation information.
+  -- @table reputation
+  -- @tfield number level Reputation level.
+  -- @tfield number points Accumulated reputation points that
+  -- determines the current level of reputation. Adjusted via
+  -- @{player:alterReputation}.
+  -- @tfield string text Descriptive title.
   instance.reputation = {
     ["level"] = 1,
     ["points"] = 0,
     ["text"] = ""
   }
 
+  --- Table of player skills.
+  -- The player earns points completing missions, and spend points
+  -- to improve skills.
+  -- @table skills
+  -- @tfield number points Amount of skill points available to spend.
+  -- @tfield number attack Affects attack rating.
+  -- @tfield number defense Affects defense rating.
+  -- @tfield number stealth Affects stealth rating.
+  -- @tfield number analysis Affects analysis rating.
+  -- @tfield number chipdesign Affects chip design rating.
   instance.skills = {
     ["points"] = 0,
     ["attack"] = 1,
@@ -79,44 +134,60 @@ function Player:create()
   instance.reputation.text = self:getReputationText(instance)
   instance.lifestyle.text = self:getLifestyleText(instance)
 
-  -- list of corporation names we visited, stores alert status and backdoors installed
+  --- List of corporations visited, stores alert status and backdoors installed.
+  -- @table corporations
   instance.corporations = {}
 
-  -- list of chips installed in the deck
-  instance.chips = {}
-
-  -- list of hardware and software we own
+  --- List of hardware owned.
+  -- @table hardware
   instance.hardware = {}
+
+  --- List of software owned.
+  -- @table software
   instance.software = {}
+
+  --- List of chips installed in the deck.
+  -- @table chips
   instance.chips = {}
 
-  instance.currentLoad = 0
-  instance.loadStatus = 0
+  --- Deck load information.
+  -- @table load
+  instance.load = {
+    ["current"] = 0,
+    ["status"] = ""
+  }
 
-  -- current contract
-  instance.contract = nil
+  --- current contract information.
+  -- @table contract
+  instance.contract = {}
 
+  --- Source code information.
   -- Source code owned by the player is stored in their repository.
   -- The project tracks progress of a current development effort on new code.
   -- Cooking tracks progress of a chip being burned.
+  -- @table sourcecode
+  -- @tfield table repository List of owned source code.
+  -- @tfield sourcecode project Tracks current development effort on code.
+  -- @tfield sourcecode cooking Tracks the source of the chip being cooked.
   instance.sourcecode = {
     ["repository"] = {},
     ["project"] = nil,
     ["cooking"] = nil
   }
 
-  -- item on special order
-  instance.order = nil
+  --- Shop item on special order.
+  -- @table order
+  instance.order = {}
 
-  -- Game world date as the number of seconds since the epoch.
+  --- Game world date as the number of seconds since the epoch.
   -- Get the readable date with os.date("%c", instance.date)
   -- and forward it by a day with +(60*60*24).
   instance.date = os.time({year=2150, month=1, day=1})
 
-  -- if we are in the matrix
+  --- We are in the matrix
   instance.onRun = false
 
-  -- a red alert was triggered (gets reset each time entering the matrix)
+  --- A red alert was triggered (gets reset each time entering the matrix)
   -- m_dwRunFlags in original source
   instance.alertTriggered = false
 
@@ -125,14 +196,16 @@ function Player:create()
   --int m_nDamageMental;
   --int m_nDamageDeck;
 
-  -- system and node we are inside
+  --- Matrix system we are in
   instance.system = nil
+
+  --- Matrix node we are in
   instance.node = nil
 
-  -- targetted ICE
+  --- targetted ICE
   instance.targetICE = nil
 
-  -- tracks the highest rated ICE that was deceived.
+  --- tracks the highest rated ICE that was deceived.
   -- this is reset each time a node is entered, or the last ICE exits your node.
   -- surely there is a better place to store this, with a shorter name.
   instance.highestRatedICEDeceived = nil
@@ -143,27 +216,38 @@ function Player:create()
 
 end
 
+--- Get the player name.
+-- @tparam player:instance player
 function Player:getName(player)
   return player.name
 end
 
--- Reset matrix-specific values.
+--- Prepare the player to enter the matrix.
+-- This resets the player mental and deck health to max.
+-- @tparam player:instance player
 function Player:prepareForMatrix(player)
   player.health.mental = self.MAXHEALTH
   player.health.deck = self.MAXHEALTH
 end
 
--- Get bank balance
+--- Get the player's credit balance.
+-- @tparam player:instance player
 function Player:getCredits(player)
   return player.credits
 end
 
--- Increase credits
+--- Increase credits.
+-- @tparam player:instance player
+-- @tparam number amount The amount of credits to add.
 function Player:addCredits(player, amount)
   player.credits = player.credits + amount
 end
 
--- If there are not enough credits to spend, return false.
+--- Spend credits.
+-- @tparam player:instance player
+-- @tparam number amount The amount of credits to spend.
+-- @treturn bool true if credits are spent, false if not enough credits
+-- available for spending the requested amount.
 function Player:spendCredits(player, amount)
   if player.credits < amount then
     return false
@@ -173,10 +257,13 @@ function Player:spendCredits(player, amount)
   end
 end
 
--- Add hardware to the player inventory.
--- If the player already own this hardware at a lower rating, it is
--- sold for a second-hand price. If the player owns a higher rated one
--- this returns false.
+--- Add hardware to the player inventory.
+-- If the player already own the hardware at a lower rating, it is
+-- sold for a second-hand price.
+-- @tparam player:instance player
+-- @tparam hardware:instance entity The hardware to add.
+-- @treturn bool true on success,
+-- false if the player owns the same or a higher rated version already.
 function Player:addHardware(player, entity)
   local hardware = require("hardware")
 
@@ -207,7 +294,10 @@ function Player:addHardware(player, entity)
   return true
 end
 
--- Remove hardware from the player inventory.
+--- Remove hardware from the player inventory.
+-- @tparam player:instance player
+-- @tparam hardware:instance entity The hardware to remove.
+-- @treturn bool true on successful removal.
 function Player:removeHardware(player, entity)
   for i,v in ipairs(player.hardware) do
     if v == entity then
@@ -217,7 +307,10 @@ function Player:removeHardware(player, entity)
   end
 end
 
--- Find player owned hardware by class name.
+--- Find owned hardware by class.
+-- @tparam player:instance player
+-- @tparam string class The class of hardware to find.
+-- @treturn hardware:instance or nil if no match found.
 function Player:findHardwareByClass(player, class)
   for i,v in ipairs(player.hardware) do
     if v.class == class then
@@ -226,16 +319,22 @@ function Player:findHardwareByClass(player, class)
   end
 end
 
--- Find the rating of hardware owned by the player.
--- Returns 0 if no hardware was found.
+--- Find rating of owned hardware by class.
+-- This is similar to calling @{player:findHardwareByClass} to get the
+-- rating with nil checking.
+-- @tparam player:instance player
+-- @tparam string class The class of hardware to find.
+-- @treturn number The rating of the hardware owned, or 0 if no match found.
 function Player:findHardwareRatingByClass(player, class)
   local ware = self:findHardwareByClass(player, class)
   return ware and ware.rating or 0
 end
 
--- Add software to the player inventory.
--- Returns true on success.
--- Returns false if the player owns the same or higher rated version.
+--- Add software to the player inventory.
+-- @tparam player:instance player
+-- @tparam software:instance entity The software to add.
+-- @treturn bool true on success,
+-- false if the player owns the same or a higher rated version already.
 function Player:addSoftware(player, entity)
   local software = require("software")
 
@@ -257,7 +356,10 @@ function Player:addSoftware(player, entity)
   return true
 end
 
--- Remove software from the player inventory.
+--- Remove software from the player inventory.
+-- @tparam player:instance player
+-- @tparam software:instance entity The software to add.
+-- @treturn bool true on success.
 function Player:removeSoftware(player, entity)
   for i,v in ipairs(player.software) do
     if v == entity then
@@ -267,7 +369,10 @@ function Player:removeSoftware(player, entity)
   end
 end
 
--- Find player owned software by class name.
+--- Find owned software by class.
+-- @tparam player:instance player
+-- @tparam string class The class of software to find.
+-- @treturn software:instance or nil if no match found.
 function Player:findSoftwareByClass(player, class)
   for i,v in ipairs(player.software) do
     if v.class == class then
@@ -276,7 +381,12 @@ function Player:findSoftwareByClass(player, class)
   end
 end
 
--- Add a chip to the player inventory.
+--- Add a chip to the player inventory.
+-- Any lower rated version if the same chip class is removed if owned.
+-- @tparam player:instance player
+-- @tparam chip:instance entity The chip to add.
+-- @treturn bool true on success,
+-- false if the player owns the same or a higher rated version already.
 function Player:addChip(player, entity)
   -- check for existing of the same class
   local chips = require("chips")
@@ -296,7 +406,11 @@ function Player:addChip(player, entity)
   return true
 end
 
--- Remove a chip from the player inventory.
+--- Remove a chip from the player inventory.
+-- @tparam player:instance player
+-- @tparam chip:instance entity The chip to remove.
+-- @treturn bool true on success,
+-- false if the chip is not owned by the player.
 function Player:removeChip(player, entity)
   for i,v in ipairs(player.chips) do
     if v == entity then
@@ -304,9 +418,13 @@ function Player:removeChip(player, entity)
       return true
     end
   end
+  return false
 end
 
--- Find player owned chip by class name.
+--- Find owned chip by class.
+-- @tparam player:instance player
+-- @tparam string class The class of chip to find.
+-- @treturn chip:instance or nil if no match found.
 function Player:findChipByClass(player, class)
   for i,v in ipairs(player.chips) do
     if v.class == class then
@@ -315,20 +433,28 @@ function Player:findChipByClass(player, class)
   end
 end
 
--- Get the total skill points available for spending.
+--- Get the total skill points available for spending.
+-- @tparam player:instance player
+-- @treturn number Skill points free for spending.
 function Player:getSkillPoints(player)
   return player.skills["points"]
 end
 
--- Add skill points to the player that they can spend.
+--- Add skill points to the player that they can spend.
+-- @tparam player:instance player
+-- @tparam number amount Skill points to add.
 function Player:addSkillPoints(player, amount)
   local skills = player.skills
   skills["points"] = skills["points"] + amount
 end
 
--- Increase one of the player skills.
--- If not enough points are available, return false.
--- The cost equals the current skill level.
+--- Increase one of the player skills.
+-- The cost to increase a skill equals the current skill's level.
+-- @tparam player:instance player
+-- @tparam string class The skill class to increase.
+-- One of @{player:skills}.
+-- @treturn bool true on success,
+-- false if not enough points are available
 function Player:spendSkillPoints(player, class)
   local skills = player.skills
   if not skills[class] then
@@ -345,7 +471,10 @@ function Player:spendSkillPoints(player, class)
   end
 end
 
--- Get the skill level of the requested skill class.
+--- Get a skill level.
+-- @tparam player:instance player
+-- @tparam string class The skill class to query.
+-- @treturn number The skill level.
 function Player:getSkillLevel(player, class)
   local skills = player.skills
   if not skills[class] then
@@ -355,7 +484,13 @@ function Player:getSkillLevel(player, class)
   end
 end
 
--- Change the player's reputation with positive or negative points
+--- Alter the player's reputation with positive or negative points.
+-- This function applies the given points and properly adjusts the
+-- player reputation level and descriptive text. Negative points will
+-- subtract from reputation.
+-- Reputation is limited to 4 * the player's lifestyle level.
+-- @tparam player:instance player
+-- @tparam number points The amount of points to apply, positive or negative.
 function Player:alterReputation(player, points)
 
   -- alias variable for ease of use
@@ -412,6 +547,12 @@ function Player:alterReputation(player, points)
 
 end
 
+--- Get the reputation title of the player.
+-- This function used internally by the player module when
+-- @{Player:alterReputation} is called. The reputation title can
+-- be read from the @{player.reputation} table instead.
+-- @tparam player:instance player
+-- @treturn string The reputation title text.
 function Player:getReputationText(player)
   local reputations = {
     "Nobody",
@@ -443,6 +584,11 @@ function Player:getReputationText(player)
   end
 end
 
+--- Get the cost for the player's current lifestyle, aka the monthly rent.
+-- @tparam player:instance player
+-- @tparam[opt] bool nextlevel Pass true to calculate the cost for the
+-- next lifestyle up from the player's current.
+-- @treturn number The cost of monthly rent.
 function Player:getLifestyleCost(player, nextlevel)
 
   local level = player.lifestyle.level
@@ -459,10 +605,19 @@ function Player:getLifestyleCost(player, nextlevel)
 
 end
 
+--- Get the cost to upgrade to the next lifestyle level.
+-- @tparam player:instance player
+-- @treturn number The upgrade cost.
 function Player:getLifestyleUpgradeCost(player)
   return self:getLifestyleCost(player, true) * 3
 end
 
+--- Upgrade to the next lifestyle level.
+-- @see getLifestyleUpgradeCost
+-- @see getCredits
+-- @tparam player:instance player
+-- @treturn bool true on success,
+-- false if the player does not have enough credits to upgrade.
 function Player:upgradeLifestyle(player)
   local cost = self:getLifestyleUpgradeCost(player)
   if player.credits >= cost then
@@ -472,13 +627,18 @@ function Player:upgradeLifestyle(player)
     -- TODO message that lifestyle has been upgraded
     return true
   end
+  return false
 end
 
+--- Downgrade to a lower lifestyle level.
+-- @tparam player:instance player
+-- @treturn bool true on success,
+-- false if the player's lifestyle is already at the lowest level.
 function Player:downgradeLifestyle(player)
   if player.lifestyle.level > 1 then
     player.lifestyle.level = player.lifestyle.level - 1
     player.lifestyle.text = self:getLifestyleText(player)
-    -- TODO message that lifestyle has been downupgraded
+    -- TODO message that lifestyle has been downgraded
     return true
   else
     -- downgrade is not possible
@@ -486,6 +646,12 @@ function Player:downgradeLifestyle(player)
   end
 end
 
+--- Get the current lifestyle title.
+-- This function is used internally in this module
+-- by the @{upgradeLifestyle} and @{downgradeLifestyle} functions.
+-- The lifestyle title can be read via the @{player:lifestyle} table.
+-- @tparam player:instance player
+-- @treturn string The descriptive lifestyle title.
 function Player:getLifestyleText(player)
   if player.lifestyle.level > #self.lifestyles then
     return self.lifestyles[#self.lifestyles].text
@@ -494,10 +660,17 @@ function Player:getLifestyleText(player)
   end
 end
 
+--- Add source code to the player inventory.
+-- @tparam player:instance player
+-- @tparam sourcecode code The source code to add.
 function Player:addSourcecode(player, code)
   table.insert(player.sourcecode.repository, code)
 end
 
+--- Find owned source code by class.
+-- @tparam player:instance player
+-- @tparam string class The class of the source code to find.
+-- @treturn sourcecode or nil if no match is found.
 function Player:findSourceByClass(player, class)
   for k, source in pairs(player.sourcecode.repository) do
     if source.class == class then
@@ -506,6 +679,11 @@ function Player:findSourceByClass(player, class)
   end
 end
 
+--- Get the chip currently cooking.
+-- A chip is cooked from source code with a chip burner @{hardware}.
+-- @see sourcecode:build
+-- @tparam player:instance player
+-- @treturn sourcecode
 function Player:getCookingChip(player)
   return player.sourcecode.cooking
 end

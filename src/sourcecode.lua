@@ -259,7 +259,7 @@ end
 --- Build developed source code.
 -- If the source is of the @{software} type, it will be built into
 -- the player's software list. If it is of the @{chips} type it is added
--- to the player.sourcecode.cooking property.
+-- to the @{player.sourcecode} cooking property.
 -- @tparam player:instance player The player instance.
 -- @tparam sourcecode:instance sourcecode The source to build.
 -- @treturn bool Build success.
