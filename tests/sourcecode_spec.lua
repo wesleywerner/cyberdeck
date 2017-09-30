@@ -95,7 +95,7 @@ describe("sourcecode", function()
 
   end)
 
-  it("cook it to a chip", function()
+  it("cook a chip", function()
 
     -- give the player a chip burner
     local Hardware = require("hardware")
@@ -138,18 +138,63 @@ describe("sourcecode", function()
   end)
 
 
-  --it("example usage", function()
+  it("get available sources", function()
 
-    --table.insert(playerdata.sourcecode, Sourcecode:create(playerdata, "Smoke", 5))
-    --table.insert(playerdata.sourcecode, Sourcecode:create(playerdata, "CPU", 5))
+    -- rating is limited to the player skill, so ensure we have the skills.
+    Player:addSkillPoints(playerdata, 1+2+3+4)
+    Player:spendSkillPoints(playerdata, "programming")
+    Player:spendSkillPoints(playerdata, "programming")
+    Player:spendSkillPoints(playerdata, "programming")
+    Player:spendSkillPoints(playerdata, "programming")
 
-    --local list = Sourcecode:getSourceList(playerdata)
+    Player:addSkillPoints(playerdata, 1+2)
+    Player:spendSkillPoints(playerdata, "chip design")
+    Player:spendSkillPoints(playerdata, "chip design")
 
-    --for k,v in pairs(list) do
-      --print(k, v.type, v.class, v.complexity, v["max build rating"], "*" .. v["owned rating"])
-    --end
+    -- assume the player already owns these sources.
+    local warecode = Sourcecode:create(playerdata, "Smoke", 5)
+    local chipcode = Sourcecode:create(playerdata, "CPU", 3)
+    assert.are.equals(5, warecode.rating)
+    assert.are.equals(3, chipcode.rating)
 
-  --end)
+    Player:addSourcecode(playerdata, warecode)
+    Player:addSourcecode(playerdata, chipcode)
+
+    -- get the source list
+    local list = Sourcecode:getSourceList(playerdata)
+
+    -- helper to find some source
+    local findSomeSource = function(class)
+      for _,v in ipairs(list) do
+        if v.class == class then
+          return v
+        end
+      end
+    end
+
+    -- test a default source
+    local defaultSource = findSomeSource("Decoy")
+    assert.is_not.is_nil(defaultSource)
+    -- we don't own any of this class yet
+    assert.are.equals(0, defaultSource.ownedrating)
+    -- test max theoretical rating
+    assert.are.equals(5, defaultSource.maxrating)
+
+    -- test owned software source
+    local ownedWare = findSomeSource("Smoke")
+    assert.is_not.is_nil(ownedWare)
+    -- test owned rating
+    assert.are.equals(5, ownedWare.ownedrating)
+
+    -- test owned chip source
+    local ownedChip = findSomeSource("CPU")
+    assert.is_not.is_nil(ownedChip)
+    -- test owned rating
+    assert.are.equals(3, ownedChip.ownedrating)
+    -- test max theoretical rating
+    assert.are.equals(3, ownedChip.maxrating)
+
+  end)
 
 
 end)

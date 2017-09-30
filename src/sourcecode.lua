@@ -170,13 +170,13 @@ function Sourcecode:getSourceList(player)
   local sourcelist = {}
 
   -- build the software list
-  for warekey, ware in pairs(Software.types) do
+  for _, ware in ipairs(Software.types) do
     if ware.clientOnly ~= true then
       table.insert(sourcelist, {
         ["type"] = "software",
-        ["class"] = warekey,
+        ["class"] = ware.class,
         ["complexity"] = ware.complexity,
-        ["max build rating"] = Player:getSkillLevel(player, "programming")
+        ["maxrating"] = Player:getSkillLevel(player, "programming")
       })
     end
   end
@@ -187,12 +187,12 @@ function Sourcecode:getSourceList(player)
   end)
 
   -- build the chips list
-  for chipkey, chip in pairs(Chips.types) do
+  for _, chip in ipairs(Chips.types) do
     table.insert(sourcelist, {
       ["type"] = "chip",
-      ["class"] = chipkey,
+      ["class"] = chip.class,
       ["complexity"] = chip.complexity,
-      ["max build rating"] = Player:getSkillLevel(player, "chip design")
+      ["maxrating"] = Player:getSkillLevel(player, "chip design")
     })
   end
 
@@ -203,17 +203,18 @@ function Sourcecode:getSourceList(player)
     local ownedSource = Player:findSourceByClass(player, source.class)
 
     -- The list contains the currently owned source details where available
-    source["owned rating"] = ownedSource and ownedSource.rating or 0
+    source["ownedrating"] = ownedSource and ownedSource.rating or 0
 
   end
 
   --- @table sourcelist
   -- @field type The type of the source as "software" or "chip".
-  -- @field class The class name of the item.
+  -- @field class The class name of the source item,
+  -- one of @{software.types} or @{chips.types}
   -- @field complexity The complexity of the chip or software.
-  -- @field max_build_rating The rating limit for newly created instances.
+  -- @field maxrating The rating limit for newly created instances.
   -- Equates to the player's programming/chip design skills.
-  -- @field owned_rating The rating of any owned sources of the same class.
+  -- @field ownedrating The rating of any owned sources of the same class.
   return sourcelist
 
 end
