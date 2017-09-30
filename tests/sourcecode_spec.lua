@@ -26,8 +26,8 @@ describe("sourcecode", function()
 
     -- upgrade the player chip design to level 2
     Player:addSkillPoints(playerdata, 1)
-    Player:spendSkillPoints(playerdata, "chip design")
-    assert.are.equals(2, Player:getSkillLevel(playerdata, "chip design"))
+    Player:spendSkillPoints(playerdata, "chipdesign")
+    assert.are.equals(2, Player:getSkillLevel(playerdata, "chipdesign"))
 
     -- attempt to create a chip source level 3
     local code = Sourcecode:create(playerdata, "Stealth Firmware", 3)
@@ -41,7 +41,7 @@ describe("sourcecode", function()
 
     -- upgrade the player chip design to level 2
     Player:addSkillPoints(playerdata, 1)
-    Player:spendSkillPoints(playerdata, "chip design")
+    Player:spendSkillPoints(playerdata, "chipdesign")
 
     local code = Sourcecode:create(playerdata, "CPU", 2)
     assert.are.equals(11, code.daysToComplete)
@@ -52,7 +52,7 @@ describe("sourcecode", function()
 
     -- upgrade the player chip design to level 2
     Player:addSkillPoints(playerdata, 1)
-    Player:spendSkillPoints(playerdata, "chip design")
+    Player:spendSkillPoints(playerdata, "chipdesign")
 
     -- add an lower rated source of the same class
     local oldversion = Sourcecode:create(playerdata, "CPU", 1)
@@ -148,8 +148,8 @@ describe("sourcecode", function()
     Player:spendSkillPoints(playerdata, "programming")
 
     Player:addSkillPoints(playerdata, 1+2)
-    Player:spendSkillPoints(playerdata, "chip design")
-    Player:spendSkillPoints(playerdata, "chip design")
+    Player:spendSkillPoints(playerdata, "chipdesign")
+    Player:spendSkillPoints(playerdata, "chipdesign")
 
     -- assume the player already owns these sources.
     local warecode = Sourcecode:create(playerdata, "Smoke", 5)

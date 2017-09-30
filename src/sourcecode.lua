@@ -77,7 +77,7 @@ function Sourcecode:create(player, class, rating)
   if isSoftware then
     relevantSkillLevel = Player:getSkillLevel(player, "programming")
   elseif isChip then
-    relevantSkillLevel = Player:getSkillLevel(player, "chip design")
+    relevantSkillLevel = Player:getSkillLevel(player, "chipdesign")
   end
 
   --- @table instance
@@ -85,7 +85,7 @@ function Sourcecode:create(player, class, rating)
   -- @field rating The instance rating, clamped to the player's relevantSkillLevel.
   -- @field relevantSkillLevel The rating of the player's skill relevant to the class.
   -- For software sources this will be the player "programming" skill,
-  -- and for chip sources the "chip design" skill.
+  -- and for chip sources the "chipdesign" skill.
   -- @field maxBuildRating NOT CURRENTLY USED, MAY BE REMOVED.
   -- @field complexity The chip or software complexity.
   -- Affects the time required to complete the project,
@@ -111,7 +111,7 @@ end
 
 --- Gets the time to develop source code.
 -- If the source is for software, the player's "programming" skill is used
--- and if it is for a chip, the "chip design" skill is used.
+-- and if it is for a chip, the "chipdesign" skill is used.
 -- This skill is then multiplied by the "design assistant" hardware rating
 -- if owned by the player.
 --
@@ -192,7 +192,7 @@ function Sourcecode:getSourceList(player)
       ["type"] = "chip",
       ["class"] = chip.class,
       ["complexity"] = chip.complexity,
-      ["maxrating"] = Player:getSkillLevel(player, "chip design")
+      ["maxrating"] = Player:getSkillLevel(player, "chipdesign")
     })
   end
 

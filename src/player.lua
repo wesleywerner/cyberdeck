@@ -128,7 +128,7 @@ function Player:create()
     ["stealth"] = 1,
     ["analysis"] = 1,
     ["programming"] = 1,
-    ["chip design"] = 1,
+    ["chipdesign"] = 1,
   }
 
   instance.reputation.text = self:getReputationText(instance)
