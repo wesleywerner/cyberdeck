@@ -311,22 +311,33 @@ end
 -- On completion the chip is installed in the deck.
 -- @tparam player:instance player The player instance where the cooking chip
 -- information is located.
+-- @treturn bool true on success
 function Sourcecode:cookChip(player)
 
     local Player = require("player")
     local Chips = require("chips")
-    local burner = Player:getCookingChip(player)
 
-    if burner then
+    -- player must own a chip burner
+    local burner = Player:findHardwareRatingByClass(player, "Chip Burner")
+
+    if burner == 0 then
+      -- TODO message that a chip burner is required
+      --print("you need a burner")
+      return false
+    end
+
+    local cooked = Player:getCookingChip(player)
+
+    if cooked then
 
       -- reduce cooking time
-      burner.cooktime = burner.cooktime - 1
+      cooked.cooktime = cooked.cooktime - 1
 
       -- it is done
-      if burner.cooktime < 1 then
+      if cooked.cooktime < 1 then
 
         -- install the new chip
-        local chip = Chips:create(burner.class, burner.rating)
+        local chip = Chips:create(cooked.class, cooked.rating)
         Player:addChip(player, chip)
 
         -- remove the project
@@ -334,7 +345,11 @@ function Sourcecode:cookChip(player)
 
       end
 
+      return true
+
     end
+
+    return false
 
 end
 

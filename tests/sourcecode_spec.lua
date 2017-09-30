@@ -120,7 +120,8 @@ describe("sourcecode", function()
 
     -- pass time so it cooks
     while code.cooktime > 0 do
-      Sourcecode:cookChip(playerdata)
+      local cookResult = Sourcecode:cookChip(playerdata)
+      assert.is_true(cookResult)
     end
 
     -- test the cooking project has been removed
