@@ -35,7 +35,7 @@ end
 -- The definition can be a table or function that returns a table.
 function System:generate(entity, nodeDefinition)
 
-  local Area = require("systemarea")
+  local AreaModule = require("systemarea")
 
   math.randomseed(entity.seed)
 
@@ -50,10 +50,10 @@ function System:generate(entity, nodeDefinition)
   for areaNo=1, areaCount do
 
     if type(nodeDefinition) == "table" then
-      local area = Area:create(areaNo, nodeDefinition)
+      local area = AreaModule:create(areaNo, nodeDefinition)
       table.insert(entity.areas, area)
     elseif type(nodeDefinition) == "function" then
-      local area = Area:create(areaNo, nodeDefinition(entity, areaNo) )
+      local area = AreaModule:create(areaNo, nodeDefinition(entity, areaNo) )
       table.insert(entity.areas, area)
     end
 

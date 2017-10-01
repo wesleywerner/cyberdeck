@@ -265,13 +265,13 @@ end
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
 function Player:addHardware(player, entity)
-  local hardware = require("hardware")
+  local HWModule = require("hardware")
 
   -- check for existing of the same class
   local existing = self:findHardwareByClass(player, entity.class)
   if existing then
-    local currentRating = hardware:getRating(existing)
-    local proposedRating = hardware:getRating(entity)
+    local currentRating = HWModule:getRating(existing)
+    local proposedRating = HWModule:getRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeHardware(player, existing)
@@ -283,7 +283,7 @@ function Player:addHardware(player, entity)
 
   -- resell old hardware
   if existing then
-    local value = hardware:getResellPrice(existing)
+    local value = HWModule:getResellPrice(existing)
     self:removeHardware(player, existing)
     self:addCredits(player, value)
     -- TODO send message: You sold your old hardware for %dcr
@@ -336,13 +336,13 @@ end
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
 function Player:addSoftware(player, entity)
-  local software = require("software")
+  local SWModule = require("software")
 
   -- check for existing of the same class
   local existing = self:findSoftwareByClass(player, entity.class)
   if existing then
-    local currentRating = software:getPotentialRating(existing)
-    local proposedRating = software:getPotentialRating(entity)
+    local currentRating = SWModule:getPotentialRating(existing)
+    local proposedRating = SWModule:getPotentialRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeSoftware(player, existing)
@@ -389,11 +389,11 @@ end
 -- false if the player owns the same or a higher rated version already.
 function Player:addChip(player, entity)
   -- check for existing of the same class
-  local chips = require("chips")
+  local CHModule = require("chips")
   local existing = self:findChipByClass(player, entity.class)
   if existing then
-    local currentRating = chips:getRating(existing)
-    local proposedRating = chips:getRating(entity)
+    local currentRating = CHModule:getRating(existing)
+    local proposedRating = CHModule:getRating(entity)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeChip(player, existing)

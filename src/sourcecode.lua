@@ -43,23 +43,23 @@ local Sourcecode = {}
 -- @treturn sourcecode:instance
 function Sourcecode:create(player, class, rating)
 
-  local Player = require("player")
-  local Software = require("software")
-  local Chips = require("chips")
+  local PLModule = require("player")
+  local SWModule = require("software")
+  local CHModule = require("chips")
 
   -- source can refer to software or a chip design. find out which one it is.
   local isSoftware = false
   local isChip = false
   local complexity = 0
 
-  local softwareDefinition = Software:getType(class)
+  local softwareDefinition = SWModule:getType(class)
   if softwareDefinition then
       isSoftware = true
       complexity = softwareDefinition.complexity
   end
 
   if not isSoftware then
-    local chipDefinition = Chips:getType(class)
+    local chipDefinition = CHModule:getType(class)
     if chipDefinition then
         isChip = true
         complexity = chipDefinition.complexity
@@ -75,9 +75,9 @@ function Sourcecode:create(player, class, rating)
   local relevantSkillLevel = 0
 
   if isSoftware then
-    relevantSkillLevel = Player:getSkillLevel(player, "programming")
+    relevantSkillLevel = PLModule:getSkillLevel(player, "programming")
   elseif isChip then
-    relevantSkillLevel = Player:getSkillLevel(player, "chipdesign")
+    relevantSkillLevel = PLModule:getSkillLevel(player, "chipdesign")
   end
 
   --- @table instance
@@ -139,15 +139,15 @@ end
 -- @treturn number The days to develop the code to completion
 function Sourcecode:calculateTimeToDevelop(player, entity)
 
-  local Player = require("player")
+  local PLModule = require("player")
 
   -- Owning design assistant hardware reduces the time
-  local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
+  local designAssistLevel = PLModule:findHardwareRatingByClass(player, "Design Assistant")
   local appliedSkill = entity.relevantSkillLevel * (1 + designAssistLevel)
   local baseTime = entity.complexity * math.pow(entity.rating, 2)
 
   -- Receive a time bonus if the player owns source for this class already
-  local ownedSource = Player:findSourceByClass(player, entity.class)
+  local ownedSource = PLModule:findSourceByClass(player, entity.class)
   if ownedSource then
     local previousBaseTime = (entity.complexity * math.pow(ownedSource.rating, 2))
     baseTime = baseTime - previousBaseTime
@@ -164,19 +164,19 @@ end
 -- @treturn sourcecode:sourcelist
 function Sourcecode:getSourceList(player)
 
-  local Player = require("player")
-  local Software = require("software")
-  local Chips = require("chips")
+  local PLModule = require("player")
+  local SWModule = require("software")
+  local CHModule = require("chips")
   local sourcelist = {}
 
   -- build the software list
-  for _, ware in ipairs(Software.types) do
+  for _, ware in ipairs(SWModule.types) do
     if ware.clientOnly ~= true then
       table.insert(sourcelist, {
         ["type"] = "software",
         ["class"] = ware.class,
         ["complexity"] = ware.complexity,
-        ["maxrating"] = Player:getSkillLevel(player, "programming")
+        ["maxrating"] = PLModule:getSkillLevel(player, "programming")
       })
     end
   end
@@ -187,12 +187,12 @@ function Sourcecode:getSourceList(player)
   end)
 
   -- build the chips list
-  for _, chip in ipairs(Chips.types) do
+  for _, chip in ipairs(CHModule.types) do
     table.insert(sourcelist, {
       ["type"] = "chip",
       ["class"] = chip.class,
       ["complexity"] = chip.complexity,
-      ["maxrating"] = Player:getSkillLevel(player, "chipdesign")
+      ["maxrating"] = PLModule:getSkillLevel(player, "chipdesign")
     })
   end
 
@@ -200,7 +200,7 @@ function Sourcecode:getSourceList(player)
   for k, source in pairs(sourcelist) do
 
     -- find this source that is owned by the player
-    local ownedSource = Player:findSourceByClass(player, source.class)
+    local ownedSource = PLModule:findSourceByClass(player, source.class)
 
     -- The list contains the currently owned source details where available
     source["ownedrating"] = ownedSource and ownedSource.rating or 0
@@ -226,8 +226,8 @@ end
 -- @tparam sourcecode:instance entity The source code instance to work on.
 function Sourcecode:workOnCode(player, entity)
 
-  local Die = require("die")
-  local Player = require("player")
+  local DiceModule = require("die")
+  local PLModule = require("player")
   entity.daysToComplete = entity.daysToComplete - 1
 
   -- project complete, now we roll to see if we found any bugs
@@ -235,7 +235,7 @@ function Sourcecode:workOnCode(player, entity)
   if entity.daysToComplete <= 0 then
 
     -- owning design assistant hardware improves our success rate
-    local designAssistLevel = Player:findHardwareRatingByClass(player, "Design Assistant")
+    local designAssistLevel = PLModule:findHardwareRatingByClass(player, "Design Assistant")
 
     -- roll for success against:
     -- (10 + source rating) - (relevant skill * design assist rating).
@@ -243,10 +243,10 @@ function Sourcecode:workOnCode(player, entity)
     -- Increase the target by the source rating (reduces success).
     -- Subtract the programming/chip design skill and assistant (increases success).
     local rolltarget = (10 + entity.rating) - (entity.relevantSkillLevel + designAssistLevel)
-    local roll = Die:roll(rolltarget)
+    local roll = DiceModule:roll(rolltarget)
 
     if roll.success then
-      Player:addSourcecode(player, entity)
+      PLModule:addSourcecode(player, entity)
       -- TODO message that the project is complete and now in your sources list
     else
       entity.daysToComplete = (self:calculateTimeToDevelop(player, entity) + 3) / 4
@@ -266,8 +266,8 @@ end
 -- @treturn bool Build success.
 function Sourcecode:build(player, sourcecode)
 
-  local Player = require("player")
-  local Software = require("software")
+  local PLModule = require("player")
+  local SWModule = require("software")
 
   if sourcecode.daysToComplete > 0 then
     -- TODO message that the source is undeveloped
@@ -275,15 +275,15 @@ function Sourcecode:build(player, sourcecode)
   end
 
   if sourcecode.isSoftware then
-    local program = Software:create(sourcecode.class, sourcecode.rating)
-    Player:addSoftware(player, program)
+    local program = SWModule:create(sourcecode.class, sourcecode.rating)
+    PLModule:addSoftware(player, program)
     return true
   end
 
   if sourcecode.isChip then
 
     -- player must own a chip burner
-    local burner = Player:findHardwareRatingByClass(player, "Chip Burner")
+    local burner = PLModule:findHardwareRatingByClass(player, "Chip Burner")
 
     if burner == 0 then
       -- TODO message that a chip burner is required
@@ -291,7 +291,7 @@ function Sourcecode:build(player, sourcecode)
       return false
     end
 
-    local currentproject = Player:getCookingChip(player)
+    local currentproject = PLModule:getCookingChip(player)
     if currentproject then
       -- TODO message that a chip is already cooking
       --print("chip already cooking")
@@ -314,11 +314,11 @@ end
 -- @treturn bool true on success
 function Sourcecode:cookChip(player)
 
-    local Player = require("player")
-    local Chips = require("chips")
+    local PLModule = require("player")
+    local CHModule = require("chips")
 
     -- player must own a chip burner
-    local burner = Player:findHardwareRatingByClass(player, "Chip Burner")
+    local burner = PLModule:findHardwareRatingByClass(player, "Chip Burner")
 
     if burner == 0 then
       -- TODO message that a chip burner is required
@@ -326,7 +326,7 @@ function Sourcecode:cookChip(player)
       return false
     end
 
-    local cooked = Player:getCookingChip(player)
+    local cooked = PLModule:getCookingChip(player)
 
     if cooked then
 
@@ -337,8 +337,8 @@ function Sourcecode:cookChip(player)
       if cooked.cooktime < 1 then
 
         -- install the new chip
-        local chip = Chips:create(cooked.class, cooked.rating)
-        Player:addChip(player, chip)
+        local chip = CHModule:create(cooked.class, cooked.rating)
+        PLModule:addChip(player, chip)
 
         -- remove the project
         player.sourcecode.cooking = nil
