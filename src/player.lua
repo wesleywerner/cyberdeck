@@ -261,17 +261,17 @@ end
 -- If the player already own the hardware at a lower rating, it is
 -- sold for a second-hand price.
 -- @tparam player:instance player
--- @tparam hardware:instance entity The hardware to add.
+-- @tparam hardware:instance hardware The hardware to add.
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
-function Player:addHardware(player, entity)
+function Player:addHardware(player, hardware)
   local HWModule = require("hardware")
 
   -- check for existing of the same class
-  local existing = self:findHardwareByClass(player, entity.class)
+  local existing = self:findHardwareByClass(player, hardware.class)
   if existing then
     local currentRating = HWModule:getRating(existing)
-    local proposedRating = HWModule:getRating(entity)
+    local proposedRating = HWModule:getRating(hardware)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeHardware(player, existing)
@@ -290,17 +290,17 @@ function Player:addHardware(player, entity)
   end
 
   -- add the new hardware
-  table.insert(player.hardware, entity)
+  table.insert(player.hardware, hardware)
   return true
 end
 
 --- Remove hardware from the player inventory.
 -- @tparam player:instance player
--- @tparam hardware:instance entity The hardware to remove.
+-- @tparam hardware:instance hardware The hardware to remove.
 -- @treturn bool true on successful removal.
-function Player:removeHardware(player, entity)
+function Player:removeHardware(player, hardware)
   for i,v in ipairs(player.hardware) do
-    if v == entity then
+    if v == hardware then
       table.remove(player.hardware, i)
       return true
     end
@@ -332,17 +332,17 @@ end
 
 --- Add software to the player inventory.
 -- @tparam player:instance player
--- @tparam software:instance entity The software to add.
+-- @tparam software:instance software The software to add.
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
-function Player:addSoftware(player, entity)
+function Player:addSoftware(player, software)
   local SWModule = require("software")
 
   -- check for existing of the same class
-  local existing = self:findSoftwareByClass(player, entity.class)
+  local existing = self:findSoftwareByClass(player, software.class)
   if existing then
     local currentRating = SWModule:getPotentialRating(existing)
-    local proposedRating = SWModule:getPotentialRating(entity)
+    local proposedRating = SWModule:getPotentialRating(software)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeSoftware(player, existing)
@@ -352,17 +352,17 @@ function Player:addSoftware(player, entity)
     end
   end
 
-  table.insert(player.software, entity)
+  table.insert(player.software, software)
   return true
 end
 
 --- Remove software from the player inventory.
 -- @tparam player:instance player
--- @tparam software:instance entity The software to add.
+-- @tparam software:instance software The software to add.
 -- @treturn bool true on success.
-function Player:removeSoftware(player, entity)
+function Player:removeSoftware(player, software)
   for i,v in ipairs(player.software) do
-    if v == entity then
+    if v == software then
       table.remove(player.software, i)
       return true
     end
@@ -384,16 +384,16 @@ end
 --- Add a chip to the player inventory.
 -- Any lower rated version if the same chip class is removed if owned.
 -- @tparam player:instance player
--- @tparam chip:instance entity The chip to add.
+-- @tparam chip:instance chip The chip to add.
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
-function Player:addChip(player, entity)
+function Player:addChip(player, chip)
   -- check for existing of the same class
   local CHModule = require("chips")
-  local existing = self:findChipByClass(player, entity.class)
+  local existing = self:findChipByClass(player, chip.class)
   if existing then
     local currentRating = CHModule:getRating(existing)
-    local proposedRating = CHModule:getRating(entity)
+    local proposedRating = CHModule:getRating(chip)
     -- remove existing if lower rated
     if currentRating < proposedRating then
       self:removeChip(player, existing)
@@ -402,18 +402,18 @@ function Player:addChip(player, entity)
       return false
     end
   end
-  table.insert(player.chips, entity)
+  table.insert(player.chips, chip)
   return true
 end
 
 --- Remove a chip from the player inventory.
 -- @tparam player:instance player
--- @tparam chip:instance entity The chip to remove.
+-- @tparam chip:instance chip The chip to remove.
 -- @treturn bool true on success,
 -- false if the chip is not owned by the player.
-function Player:removeChip(player, entity)
+function Player:removeChip(player, chip)
   for i,v in ipairs(player.chips) do
-    if v == entity then
+    if v == chip then
       table.remove(player.chips, i)
       return true
     end
@@ -662,9 +662,9 @@ end
 
 --- Add source code to the player inventory.
 -- @tparam player:instance player
--- @tparam sourcecode code The source code to add.
-function Player:addSourcecode(player, code)
-  table.insert(player.sourcecode.repository, code)
+-- @tparam sourcecode sourcecode The source code to add.
+function Player:addSourcecode(player, sourcecode)
+  table.insert(player.sourcecode.repository, sourcecode)
 end
 
 --- Find owned source code by class.

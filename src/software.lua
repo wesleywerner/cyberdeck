@@ -765,17 +765,17 @@ function Software:getType(class)
 end
 
 -- Get the potential rating.
-function Software:getPotentialRating(entity)
-  return entity.potentialRating
+function Software:getPotentialRating(software)
+  return software.potentialRating
 end
 
 -- Get the active (current) rating.
-function Software:getActiveRating(entity)
-  return entity.activeRating
+function Software:getActiveRating(software)
+  return software.activeRating
 end
 
 -- load time is dependent on your hardware bus and node speed.
-function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthRate)
+function Software:getLoadTime(software, inActivatedHighSpeedNode, playerBandwidthRate)
 
   -- If have a high-speed connection, time is 1 turn.
   if inActivatedHighSpeedNode == true then
@@ -783,7 +783,7 @@ function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthR
   end
 
   -- Time is size / (2^(bus size))
-  local mp = self:getMemoryUsage(entity)
+  local mp = self:getMemoryUsage(software)
   local speed = 2^playerBandwidthRate
   local loadtime = math.floor((mp + speed - 1) / speed)
 
@@ -792,68 +792,68 @@ function Software:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthR
 
 end
 
-function Software:getMemoryUsage(sw)
-  local def = self:getType(sw.class)
-  return def.complexity * sw.potentialRating
+function Software:getMemoryUsage(software)
+  local def = self:getType(software.class)
+  return def.complexity * software.potentialRating
 end
 
-function Software:getDefaultName(sw)
-  local def = self:getType(sw.class)
-  return def.names[sw.potentialRating]
+function Software:getDefaultName(software)
+  local def = self:getType(software.class)
+  return def.names[software.potentialRating]
 end
 
-function Software:getPrice(sw)
-  local def = self:getType(sw.class)
-  return def.complexity * sw.potentialRating^2 * 25;
+function Software:getPrice(software)
+  local def = self:getType(software.class)
+  return def.complexity * software.potentialRating^2 * 25;
 end
 
-function Software:getText(sw)
-  return string.format("%s (%s %d)", sw.name, sw.class, sw.potentialRating)
+function Software:getText(software)
+  return string.format("%s (%s %d)", software.name, software.class, software.potentialRating)
 end
 
 -- Can load if not loaded already and no load turns are set.
-function Software:canLoad(entity)
-  return not entity.loaded and entity.loadTurns == 0
+function Software:canLoad(software)
+  return not software.loaded and software.loadTurns == 0
 end
 
 -- Is loaded and ready for use
-function Software:isLoaded(entity)
-  return entity.loaded
+function Software:isLoaded(software)
+  return software.loaded
 end
 
 -- Is loading when there are load turns left
-function Software:isLoading(entity)
-  return entity.loadTurns > 0
+function Software:isLoading(software)
+  return software.loadTurns > 0
 end
 
 -- Crashes when loaded and the active rating drops to zero or below
-function Software:hasCrashed(entity)
-  return entity.loaded and entity.activeRating < 1
+function Software:hasCrashed(software)
+  return software.loaded and software.activeRating < 1
 end
 
-function Software:beginLoad(entity, inActivatedHighSpeedNode, playerBandwidthRate)
+function Software:beginLoad(software, inActivatedHighSpeedNode, playerBandwidthRate)
   -- TODO check if the deck won't overload
   -- TODO check how many other programs are loading, and if we have
   --      the memory to load this one asynchronously
-  if self:canLoad(entity) then
-    entity.loadTurns = self:getLoadTime(entity, inActivatedHighSpeedNode, playerBandwidthRate)
+  if self:canLoad(software) then
+    software.loadTurns = self:getLoadTime(software, inActivatedHighSpeedNode, playerBandwidthRate)
   end
 end
 
--- Update the entity state at the end of the player's turn.
-function Software:update(entity)
-  if self:isLoading(entity) then
-    entity.loadTurns = entity.loadTurns - 1
-    if entity.loadTurns == 0 then
-      entity.loaded = true
-      entity.activeRating = entity.potentialRating
+-- Update the software state at the end of the player's turn.
+function Software:update(software)
+  if self:isLoading(software) then
+    software.loadTurns = software.loadTurns - 1
+    if software.loadTurns == 0 then
+      software.loaded = true
+      software.activeRating = software.potentialRating
       -- TODO send message for program loaded
     end
   else
     -- test if the program has crashed
-    if self:hasCrashed(entity) then
-      entity.loaded = false
-      entity.activeRating = 0
+    if self:hasCrashed(software) then
+      software.loaded = false
+      software.activeRating = 0
       -- TODO send message for program crashed
     end
   end

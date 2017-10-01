@@ -87,48 +87,48 @@ Hardware.types = {
   },
 }
 
-function Hardware:getType(hw)
-  local def = self.types[hw.class]
+function Hardware:getType(hardware)
+  local def = self.types[hardware.class]
   if not def then
     error( "No type definition found for %q", self.class)
   end
   return def
 end
 
-function Hardware:getRating(hw)
-  return hw.rating
+function Hardware:getRating(hardware)
+  return hardware.rating
 end
 
-function Hardware:getMaxRating(hw)
-  local def = self:getType(hw)
+function Hardware:getMaxRating(hardware)
+  local def = self:getType(hardware)
   return def.maxRating
 end
 
-function Hardware:getPrice(hw)
+function Hardware:getPrice(hardware)
   -- the original calculation uses bitwise left shift on the rating.
   -- since only lua 5.3+ has native bitwise operator support we use a
   -- lookup here to keep compatiblity with older luas.
   local lookup = {1,2,4,8,16}
-  local def = self:getType(hw)
-  return def.baseCost * lookup[hw.rating]
+  local def = self:getType(hardware)
+  return def.baseCost * lookup[hardware.rating]
 end
 
-function Hardware:getResellPrice(entity)
-  return self:getPrice(entity) / 2
+function Hardware:getResellPrice(hardware)
+  return self:getPrice(hardware) / 2
 end
 
-function Hardware:getText(entity)
-  local def = self:getType(entity)
+function Hardware:getText(hardware)
+  local def = self:getType(hardware)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
-    return entity.class
+    return hardware.class
   else
     -- append a suffix instead of the current rating (if available)
-    local suffix = def.levelSuffixes and def.levelSuffixes[entity.rating]
+    local suffix = def.levelSuffixes and def.levelSuffixes[hardware.rating]
     if suffix then
-      return string.format("%s %s", entity.class, suffix )
+      return string.format("%s %s", hardware.class, suffix )
     else
-      return string.format("%s L%d", entity.class, entity.rating )
+      return string.format("%s L%d", hardware.class, hardware.rating )
     end
   end
 end

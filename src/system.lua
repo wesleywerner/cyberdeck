@@ -33,11 +33,11 @@ end
 -- The definition defines the types of nodes to place on the map.
 -- If no definition is given, use the default one.
 -- The definition can be a table or function that returns a table.
-function System:generate(entity, nodeDefinition)
+function System:generate(system, nodeDefinition)
 
   local AreaModule = require("systemarea")
 
-  math.randomseed(entity.seed)
+  math.randomseed(system.seed)
 
   -- use a default node definition if none was given
   nodeDefinition = nodeDefinition or self.defaultNodesSpecificationFunc
@@ -45,16 +45,16 @@ function System:generate(entity, nodeDefinition)
   -- The higher the system level the more areas it has.
   -- The first areas are the inner areas, the last area would be
   -- the entry point into the matrix.
-  local areaCount = self:getAreaCount(entity)
+  local areaCount = self:getAreaCount(system)
 
   for areaNo=1, areaCount do
 
     if type(nodeDefinition) == "table" then
       local area = AreaModule:create(areaNo, nodeDefinition)
-      table.insert(entity.areas, area)
+      table.insert(system.areas, area)
     elseif type(nodeDefinition) == "function" then
-      local area = AreaModule:create(areaNo, nodeDefinition(entity, areaNo) )
-      table.insert(entity.areas, area)
+      local area = AreaModule:create(areaNo, nodeDefinition(system, areaNo) )
+      table.insert(system.areas, area)
     end
 
   end
@@ -62,9 +62,9 @@ function System:generate(entity, nodeDefinition)
 end
 
 -- Return the number of areas the system will have.
-function System:getAreaCount(entity)
-  return math.max(1, math.floor(math.log(entity.size) * 1.5))
-  -- by default the number of areas is logarithmic to entity size.
+function System:getAreaCount(system)
+  return math.max(1, math.floor(math.log(system.size) * 1.5))
+  -- by default the number of areas is logarithmic to system size.
   -- level 1 has 1 area
   -- level 4 has 2 areas
   -- level 8 has 3 areas
@@ -76,13 +76,13 @@ end
 
 -- Return a table defining the nodes that should appear in the system.
 -- areaNo 1 is the innermost area.
-function System.defaultNodesSpecificationFunc(entity, areaNo)
+function System.defaultNodesSpecificationFunc(system, areaNo)
 
   local nodes = {}
 
   -- The maximum nodes is a log function that increases rapidly at
   -- lower system sizes.
-  local maxnodes = math.floor(math.log(entity.size+1)*2)
+  local maxnodes = math.floor(math.log(system.size+1)*2)
 
   -- the CPU node is always in the inner-most area, otherwise it gets a SPU.
   if areaNo == 1 then
@@ -149,7 +149,7 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
   })
 
   -- Random high-speed IO node
-  if math.random(30) < entity.size then
+  if math.random(30) < system.size then
     table.insert(nodes, {
       ["type"] = "input output node",
       ["minimum"] = 1,
@@ -203,8 +203,8 @@ function System.defaultNodesSpecificationFunc(entity, areaNo)
 
 end
 
-function System:print(entity)
-  for i,area in ipairs(entity.areas) do
+function System:print(system)
+  for i,area in ipairs(system.areas) do
     for h=1, area.mapsize do
       for w=1, area.mapsize do
         local value = area.map[w][h]

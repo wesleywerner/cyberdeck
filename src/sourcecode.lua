@@ -135,21 +135,21 @@ end
 -- ceil((base time + applied skill - 1) / applied skill)
 --
 -- @tparam player:instance player The player instance.
--- @tparam sourcecode:instance entity The source code instance to query.
+-- @tparam sourcecode:instance sourcecode The source code instance to query.
 -- @treturn number The days to develop the code to completion
-function Sourcecode:calculateTimeToDevelop(player, entity)
+function Sourcecode:calculateTimeToDevelop(player, sourcecode)
 
   local PLModule = require("player")
 
   -- Owning design assistant hardware reduces the time
   local designAssistLevel = PLModule:findHardwareRatingByClass(player, "Design Assistant")
-  local appliedSkill = entity.relevantSkillLevel * (1 + designAssistLevel)
-  local baseTime = entity.complexity * math.pow(entity.rating, 2)
+  local appliedSkill = sourcecode.relevantSkillLevel * (1 + designAssistLevel)
+  local baseTime = sourcecode.complexity * math.pow(sourcecode.rating, 2)
 
   -- Receive a time bonus if the player owns source for this class already
-  local ownedSource = PLModule:findSourceByClass(player, entity.class)
+  local ownedSource = PLModule:findSourceByClass(player, sourcecode.class)
   if ownedSource then
-    local previousBaseTime = (entity.complexity * math.pow(ownedSource.rating, 2))
+    local previousBaseTime = (sourcecode.complexity * math.pow(ownedSource.rating, 2))
     baseTime = baseTime - previousBaseTime
     --print(string.format("owned %d, reduced by %d", ownedSource.rating, previousBaseTime))
   end
@@ -223,16 +223,16 @@ end
 -- On successful work, the instance's daysToComplete value is decreased by one day.
 -- When the project completes it is added to the player's sourcecode list.
 -- @tparam player:instance player The player instance.
--- @tparam sourcecode:instance entity The source code instance to work on.
-function Sourcecode:workOnCode(player, entity)
+-- @tparam sourcecode:instance sourcecode The source code instance to work on.
+function Sourcecode:workOnCode(player, sourcecode)
 
   local DiceModule = require("die")
   local PLModule = require("player")
-  entity.daysToComplete = entity.daysToComplete - 1
+  sourcecode.daysToComplete = sourcecode.daysToComplete - 1
 
   -- project complete, now we roll to see if we found any bugs
   -- in our sourcecode, which can delay the completion.
-  if entity.daysToComplete <= 0 then
+  if sourcecode.daysToComplete <= 0 then
 
     -- owning design assistant hardware improves our success rate
     local designAssistLevel = PLModule:findHardwareRatingByClass(player, "Design Assistant")
@@ -242,14 +242,14 @@ function Sourcecode:workOnCode(player, entity)
     -- 10 gives about 50% chance of success.
     -- Increase the target by the source rating (reduces success).
     -- Subtract the programming/chip design skill and assistant (increases success).
-    local rolltarget = (10 + entity.rating) - (entity.relevantSkillLevel + designAssistLevel)
+    local rolltarget = (10 + sourcecode.rating) - (sourcecode.relevantSkillLevel + designAssistLevel)
     local roll = DiceModule:roll(rolltarget)
 
     if roll.success then
-      PLModule:addSourcecode(player, entity)
+      PLModule:addSourcecode(player, sourcecode)
       -- TODO message that the project is complete and now in your sources list
     else
-      entity.daysToComplete = (self:calculateTimeToDevelop(player, entity) + 3) / 4
+      sourcecode.daysToComplete = (self:calculateTimeToDevelop(player, sourcecode) + 3) / 4
       --TODO message that "You have discovered a flaw in your code. Additional time will be required."
     end
 
