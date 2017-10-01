@@ -13,7 +13,12 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
--- Software is what you load into your deck when you enter the matrix.
+--- An interface to manage software for your deck.
+-- Software is loaded into your deck when you enter the matrix.
+-- It provides much needed features to complete missions.
+-- @author Wesley Werner
+-- @license GPL v3
+
 -- The most prominent properties are:
 -- * a class ("Attack", "Shield", "Slow", ...) that determines behaviour
 -- * a rating (1..n) that determines how effective it works,
@@ -21,16 +26,18 @@
 --   This is known as the Potential Rating. It can fluctuate while in the
 --   matrix, and is then known as the Active Rating.
 -- * a complexity, a value used internally to calculate those above.
---
--- The types table lists all the classes and predefined
--- names for each class.
-
---- An interface to manage software for your deck.
 local Software = {}
 
+--- Create a new software instance.
+-- @tparam string class The class of software to create.
+-- One of @{software.types}.
+-- @tparam number rating (1..n) that determines effectiveness,
+--   the market price, and memory usage to run in your deck.
+--   This is known as the Potential Rating. It can fluctuate while in the
+--   matrix, and is then known as the Active Rating.
+-- @tparam string name Descriptive title for the software.
+-- @treturn software.instance
 function Software:create(class, rating, name)
-
-  local instance = {}
 
   -- validate the given values
   local typeDefinition = self:getType(class)
@@ -41,6 +48,19 @@ function Software:create(class, rating, name)
   if not rating or rating < 1 then
     error (string.format("%q is not a valid rating for software.", rating or "nil" ))
   end
+
+  --- @table instance
+  -- @field class The software class name.
+  -- @field rating The software rating.
+  -- @field potentialRating The maximum allowed potential rating possible.
+  -- @field activeRating The fluctuating rating while in the matrix.
+  -- @field loadTurns Number of turns that remain before the software
+  -- is loaded in the deck. It won't be usable until this value reaches zero.
+  -- @field loaded true when loaded and ready to use.
+  -- Used internally by @{software:isLoading} and @{software:isLoaded}.
+  -- @see software:update
+  -- An instance of software.
+  local instance = {}
 
   -- assign the given values
   instance.class = class
