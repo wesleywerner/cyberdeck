@@ -17,13 +17,13 @@ local Hardware = {}
 
 function Hardware:create(class, rating)
 
+  local typeDefinition = self:getType(class)
+  if not typeDefinition then
+    error(string.format("No type definition found for %q", class))
+  end
+
   -- new instance
   local instance = {}
-
-  -- validate the given values
-  if not self.types[class] then
-    error (string.format("%q is not a valid hardware class.", class))
-  end
 
   if not rating or rating < 1 then
     error (string.format("%q is not a valid rating for hardware.", rating or "nil" ))
@@ -38,7 +38,8 @@ function Hardware:create(class, rating)
 end
 
 Hardware.types = {
-  ["Chip Burner"] = {
+  {
+    class = "Chip Burner",
     maxRating = 4,
     baseCost = 1000,
     levelSuffixes = {
@@ -49,19 +50,23 @@ Hardware.types = {
 
     }
   },
-  ["Surge Suppressor"] = {
+  {
+    class = "Surge Suppressor",
     maxRating = 5,
     baseCost = 500,
   },
-  ["Neural Damper"] = {
+  {
+    class = "Neural Damper",
     maxRating = 5,
     baseCost = 1000,
   },
-  ["Trace Monitor"] = {
+  {
+    class = "Trace Monitor",
     maxRating = 3,
     baseCost = 250,
   },
-  ["Bio Monitor"] = {
+  {
+    class = "Bio Monitor",
     maxRating = 2,
     baseCost = 500,
     levelSuffixes = {
@@ -69,28 +74,34 @@ Hardware.types = {
       [2] = "(Auto Dump)"
     }
   },
-  ["High Bandwidth Bus"] = {
+  {
+    class = "High Bandwidth Bus",
     maxRating = 5,
     baseCost = 500,
   },
-  ["Proximity Mapper"] = {
+  {
+    class = "Proximity Mapper",
     maxRating = 1,
     baseCost = 2000,
   },
-  ["Design Assistant"] = {
+  {
+    class = "Design Assistant",
     maxRating = 3,
     baseCost = 2000,
   },
-  ["AntiTrace Proxy"] = {
+  {
+    class = "AntiTrace Proxy",
     maxRating = 1,
     baseCost = 1500,
   },
 }
 
-function Hardware:getType(hardware)
-  local def = self.types[hardware.class]
-  if not def then
-    error( "No type definition found for %q", self.class)
+function Hardware:getType(class)
+  local def = nil
+  for i,v in ipairs(self.types) do
+    if v.class == class then
+      def = v
+    end
   end
   return def
 end
@@ -100,7 +111,7 @@ function Hardware:getRating(hardware)
 end
 
 function Hardware:getMaxRating(hardware)
-  local def = self:getType(hardware)
+  local def = self:getType(hardware.class)
   return def.maxRating
 end
 
@@ -109,7 +120,7 @@ function Hardware:getPrice(hardware)
   -- since only lua 5.3+ has native bitwise operator support we use a
   -- lookup here to keep compatiblity with older luas.
   local lookup = {1,2,4,8,16}
-  local def = self:getType(hardware)
+  local def = self:getType(hardware.class)
   return def.baseCost * lookup[hardware.rating]
 end
 
@@ -118,7 +129,7 @@ function Hardware:getResellPrice(hardware)
 end
 
 function Hardware:getText(hardware)
-  local def = self:getType(hardware)
+  local def = self:getType(hardware.class)
   if def.maxRating == 1 then
     -- only one level presents a simplified text
     return hardware.class

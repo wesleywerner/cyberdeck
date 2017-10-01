@@ -3,8 +3,8 @@ describe("Hardware", function()
   local hardware = require('hardware')
 
   it("get the type definition", function()
-    local hw = hardware:create("Chip Burner", 1)
-    assert.are.equals(hardware:getType(hw), hardware.types["Chip Burner"])
+    local expected = hardware:getType("Chip Burner")
+    assert.are.equals(expected.class, "Chip Burner")
   end)
 
   it("get the rating", function()
