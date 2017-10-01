@@ -71,13 +71,13 @@ Ice.MAX_HEALTH = 20
 
 function Ice:create(class, rating, flags)
 
+  local typeDefinition = self:getType(class)
+  if not typeDefinition then
+    error(string.format("No type definition found for %q", class))
+  end
+
   -- new instance
   local instance = {}
-
-  -- validate the given values
-  if not self.types[class] then
-    error (string.format("%q is not a valid ICE class.", class))
-  end
 
   if not rating or rating < 1 then
     error (string.format("%q is not a valid rating for ICE.", rating or "nil" ))
@@ -145,7 +145,8 @@ end
 -- There are a couple types of ICE, some of them have optional flags
 -- to change their behaviour. Some of these flags changes the ICE's name.
 Ice.types = {
-  ["Gateway"] = {
+  {
+    class = "Gateway",
     note = "Bars passageway to another node.",
     isCombat = false,
     names = {
@@ -171,7 +172,8 @@ Ice.types = {
       "Big Bouncer",
     },
   },
-  ["Probe"] = {
+  {
+    class = "Probe",
     note = "Searches for intruders in the system.",
     isCombat = false,
     names = {
@@ -197,7 +199,8 @@ Ice.types = {
       "Beholder",
     },
   },
-  ["Guardian"] = {
+  {
+    class = "Guardian",
     note = "Guards access to the node.",
     isCombat = false,
     names = {
@@ -223,7 +226,8 @@ Ice.types = {
       "AndroSphinx",
     },
   },
-  ["Tapeworm"] = {
+  {
+    class = "Tapeworm",
     note = "Guards a file. Will self-destruct on illegal access, taking the file with it.",
     isCombat = false,
     names = {
@@ -249,7 +253,8 @@ Ice.types = {
       "StrangleVine II",
     },
   },
-  ["Attack"] = {
+  {
+    class = "Attack",
     note = "Attacks intruders.",
     isCombat = true,
     names = {
@@ -275,7 +280,8 @@ Ice.types = {
       "Green Beret",
     },
   },
-  ["Trace"] = {
+  {
+    class = "Trace",
     note = "Attempts to trace an intruder's signal in the system.",
     isCombat = true,
     names = {
@@ -433,10 +439,12 @@ function Ice:applyFlags(ice, flags)
   end
 end
 
-function Ice:getType(ice)
-  local def = self.types[ice.class]
-  if not def then
-    error("No type definition found for %q", ice.class)
+function Ice:getType(class)
+  local def = nil
+  for i,v in ipairs(self.types) do
+    if v.class == class then
+      def = v
+    end
   end
   return def
 end
@@ -462,7 +470,7 @@ function Ice:getDefaultName(ice)
   elseif ice.dumper then
     nameList = self.alternateNames["dumper"]
   else
-    local def = self:getType(ice)
+    local def = self:getType(ice.class)
     nameList = def.names
   end
 
@@ -479,7 +487,7 @@ function Ice:getDefaultName(ice)
 end
 
 function Ice:getNotes(ice)
-  local def = self:getType(ice)
+  local def = self:getType(ice.class)
   if ice.analyzedLevel == 0 then
     -- give the ICE type note
     return def.note
@@ -546,7 +554,7 @@ end
 -- non-combat ICE take a penalty.
 function Ice:getAttackRating(ice, versusHardwareOrOtherICE)
   local nRating = self:getRating(ice, versusHardwareOrOtherICE)
-  local def = self:getType(ice)
+  local def = self:getType(ice.class)
   if not def.isCombat then
     return nRating - 2
   else
@@ -559,7 +567,7 @@ end
 -- non-combat ICE get a bonus if alarm set.
 function Ice:getSensorRating(ice, versusHardwareOrOtherICE)
   local nRating = self:getRating(ice, versusHardwareOrOtherICE)
-  local def = self:getType(ice)
+  local def = self:getType(ice.class)
   -- TODO check if current system alert is not green
   if not def.isCombat then
     return nRating + 2

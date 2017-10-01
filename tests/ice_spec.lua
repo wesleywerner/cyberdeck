@@ -3,8 +3,8 @@ describe("Intrusion Countermeasure Elements", function()
   local ice = require('ice')
 
   it("get the type definition", function()
-    local probe = ice:create("Probe", 2)
-    assert.are.equals(ice:getType(probe), ice.types["Probe"])
+    local expected = ice:getType("Probe")
+    assert.are.equals(expected.class, "Probe")
   end)
 
   it("get the rating", function()
