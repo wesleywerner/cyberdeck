@@ -18,24 +18,28 @@
 -- It provides much needed features to complete missions.
 -- @author Wesley Werner
 -- @license GPL v3
-
--- The most prominent properties are:
--- * a class ("Attack", "Shield", "Slow", ...) that determines behaviour
--- * a rating (1..n) that determines how effective it works,
---   the market price, and memory required to run in your deck.
---   This is known as the Potential Rating. It can fluctuate while in the
---   matrix, and is then known as the Active Rating.
--- * a complexity, a value used internally to calculate those above.
 local Software = {}
 
 --- Create a new software instance.
--- @tparam string class The class of software to create.
--- One of @{software.types}.
--- @tparam number rating (1..n) that determines effectiveness,
---   the market price, and memory usage to run in your deck.
---   This is known as the Potential Rating. It can fluctuate while in the
---   matrix, and is then known as the Active Rating.
--- @tparam string name Descriptive title for the software.
+--
+-- @tparam string class
+--   The class determines the behaviour and function.
+--   One of @{software.types}.
+--
+-- @tparam number rating
+--   Effectiveness of the software, also determines
+--   the market price, and memory usage when running in the deck.
+--   The value given here is saved as the potentialRating
+--   and is used to restore the software rating to full when it is
+--   loaded into the deck.
+--   In contrast the activeRating is the value to watch,
+--   it reflects the current rating which can fluctuate during play,
+--   notably from being used.
+--
+-- @tparam[opt] string name
+--   A descriptive title for the software. A default name is selected
+--   if not given, or given as nil.
+--
 -- @treturn software.instance
 function Software:create(class, rating, name)
 
@@ -50,41 +54,46 @@ function Software:create(class, rating, name)
   end
 
   --- @table instance
-  -- @field class The software class name.
-  -- @field rating The software rating.
-  -- @field potentialRating The maximum allowed potential rating possible.
-  -- @field activeRating The fluctuating rating while in the matrix.
-  -- @field loadTurns Number of turns that remain before the software
-  -- is loaded in the deck. It won't be usable until this value reaches zero.
-  -- @field loaded true when loaded and ready to use.
-  -- Used internally by @{software:isLoading} and @{software:isLoaded}.
+  --
+  -- @tfield string class
+  --   The software class name.
+  --
+  -- @tfield number rating
+  --   The software rating.
+  --
+  -- @tfield number potentialRating
+  --   The maximum allowed potential rating possible.
+  --   This value is set from the rating given to @{software:create}.
+  --
+  -- @tfield number activeRating
+  --   The effective rating while in the matrix.
+  --   It will equal potential rating when (re)loaded into the deck.
+  --   It can fluctuate while in the matrix.
+  --   The "Medic" software for example
+  --   decreases rating on each use, until it hits zero and crashes.
+  --
+  -- @tfield number loadTurns
+  --   Turns remaining until the software is loaded in the deck.
+  --
+  -- @tfield bool loaded
+  --   The application is loaded in the deck and ready to use.
+  --   Used internally by @{software:isLoading} and @{software:isLoaded}.
+  --
+  -- @tfield bool background
+  --   The program does not require execution by the player, it runs
+  --   in the background and is used automatically in certain events.
+  --   The shield and hide programs for example.
+  --
   -- @see software:update
-  -- An instance of software.
-  local instance = {}
 
-  -- assign the given values
+  local instance = {}
   instance.class = class
   instance.potentialRating = math.floor(rating)
   instance.name = name or self:getDefaultName(instance)
-
-  -- The effective rating while in the matrix.
-  -- It will equal "rating" when loaded into your deck.
-  -- It can also be lowered while in the matrix - medic for example
-  -- decreases on each use, until it hits zero and crashes.
   instance.activeRating = 0
-
-  -- Number of turns that remain for the software to be fully loaded.
-  -- It won't be usable until this value reaches zero.
   instance.loadTurns = 0
-
-  -- The program is ready for use.
   instance.loaded = false
-
-  -- The program does not require execution by the player, it runs
-  -- in the background and is used automatically in certain events.
-  -- The shield and hide programs for example.
   instance.background = false
-
   return instance
 
 end
@@ -94,12 +103,25 @@ end
 -- Virus, Silence, Confuse, Weaken, Shield, Smoke, Decoy, Medic, Armor, Hide,
 -- Deceive, Relocate, Analyze, Scan, Evaluate, Decrypt, Reflect, Attack Boost,
 -- Defense Boost, Stealth Boost, Analysis Boost, Client Software.
+--
 -- @table Software.types
--- @field class Software class name.
--- @field complexity Affects the software price and memory usage (among other things).
--- @field names List of predefined software names, indexed to correlate to the software rating.
--- @field includeOnNewGame The player starts with this software.
--- @field clientOnly Only available as a client supplied program, ie not for sale in the @{shop}.
+--
+-- @tfield string class
+--   Software class name.
+--
+-- @tfield number complexity
+--   Affects the software price and memory usage.
+--
+-- @tfield table names
+--   List of predefined software titles, indexed to correlate
+--   to the software rating.
+--
+-- @tfield bool includeOnNewGame
+--   The player starts with this software.
+--
+-- @tfield bool clientOnly
+--   Only available as a client supplied program
+--   i,e. not for sale in the @{shop}.
 Software.types = {
   {
     class = "Attack",
@@ -773,7 +795,12 @@ Software.types = {
 
 }
 
---[[ Gets the definition for the class underlying this software ]]
+--- Get the type definition.
+--
+-- @tparam string class
+--   The class name to look up.
+--
+-- @treturn software.types or nil if no match is found.
 function Software:getType(class)
   local def = nil
   for i,v in ipairs(self.types) do
@@ -784,17 +811,46 @@ function Software:getType(class)
   return def
 end
 
--- Get the potential rating.
+--- Get the potential rating.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn number The potential rating.
 function Software:getPotentialRating(software)
   return software.potentialRating
 end
 
--- Get the active (current) rating.
+--- Get the active rating.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn number The active rating.
 function Software:getActiveRating(software)
   return software.activeRating
 end
 
--- load time is dependent on your hardware bus and node speed.
+--- Get the time required for software to load into the deck.
+--  This is dependent on the owned hardware bus rating (if any)
+--  and whether the player is inside a high-speed node in the matrix.
+--
+-- @tparam software.instance software
+--   The software instance to query. The memory points of the software
+--   is a factor in load time.
+--
+--@tparam bool inActivatedHighSpeedNode
+--   Flag indicating the player is inside a high-speed node inside
+--   the matrix. If true the load time is reduced to 1 turn.
+--
+-- @tparam bool playerBandwidthRate
+--   The rating of the "High Bandwidth Bus" hardware owned by the player.
+--   Speed is calculated as 2 to the power of the bus rating, it indicates
+--   the factor at which software can load. No bus hardware (0 rating)
+--   thus yields a speed of 1, not a very expedient rating.
+--   Ideally this is found via a call to @{player:findHardwareRatingByClass}.
+--
+-- @treturn number The load time as the number of turns.
 function Software:getLoadTime(software, inActivatedHighSpeedNode, playerBandwidthRate)
 
   -- If have a high-speed connection, time is 1 turn.
@@ -812,55 +868,133 @@ function Software:getLoadTime(software, inActivatedHighSpeedNode, playerBandwidt
 
 end
 
+--- Get the memory points required to load software into the deck.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn number
+--
+-- @see software:beginLoad
 function Software:getMemoryUsage(software)
   local def = self:getType(software.class)
   return def.complexity * software.potentialRating
 end
 
+--- Get the default name for software class and rating.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn string
 function Software:getDefaultName(software)
   local def = self:getType(software.class)
   return def.names[software.potentialRating]
 end
 
+--- Get the recommended market price for software by class and rating.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn number
 function Software:getPrice(software)
   local def = self:getType(software.class)
   return def.complexity * software.potentialRating^2 * 25;
 end
 
+--- Get a formatted title for software.
+--  Contains the name, class and potential rating.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn string
 function Software:getText(software)
   return string.format("%s (%s %d)", software.name, software.class, software.potentialRating)
 end
 
--- Can load if not loaded already and no load turns are set.
+--- Get if can be loaded into the deck.
+--  That is: if not already loading or loaded.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn bool
 function Software:canLoad(software)
-  return not software.loaded and software.loadTurns == 0
+  return not self:isLoaded(software) and not self:isLoading(software)
 end
 
--- Is loaded and ready for use
+--- Get if software is loaded into the deck.
+--  This means it is ready for use in the matrix.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn bool
 function Software:isLoaded(software)
   return software.loaded
 end
 
--- Is loading when there are load turns left
+--- Get if software is busy loading into the deck.
+--  True while there are load turns left.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn bool
 function Software:isLoading(software)
   return software.loadTurns > 0
 end
 
--- Crashes when loaded and the active rating drops to zero or below
+--- The software has crashed.
+--  A crash occurs when the active rating drops to zero or below.
+--  Used internally by @{software:update} to unload crashed software.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+-- @treturn bool
 function Software:hasCrashed(software)
   return software.loaded and software.activeRating < 1
 end
 
+--- Load software into the deck.
+--  This is not instant. It begins the load process, which is advanced
+--  with each call to @{software:update}.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
+--@tparam bool inActivatedHighSpeedNode
+--   Flag indicating the player is inside a high-speed node inside
+--   the matrix. If true the load time is reduced to 1 turn.
+--
+-- @tparam bool playerBandwidthRate
+--   The rating of the "High Bandwidth Bus" hardware owned by the player.
+--
+-- @treturn bool
+--   true on success
+--
+-- @see software:getLoadTime
 function Software:beginLoad(software, inActivatedHighSpeedNode, playerBandwidthRate)
   -- TODO check if the deck won't overload
   -- TODO check how many other programs are loading, and if we have
   --      the memory to load this one asynchronously
+  -- TODO return values
+  -- TODO send messages when load fails
   if self:canLoad(software) then
     software.loadTurns = self:getLoadTime(software, inActivatedHighSpeedNode, playerBandwidthRate)
   end
 end
 
--- Update the software state at the end of the player's turn.
+--- Update the software state.
+--  Advance the loading of software, and unload crashed software.
+--  Ideally called at the end of the player's turn.
+--
+-- @tparam software.instance software
+--   The software instance to query.
+--
 function Software:update(software)
   if self:isLoading(software) then
     software.loadTurns = software.loadTurns - 1
@@ -876,14 +1010,6 @@ function Software:update(software)
       software.activeRating = 0
       -- TODO send message for program crashed
     end
-  end
-end
-
-function Software:updateAll(softwarelist)
-  -- TODO loop through all software and update
-  --- pseudocode:
-  for k,v in softwarelist do
-    self:update(v)
   end
 end
 
