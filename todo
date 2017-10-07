@@ -1,5 +1,8 @@
 # todo
 
+* Rename all "entity" parameters to be less ambiguous.
+* change ICE.types to an indexed table.
+* change hardware.types to an indexed table.
 * generating all ICE in the matrix should append codes to the ICE names - string.format("%x%d",10,9)
 
 # list of original source files
