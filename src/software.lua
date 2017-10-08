@@ -53,7 +53,8 @@ function Software:create(class, rating, name)
     error (string.format("%q is not a valid rating for software.", rating or "nil" ))
   end
 
-  --- @table instance
+  --- The instance definition received from calling @{create}.
+  -- @table instance
   --
   -- @tfield string class
   --   The software class name.
@@ -98,13 +99,14 @@ function Software:create(class, rating, name)
 
 end
 
---- List of the available software the player can load in their deck.
--- The list of software types are: Attack, Area Attack, Piercing Attack, Slow,
+--- A table of available software types.
+-- Each type is identified by a class name.
+-- The list of software classes are: Attack, Area Attack, Piercing Attack, Slow,
 -- Virus, Silence, Confuse, Weaken, Shield, Smoke, Decoy, Medic, Armor, Hide,
 -- Deceive, Relocate, Analyze, Scan, Evaluate, Decrypt, Reflect, Attack Boost,
 -- Defense Boost, Stealth Boost, Analysis Boost, Client Software.
 --
--- @table Software.types
+-- @table types
 --
 -- @tfield string class
 --   Software class name.
