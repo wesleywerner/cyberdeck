@@ -20,10 +20,15 @@ local Player = {}
 
 Player.MAXHEALTH = 20
 
---- A lookup list of all the lifestyles available.
+--- A table of available lifestyles.
+--
 -- @table lifestyles
+--
 -- @tfield number cost
+-- The monthly rent for the lifestyle level.
+--
 -- @tfield string text
+-- Descriptive title of the lifestyle.
 Player.lifestyles = {
   {
     ["cost"] = 500,
@@ -51,31 +56,56 @@ Player.lifestyles = {
 -- @treturn player:instance
 function Player:create()
 
-  --- @table instance
-  -- @tfield string name The player name.
-  -- @tfield number credits Money owned by the player.
-  -- @tfield player:lifestyle lifestyle Living data.
-  -- @tfield player:health health Health data.
-  -- @tfield player:reputation reputation
-  -- @tfield player:skills skills
-  -- @tfield player:corporations corporations
-  -- @tfield player:hardware hardware
-  -- @tfield player:software software
-  -- @tfield player:chips chips
-  -- @tfield player:load load
-  -- @tfield player:contract contract
-  -- @tfield player:sourcecode sourcecode
-  -- @tfield player:order order
+  --- The instance definition received from calling @{create}.
+  -- @table instance
+  --
+  -- @tfield string name
+  -- The player name.
+  --
+  -- @tfield number credits
+  -- Monetary credits for buying items from the @{shop}.
+  --
+  -- @tfield instance.lifestyle lifestyle
+  -- Living conditions of the player.
+  --
+  -- @tfield instance.health health
+  -- Health status of the player.
+  --
+  -- @tfield instance.reputation reputation
+  --
+  -- @tfield instance.skills skills
+  --
+  -- @tfield instance.corporations corporations
+  --
+  -- @tfield instance.hardware hardware
+  --
+  -- @tfield instance.software software
+  --
+  -- @tfield instance.chips chips
+  --
+  -- @tfield instance.load load
+  --
+  -- @tfield instance.contract contract
+  --
+  -- @tfield instance.sourcecode sourcecode
+  --
+  -- @tfield instance.order order
 
   local instance = {}
   instance.name = "Hacker X"
   instance.credits = 0
 
-  --- The player's current lifestyle information.
+  --- The player's current lifestyle.
   -- One of @{player.lifestyles}
-  -- @table lifestyle
-  -- @tfield number level Current lifestyle level.
-  -- @tfield string text Current lifestyle title.
+  --
+  -- @table instance.lifestyle
+  --
+  -- @tfield number level
+  -- Current lifestyle corresponding to an entry in the @{lifestyles}
+  -- table by index.
+  --
+  -- @tfield string text
+  -- The current lifestyle descriptive title.
   instance.lifestyle = {
     ["level"] = 1,
     ["text"] = ""
@@ -84,7 +114,8 @@ function Player:create()
   --- Player mental, physical and deck health information.
   -- Mental and deck health resets to max when entering the matrix.
   -- Physical health only gets restored through rest or hospital visits.
-  -- @table health
+  -- @table instance.health
+  --
   -- @tfield number physical Death occurs when this drops to zero.
   -- @tfield number mental Player falls unconscious when this drops
   -- below zero, and negative values carry over to physical health.
@@ -99,7 +130,7 @@ function Player:create()
   }
 
   --- Player reputation information.
-  -- @table reputation
+  -- @table instance.reputation
   -- @tfield number level Reputation level.
   -- @tfield number points Accumulated reputation points that
   -- determines the current level of reputation. Adjusted via
@@ -114,7 +145,7 @@ function Player:create()
   --- Table of player skills.
   -- The player earns points completing missions, and spend points
   -- to improve skills.
-  -- @table skills
+  -- @table instance.skills
   -- @tfield number points Amount of skill points available to spend.
   -- @tfield number attack Affects attack rating.
   -- @tfield number defense Affects defense rating.
@@ -135,37 +166,37 @@ function Player:create()
   instance.lifestyle.text = self:getLifestyleText(instance)
 
   --- List of corporations visited, stores alert status and backdoors installed.
-  -- @table corporations
+  -- @table instance.corporations
   instance.corporations = {}
 
   --- List of hardware owned.
-  -- @table hardware
+  -- @table instance.hardware
   instance.hardware = {}
 
   --- List of software owned.
-  -- @table software
+  -- @table instance.software
   instance.software = {}
 
   --- List of chips installed in the deck.
-  -- @table chips
+  -- @table instance.chips
   instance.chips = {}
 
   --- Deck load information.
-  -- @table load
+  -- @table instance.load
   instance.load = {
     ["current"] = 0,
     ["status"] = ""
   }
 
   --- current contract information.
-  -- @table contract
+  -- @table instance.contract
   instance.contract = {}
 
   --- Source code information.
   -- Source code owned by the player is stored in their repository.
   -- The project tracks progress of a current development effort on new code.
   -- Cooking tracks progress of a chip being burned.
-  -- @table sourcecode
+  -- @table instance.sourcecode
   -- @tfield table repository List of owned source code.
   -- @tfield sourcecode project Tracks current development effort on code.
   -- @tfield sourcecode cooking Tracks the source of the chip being cooked.
@@ -176,7 +207,7 @@ function Player:create()
   }
 
   --- Shop item on special order.
-  -- @table order
+  -- @table instance.order
   instance.order = {}
 
   --- Game world date as the number of seconds since the epoch.
