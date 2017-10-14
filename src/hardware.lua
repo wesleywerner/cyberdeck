@@ -13,8 +13,22 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
+--- An interface to manage hardware for your deck.
+-- Hardware augments your deck.
+-- @author Wesley Werner
+-- @license GPL v3
 local Hardware = {}
 
+--- Create a new hardware instance.
+--
+-- @tparam string class
+-- The hardware class to create.
+-- One of @{hardware.types}.
+--
+-- @tparam number rating
+-- The rating of hardware to create.
+--
+-- @treturn hardware.instance
 function Hardware:create(class, rating)
 
   local typeDefinition = self:getType(class)
@@ -37,6 +51,18 @@ function Hardware:create(class, rating)
 
 end
 
+--- A table of available hardware types.
+--
+-- @table types
+--
+-- @tfield string class
+--
+-- @tfield number maxRating
+-- The maximum rating a piece of hardware can be upgraded to.
+--
+-- @tfield number baseCost
+--
+-- @tfield table levelSuffixes
 Hardware.types = {
   {
     class = "Chip Burner",
@@ -96,6 +122,12 @@ Hardware.types = {
   },
 }
 
+--- Get the type definition for a given hardware class.
+--
+-- @tparam string class
+-- The hardware class to query.
+--
+-- @treturn hardware.types
 function Hardware:getType(class)
   local def = nil
   for i,v in ipairs(self.types) do
@@ -106,15 +138,34 @@ function Hardware:getType(class)
   return def
 end
 
+--- Get the rating for a piece of hardware.
+--
+-- @tparam instance hardware
+-- The hardware instance to query.
+--
+-- @treturn number
 function Hardware:getRating(hardware)
   return hardware.rating
 end
 
+
+--- Get the maximum rating for a piece of hardware.
+--
+-- @tparam instance hardware
+-- The hardware instance to query.
+--
+-- @treturn number
 function Hardware:getMaxRating(hardware)
   local def = self:getType(hardware.class)
   return def.maxRating
 end
 
+--- Get the cost for a piece of hardware.
+--
+-- @tparam instance hardware
+-- The hardware instance to query.
+--
+-- @treturn number
 function Hardware:getPrice(hardware)
   -- the original calculation uses bitwise left shift on the rating.
   -- since only lua 5.3+ has native bitwise operator support we use a
@@ -124,10 +175,23 @@ function Hardware:getPrice(hardware)
   return def.baseCost * lookup[hardware.rating]
 end
 
+--- Get the second-hand resell cost for a piece of hardware.
+--
+-- @tparam instance hardware
+-- The hardware instance to query.
+--
+-- @treturn number
 function Hardware:getResellPrice(hardware)
   return self:getPrice(hardware) / 2
 end
 
+--- Get the title for a piece of hardware.
+-- Composed of the class, rating and (sometimes) a suffix.
+--
+-- @tparam instance hardware
+-- The hardware instance to query.
+--
+-- @treturn number
 function Hardware:getText(hardware)
   local def = self:getType(hardware.class)
   if def.maxRating == 1 then
