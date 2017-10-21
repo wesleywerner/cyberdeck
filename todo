@@ -2,6 +2,11 @@
 
 * generating all ICE in the matrix should append codes to the ICE names - string.format("%x%d",10,9)
 
+* skinnable
+* each game is a collection of short missions
+* missions are drawn from a pool
+* each player level has a pool of missions
+
 # list of original source files
 
 ## done
