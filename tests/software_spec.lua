@@ -93,12 +93,20 @@ describe("Software", function()
     assert.are.equals(1, loadtime)
   end)
 
-  it("get the load time for a high-bandwidth bus", function()
+  it("get the load time with a bandwidth bus", function()
     local sw = software:create("Virus", 2)  -- gives 6 memory points
     local bandwidthrate = 2
     local highspeednode = false
     local loadtime = software:getLoadTime(sw, highspeednode, bandwidthrate)
     assert.are.equals(2, loadtime)
+  end)
+
+  it("get the load time with no bandwidth bus", function()
+    local sw = software:create("Virus", 2)  -- gives 6 memory points
+    local bandwidthrate = 0 -- gives a speed factor of 1 (ie no factor)
+    local highspeednode = false
+    local loadtime = software:getLoadTime(sw, highspeednode, bandwidthrate)
+    assert.are.equals(6, loadtime)
   end)
 
   it("errors on creating an invalid software", function()

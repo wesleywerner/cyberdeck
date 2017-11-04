@@ -21,8 +21,13 @@
 local Chips = {}
 
 --- Create a new instance of a chip.
--- @tparam string class The class of the chip, one of @{chips.types}.
--- @tparam number rating The rating of the chip affects the price and affectiveness.
+--
+-- @tparam string class
+-- The class of the chip, one of @{chips.types}.
+--
+-- @tparam number rating
+-- The rating of the chip affects the price and affectiveness.
+--
 -- @treturn chips:instance
 function Chips:create(class, rating)
 
@@ -36,11 +41,14 @@ function Chips:create(class, rating)
     error (string.format("%q is not a valid rating for chips.", rating or "nil" ))
   end
 
+  --- The instance definition received from calling @{create}.
   --- @table instance
-  -- @field class The chip's class name.
-  -- @field rating The chip's rating.
-  -- An instance of a chip.
-
+  --
+  -- @tfield string class
+  -- The chip's class name.
+  --
+  -- @tfield number rating
+  -- The chip's rating.
   local instance = {}
   instance.class = class
   instance.rating = rating
@@ -48,12 +56,22 @@ function Chips:create(class, rating)
 
 end
 
---- A table of all chip types.
--- The list of chip types are: CPU, Attack Firmware, Defense Firmware, Stealth Firmware, Analysis Firmware, Coprocessor.
--- @table Chips.types
--- @field class Chip class name.
--- @field baseCost Cost used to derive market price.
--- @field complexity Affects price, memory usage and development time as a @{sourcecode} item.
+--- A table of available chip types.
+-- Each type is identified by a class name.
+-- The list of chip classes are:
+-- CPU, Attack Firmware, Defense Firmware,
+-- Stealth Firmware, Analysis Firmware, Coprocessor.
+--
+-- @table types
+--
+-- @tfield string class
+-- The class of the chip.
+--
+-- @tfield number baseCost
+-- A base cost used to derive market price.
+--
+-- @tfield number complexity
+-- Affects price, memory usage and development time as a @{sourcecode} item.
 Chips.types = {
   {
     class = "CPU",
@@ -87,9 +105,12 @@ Chips.types = {
   },
 }
 
---- Gets the type definition of a chip.
--- @tparam string class The class name to look up.
--- @treturn table The @{chips.types} entry, or nil if no match is found.
+--- Get the type definition.
+--
+-- @tparam string class
+--   The class name to look up.
+--
+-- @treturn chips.types or nil if no match is found.
 function Chips:getType(class)
   local def = nil
   for i,v in ipairs(self.types) do
@@ -100,39 +121,60 @@ function Chips:getType(class)
   return def
 end
 
---- Gets the name of a chip.
--- @tparam table chip The chip to query.
--- @treturn string The name of the chip.
+--- Get the name.
+--  Currently it returns the class name.
+--
+-- @tparam chips.instance chip
+-- The chip instance to query.
+--
+-- @treturn string
+-- The name of the chip.
 function Chips:getName(chip)
   return chip.class
 end
 
---- Gets the rating of a chip.
--- @tparam table chip The chip to query.
--- @treturn number The rating of the chip.
+--- Get the rating.
+--
+-- @tparam chips.instance chip
+-- The chip instance to query.
+--
+-- @treturn number
+-- The rating of the chip.
 function Chips:getRating(chip)
   return chip.rating
 end
 
---- Gets the price of a chip.
+--- Get the market price.
 -- The chip rating affects the price.
--- @tparam table chip The chip to query.
+--
+-- @tparam chips.instance chip
+-- The chip instance to query.
+--
+-- @treturn number
 function Chips:getPrice(chip)
   local def = self:getType(chip.class)
   return math.pow(chip.rating, 2) * def.baseCost
 end
 
---- Gets the display text of a chip.
+--- Get the display text.
 -- Formatted as the chip name and rating.
--- @tparam table chip The chip to query.
+--
+-- @tparam chips.instance chip
+-- The chip instance to query.
+--
+-- @treturn string
 function Chips:getText(chip)
   return string.format("%s L%d", self:getName(chip), chip.rating)
 end
 
---- Gets the complexity of a chip.
+--- Ges the complexity.
 -- For more on how this is used, see @{sourcecode:instance}
--- @tparam table chip The chip to query.
--- @treturn number The complexity of the chip.
+--
+-- @tparam chips.instance chip
+-- The chip instance to query.
+--
+-- @treturn number
+-- The complexity of the chip.
 function Chips:getComplexity(chip)
   local definition = self:getType(chip.class)
   return definition.complexity

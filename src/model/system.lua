@@ -13,6 +13,14 @@
    along with this program. If not, see http://www.gnu.org/licenses/.
 ]]--
 
+--- An interface to manage systems in the matrix.
+-- A system is made from one or more areas, each one contains multiple
+-- nodes.
+--
+-- A system is analogous to a dungeon, areas the levels, nodes the rooms.
+--
+-- @author Wesley Werner
+-- @license GPL v3
 local System = {}
 
 function System:create(size, seed)
@@ -63,20 +71,78 @@ end
 
 -- Return the number of areas the system will have.
 function System:getAreaCount(system)
-  return math.max(1, math.floor(math.log(system.size) * 1.5))
-  -- by default the number of areas is logarithmic to system size.
-  -- level 1 has 1 area
-  -- level 4 has 2 areas
-  -- level 8 has 3 areas
-  -- level 15 has 4 areas
+  local factor = 1.5
+  local curve = math.log(system.size)
+  return math.max(1, math.floor(curve * factor))
+  -- the number of areas is logarithmic to system size.
+  -- the factor adjusts the curve angle:
+  -- factor 1.5 jumps areas at levels 4, 8, 15
+  -- factor 2.0 jumps areas at levels 3, 5, 8
+  -- factor 3.0 jumps areas at levels 2, 3, 4, 6, 8
   -- for i=1,20 do
   -- print("level " .. i .. " has " .. math.floor(math.log(i)*1.5) .. " areas")
   -- end
 end
 
--- Return a table defining the nodes that should appear in the system.
--- areaNo 1 is the innermost area.
+--- Return the default node definition table.
+-- It defines the nodes that should appear in the system.
+-- This function is used internally to get the default node definition
+-- table, when none is supplied during system generation.
+--
+-- @tparam system.instance system
+--
+-- @tparam number areaNo
+-- The area number being generated.
+--
+-- @treturn definition
 function System.defaultNodesSpecificationFunc(system, areaNo)
+
+  --- Defines node placement during area generation.
+  --
+  -- This is a table that contains a list of sub-tables,
+  -- each is a definition that controls the nodes that are placed
+  -- when a system is generated.
+  --
+  -- @table definition
+  --
+  -- @tparam string name
+  -- A descriptive name of the node type, it has no bearing on what actions
+  -- the node provides.
+  --
+  -- @tparam number minimum
+  -- Ensure the node exists at least this number of times in each area.
+  --
+  -- @tparam number spare
+  -- The number of extra nodes to add for this type.
+  --
+  -- @tparam table controls
+  -- A list of strings that determines which in-game actions
+  -- can be performed when inside of the node.
+  -- See @{controls}
+
+
+
+  --- A list of the controls that govern what special actions can
+  -- be performed when inside a node.
+  --
+  -- @table controls
+  --
+  -- @param "external alarms"
+  -- The node has an switch to disable external alarms.
+  --
+  -- @param "security"
+  -- A chance of more ICE appearing in the security node.
+  -- A chance of higher rating ICE in this node too.
+  --
+  -- @param "ice"
+  --
+  -- @param "high speed"
+  --
+  -- @param "in"
+  -- A portal leading in to the next area of the system.
+  --
+  -- @param "out"
+  -- A portal leading out to the previous area of the system.
 
   local nodes = {}
 

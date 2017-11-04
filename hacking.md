@@ -18,7 +18,7 @@ _These are first impressions on phase two, and subject to change_
 
 ### phase three
 
-The third phase introduces new features to the game. It could even start concurrently with phase 2, if I feel like I am not coding enough already. See [new feature ideas](new feature ideas)
+The third phase introduces new features to the game. It could even start concurrently with phase 2, if I feel like I am not coding enough already. See [new feature ideas](new-feature-ideas).
 
 ### functional design
 
@@ -62,7 +62,8 @@ Install code linting and unit testing rocks:
 
 ```
 sudo luarocks install luacheck && \
-sudo luarocks install busted
+sudo luarocks install busted && \
+sudo luarocks install luacov
 ```
 
 # linting
@@ -100,9 +101,13 @@ less luacov.report.out
 
 # document generation
 
-LDoc is used to generate documentation for the source code, it is included as a git submodule. It requires the penlight rock.
+LDoc is used to generate documentation for the source code, it is included as a git submodule. It requires the penlight rock, which may already be installed as a dependency if you installed `busted` earlier.
 
 ```
+# pull the LDoc submodule
+git submodule init && git submodule update
+
+# install penlight dependency
 luarocks install penlight
 ```
 
