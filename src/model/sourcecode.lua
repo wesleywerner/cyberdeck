@@ -43,9 +43,9 @@ local Sourcecode = {}
 -- @treturn sourcecode:instance
 function Sourcecode:create(player, class, rating)
 
-  local PLModule = require("player")
-  local SWModule = require("software")
-  local CHModule = require("chips")
+  local PLModule = require("model.player")
+  local SWModule = require("model.software")
+  local CHModule = require("model.chips")
 
   -- source can refer to software or a chip design. find out which one it is.
   local isSoftware = false
@@ -139,7 +139,7 @@ end
 -- @treturn number The days to develop the code to completion
 function Sourcecode:calculateTimeToDevelop(player, sourcecode)
 
-  local PLModule = require("player")
+  local PLModule = require("model.player")
 
   -- Owning design assistant hardware reduces the time
   local designAssistLevel = PLModule:findHardwareRatingByClass(player, "Design Assistant")
@@ -164,9 +164,9 @@ end
 -- @treturn sourcecode:sourcelist
 function Sourcecode:getSourceList(player)
 
-  local PLModule = require("player")
-  local SWModule = require("software")
-  local CHModule = require("chips")
+  local PLModule = require("model.player")
+  local SWModule = require("model.software")
+  local CHModule = require("model.chips")
   local sourcelist = {}
 
   -- build the software list
@@ -226,8 +226,8 @@ end
 -- @tparam sourcecode:instance sourcecode The source code instance to work on.
 function Sourcecode:workOnCode(player, sourcecode)
 
-  local DiceModule = require("die")
-  local PLModule = require("player")
+  local DiceModule = require("model.die")
+  local PLModule = require("model.player")
   sourcecode.daysToComplete = sourcecode.daysToComplete - 1
 
   -- project complete, now we roll to see if we found any bugs
@@ -266,8 +266,8 @@ end
 -- @treturn bool Build success.
 function Sourcecode:build(player, sourcecode)
 
-  local PLModule = require("player")
-  local SWModule = require("software")
+  local PLModule = require("model.player")
+  local SWModule = require("model.software")
 
   if sourcecode.daysToComplete > 0 then
     -- TODO message that the source is undeveloped
@@ -314,8 +314,8 @@ end
 -- @treturn bool true on success
 function Sourcecode:cookChip(player)
 
-    local PLModule = require("player")
-    local CHModule = require("chips")
+    local PLModule = require("model.player")
+    local CHModule = require("model.chips")
 
     -- player must own a chip burner
     local burner = PLModule:findHardwareRatingByClass(player, "Chip Burner")

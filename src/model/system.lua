@@ -35,7 +35,7 @@ end
 -- The definition can be a table or function that returns a table.
 function System:generate(system, nodeDefinition)
 
-  local AreaModule = require("systemarea")
+  local AreaModule = require("model.systemarea")
 
   math.randomseed(system.seed)
 

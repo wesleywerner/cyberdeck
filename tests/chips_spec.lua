@@ -1,6 +1,6 @@
 describe("Chips", function()
 
-  local chips = require('chips')
+  local chips = require('model.chips')
 
   it("get the type definition", function()
     local cpu = chips:create("CPU", 1)

@@ -1,6 +1,6 @@
 describe("Intrusion Countermeasure Elements", function()
 
-  local ice = require('ice')
+  local ice = require('model.ice')
 
   it("get the type definition", function()
     local expected = ice:getType("Probe")

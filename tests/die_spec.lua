@@ -1,7 +1,7 @@
 --- Die cast unit tests.
 describe("Die", function()
 
-  local Die = require("die")
+  local Die = require("model.die")
 
   it("roll expected success", function()
     local roll = Die:roll(0)

@@ -1,6 +1,6 @@
 describe("Player", function()
 
-  local player = require("player")
+  local player = require("model.player")
   local playerdata = nil
 
   -- create a new player for each test
@@ -60,7 +60,7 @@ describe("Player", function()
 
   describe("hardware", function()
 
-    local hardware = require("hardware")
+    local hardware = require("model.hardware")
 
     it("add new", function()
 
@@ -133,7 +133,7 @@ describe("Player", function()
 
   describe("software", function()
 
-    local software = require("software")
+    local software = require("model.software")
 
     it("add new", function()
 
@@ -188,7 +188,7 @@ describe("Player", function()
 
   describe("chips", function()
 
-    local chips = require("chips")
+    local chips = require("model.chips")
 
     it("add new", function()
 

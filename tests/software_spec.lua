@@ -1,6 +1,6 @@
 describe("Software", function()
 
-  local software = require('software')
+  local software = require('model.software')
 
   it("get the type definition", function()
     local sw = software:create("Attack", 1)

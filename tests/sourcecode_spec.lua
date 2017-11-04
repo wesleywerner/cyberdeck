@@ -1,7 +1,7 @@
 describe("sourcecode", function()
 
-  local Player = require("player")
-  local Sourcecode = require("sourcecode")
+  local Player = require("model.player")
+  local Sourcecode = require("model.sourcecode")
   local playerdata = nil
 
   -- create a new player for each test
@@ -98,7 +98,7 @@ describe("sourcecode", function()
   it("cook a chip", function()
 
     -- give the player a chip burner
-    local Hardware = require("hardware")
+    local Hardware = require("model.hardware")
     local burner = Hardware:create("Chip Burner", 1)
     Player:addHardware(playerdata, burner)
 

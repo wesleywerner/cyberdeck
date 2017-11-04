@@ -265,7 +265,7 @@ end
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
 function Player:addHardware(player, hardware)
-  local HWModule = require("hardware")
+  local HWModule = require("model.hardware")
 
   -- check for existing of the same class
   local existing = self:findHardwareByClass(player, hardware.class)
@@ -336,7 +336,7 @@ end
 -- @treturn bool true on success,
 -- false if the player owns the same or a higher rated version already.
 function Player:addSoftware(player, software)
-  local SWModule = require("software")
+  local SWModule = require("model.software")
 
   -- check for existing of the same class
   local existing = self:findSoftwareByClass(player, software.class)
@@ -389,7 +389,7 @@ end
 -- false if the player owns the same or a higher rated version already.
 function Player:addChip(player, chip)
   -- check for existing of the same class
-  local CHModule = require("chips")
+  local CHModule = require("model.chips")
   local existing = self:findChipByClass(player, chip.class)
   if existing then
     local currentRating = CHModule:getRating(existing)

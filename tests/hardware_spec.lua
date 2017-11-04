@@ -1,6 +1,6 @@
 describe("Hardware", function()
 
-  local hardware = require('hardware')
+  local hardware = require('model.hardware')
 
   it("get the type definition", function()
     local expected = hardware:getType("Chip Burner")

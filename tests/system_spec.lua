@@ -30,7 +30,7 @@ describe("system", function()
 
   describe("area", function()
 
-    local area = require("systemarea")
+    local area = require("model.systemarea")
 
     it("calculates the area node count", function()
 
@@ -61,7 +61,7 @@ describe("system", function()
 
   describe("main", function()
 
-    local system = require("src.system")
+    local system = require("model.system")
 
     it("generates from a function node definition", function()
 
