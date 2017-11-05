@@ -25,7 +25,7 @@
 
   guarding (STATE_GUARDING)
     Attack and trace ICE that are *not* bypassed will query the player autonomously.
-    Other ICE only query if they are accessed.
+    Other ICE only query if they were accessed by the player during the current turn.
 
   following (STATE_FOLLOWING)
     Follows the player to adjacent nodes, unless the current node is smoked.
@@ -62,7 +62,7 @@
     state is moving and ICE is attack, probe or trace &^
     state is searching with notice &^
     state is queried1/2/3 &
-    state is guarding and (ICE is attack or trace &^) or (ICE was accessed)
+    state is guarding and (ICE is attack or trace &^) or (ICE was accessed in the current turn)
 ]]
 
 
@@ -100,7 +100,12 @@ function Ice:create(class, rating, flags)
   instance.analyzedLevel = 0
   -- was this ICE bypassed by the player
   instance.bypassed = nil
-  -- was this ICE accessed by the player
+  -- the ICE was accessed by the player during the current turn.
+  -- notably when trying to move between nodes and a gateway ICE is
+  -- not fooled by the hide program, or attempty IO node access, file
+  -- get/edit/del, backdoor creation, killing alarms, cancelling system
+  -- shutdown, killing a trace, entering a portal, crashing the system,
+  -- getting the system map
   instance.accessed = nil
   -- home node of this ICE
   instance.homeNode = nil
@@ -594,6 +599,30 @@ function Ice:setState(ice, newstate)
     error(string.format("%q is not a valid ICE state"))
   end
   ice.state = newstate
+end
+
+function Ice:endTurn(node)
+
+  -- TODO pseudo code
+  for _, ice in pairs(node.ice) do
+
+    -- TODO ice actions at work
+
+    -- see CMatrixView::DoEndPlayerTurn (line 3787)
+
+    -- TODO update active trace progress
+    -- see CMatrixView::DoEndPlayerTurn (line 3753)
+
+    -- ICE do actions including attacking here
+
+    -- TODO Handle ICE reactivation
+
+
+    -- clear the accessed flag at the end of this turn
+    ice.accessed = false
+
+  end
+
 end
 
 return Ice

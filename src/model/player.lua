@@ -269,7 +269,8 @@ function Player:create()
   -- surely there is a better place to store this, with a shorter name.
   instance.highestRatedICEDeceived = nil
 
-
+  --- The player was traced
+  instance.traced = false
 
   return instance
 
@@ -851,6 +852,28 @@ end
 -- @treturn sourcecode
 function Player:getCookingChip(player)
   return player.sourcecode.cooking
+end
+
+function Player:endTurn(player)
+
+  local softwareModule = require("model.software")
+
+  -- update any actively loading programs
+  for _, software in pairs(player.software) do
+    softwareModule:update(software)
+  end
+
+  -- TODO decrease file transfer time
+  -- see CMatrixView::DoEndPlayerTurn
+
+  -- TODO update active scan progress
+
+  -- TODO update client program running progress
+
+  -- TODO update active node programs (silence, smoke etc)
+
+  -- TODO check for system shutdown
+
 end
 
 return Player
