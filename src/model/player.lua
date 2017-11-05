@@ -288,6 +288,9 @@ end
 function Player:prepareForMatrix(player)
   player.health.mental = self.MAXHEALTH
   player.health.deck = self.MAXHEALTH
+  player.traced = false
+  player.alertTriggered = false
+  player.onRun = true
 end
 
 --- Get the player's credit balance.
