@@ -171,7 +171,7 @@ function Area:convertMapPointsToNodes(area)
     for w=1, area.mapsize do
 
       -- get node definition id for this map position
-      local nodeDefinitionId = area.map[h][w]
+      local nodeDefinitionId = area.map[w][h]
 
       -- get the node definition
       local definition = area.definition[nodeDefinitionId]
@@ -193,10 +193,10 @@ function Area:convertMapPointsToNodes(area)
         -- generate ICE in this node
         node.ice = {}
 
-        area.map[h][w] = node
+        area.map[w][h] = node
 
       else
-        area.map[h][w] = nil
+        area.map[w][h] = nil
       end
     end
   end
@@ -206,6 +206,34 @@ end
 --- Generate exit links between nodes in this area.
 function Area:linkNodeExits(area)
 
+  for h=1, area.mapsize do
+    for w=1, area.mapsize do
+
+      local node = area.map[w][h]
+
+      if node then
+        node.exits = {}
+        node.exits["north"] = self:getNodeFromMap(area, w, h-1)
+        node.exits["south"] = self:getNodeFromMap(area, w, h+1)
+        node.exits["east"] = self:getNodeFromMap(area, w+1, h)
+        node.exits["west"] = self:getNodeFromMap(area, w-1, h)
+      end
+
+    end
+  end
+
+end
+
+--- Get the node at a given map position
+function Area:getNodeFromMap(area, x, y)
+
+  -- clamp values
+  x = math.max(1, x)
+  y = math.max(1, y)
+  x = math.min(area.mapsize, x)
+  y = math.min(area.mapsize, y)
+
+  return area.map[x][y]
 
 end
 

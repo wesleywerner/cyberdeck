@@ -305,7 +305,7 @@ function System:getEntryNode(system)
   for h=1, area.mapsize do
     for w=1, area.mapsize do
       -- get node definition id for this map position
-      local node = area.map[h][w]
+      local node = area.map[w][h]
       -- this is a portal out control node
       if node and node.controls["out"] then
         return node
