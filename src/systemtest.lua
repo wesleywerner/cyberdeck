@@ -1,4 +1,4 @@
-local system = require("system")
-local sysobj = system:create(4, os.time())
+local system = require("model.system")
+local sysobj = system:create(1, os.time())
 system:generate(sysobj)
 system:print(sysobj)

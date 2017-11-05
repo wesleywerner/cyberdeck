@@ -274,10 +274,14 @@ function System:print(system)
     for h=1, area.mapsize do
       for w=1, area.mapsize do
         local value = area.map[w][h]
-        if value == -1 then
-          io.write("+")
-        elseif value > 0 then
-          io.write(value)
+        if value then
+          if value == -1 then
+            io.write("+")
+          elseif value.id > 0 then
+            io.write(value.id)
+          else
+            io.write(" ")
+          end
         else
           io.write(" ")
         end
@@ -285,6 +289,30 @@ function System:print(system)
       io.write("\n")
     end
   end
+end
+
+--- Get the node that serves as the first point of entry into the system.
+--
+-- @tparam system.instance system
+--
+-- @treturn systemarea.node
+function System:getEntryNode(system)
+
+  -- in larger systems with multiple areas we enter from the outside
+  local area = system.areas[#system.areas]
+
+  -- find the portal out node
+  for h=1, area.mapsize do
+    for w=1, area.mapsize do
+      -- get node definition id for this map position
+      local node = area.map[h][w]
+      -- this is a portal out control node
+      if node and node.controls["out"] then
+        return node
+      end
+    end
+  end
+
 end
 
 return System

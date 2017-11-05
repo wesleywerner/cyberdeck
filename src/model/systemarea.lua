@@ -35,6 +35,8 @@ function Area:create(number, definition)
 
   self:generateLayout(instance)
   self:assignNodesToMap(instance)
+  self:convertMapPointsToNodes(instance)
+  self:linkNodeExits(instance)
 
   return instance
 
@@ -157,6 +159,54 @@ function Area:assignNodesToMap(area)
       end
     end
   end
+end
+
+--- Convert the map points into node objects.
+-- Initially an area map is generated as numbers that correlate
+-- to the node definition entries. This method converts each map point
+-- to a bonafide node object.
+function Area:convertMapPointsToNodes(area)
+
+  for h=1, area.mapsize do
+    for w=1, area.mapsize do
+
+      -- get node definition id for this map position
+      local nodeDefinitionId = area.map[h][w]
+
+      -- get the node definition
+      local definition = area.definition[nodeDefinitionId]
+
+      if definition then
+
+        local node = {}
+        node.id = nodeDefinitionId
+        node.type = definition.type
+
+        -- convert the control flags into an easy lookup
+        node.controls = {}
+        if definition.controls then
+          for _, control in pairs (definition.controls) do
+            node.controls[control] = true
+          end
+        end
+
+        -- generate ICE in this node
+        node.ice = {}
+
+        area.map[h][w] = node
+
+      else
+        area.map[h][w] = nil
+      end
+    end
+  end
+
+end
+
+--- Generate exit links between nodes in this area.
+function Area:linkNodeExits(area)
+
+
 end
 
 return Area
