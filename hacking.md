@@ -45,17 +45,16 @@ These logic modules are not factories, it is a horrible name and it won't be men
 
 You will need:
 
-* [LÖVE game framework](http://love2d.org/)
-* [Lua 5.x](http://www.lua.org/)
+* [LÖVE game framework](https://love2d.org/)
+* [Lua 5.x](https://www.lua.org/)
 * [Lua Rocks](https://luarocks.org/)
-
-Just be sure your package manager has love >= 0.10.2, if not you will have to build it from source.
+* [NodeJS](https://nodejs.org/en/)
+* [npm](https://www.npmjs.com/)
 
 These commands are for apt-based systems, please adapt to them as needed.
 
 ```
-# this should pull Lua5.1 in as a dependency
-sudo apt-get install love luarocks
+sudo apt-get install love luarocks npm
 ```
 
 Install code linting and unit testing rocks:
@@ -66,26 +65,28 @@ sudo luarocks install busted && \
 sudo luarocks install luacov
 ```
 
+# building
+
+Run the npm build script from the root directory. This creates the `build/` subdirectory:
+
+```
+npm run build
+```
+
 # linting
 
 Check the code syntax:
 
 ```
-luacheck --no-unused-args src/*.lua
-```
-
-Check the syntax of the tests by ignoring the busted global:
-
-```
-luacheck --no-unused-args --std max+busted tests/*.lua
+luacheck --no-unused-args --allow-defined build/main.lua
 ```
 
 # testing
 
-Unit testing is done with busted, the `.busted` config already defines everything, so simply run:
+Unit testing is done with busted. A node script takes care of making a build before it runs `busted`:
 
 ```
-busted
+npm test
 ```
 
 Check code coverage:

@@ -1,0 +1,15 @@
+{
+  "name": "cyberdeck",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "node scripts/build.js",
+    "test": "npm run build && busted"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "strip-comments": "^2.0.1"
+  }
+}

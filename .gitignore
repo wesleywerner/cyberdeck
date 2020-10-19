@@ -1,5 +1,13 @@
-# generated docs
+# old sources
+src/old/
+
+# generated docs and builds
 doc/
+build/
+
+# npm packages
+node_modules/
+package-lock.json
 
 # symlink to original source
 decker-source

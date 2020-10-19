@@ -1,5 +1,11 @@
 # todo
 
+## refactor for pico-8 development
+
+- move all tests/ to spec/
+- move all src/model to src/
+- add jobs tor travis config to support npm
+
 * generating all ICE in the matrix should append codes to the ICE names - string.format("%x%d",10,9)
 
 * skinnable
