@@ -14,8 +14,10 @@ install:
   - luarocks install busted
   - luarocks install luacov
   - luarocks install luacov-coveralls
+  - npm install
 
 script:
+  - npm run build
   - luacheck --no-unused-args --allow-defined build/main.lua
   - busted
 
@@ -27,6 +29,7 @@ branches:
     - master
     - stable
     - beta
+    - refactor-project
   except:
     - gh-pages
 
